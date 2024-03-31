@@ -63,16 +63,16 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="bg-black h-screen">
-        <div class="h-[10%]">
-            <RoomInfo :roomName="currentRoom" :users="users" :username="username"/>
-        </div>
-
         <div class="flex flex-row gap-0 h-[90%]">
             <video controls class="w-5/6 border-solid border-2 border-slate-500">
             </video>
             
             <Chat :chats class="w-1/6">
             </Chat>
+        </div>
+        
+        <div class="h-[10%]">
+            <RoomInfo :roomName="currentRoom" :users="users" :username="username"/>
         </div>
     </div>
 </template>

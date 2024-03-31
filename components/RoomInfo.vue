@@ -1,6 +1,6 @@
 <template>
-    <div class="h-full flex items-center p-4 border-solid border-2 border-slate-500">
-        <div class="flex flex-row gap-5">
+    <div class="h-full flex items-center pl-4 border-solid border-x-2 border-b-2 border-slate-500">
+        <div class="flex flex-row gap-5 h-full border-solid items-center">
             <div class="flex flex-row gap-2">
                 <h2 class="text-slate-600 font-bold">Room: </h2>
                 <span class="text-white"> {{ roomName }}</span>
