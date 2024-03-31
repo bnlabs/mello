@@ -13,7 +13,7 @@
 
             <div class="flex flex-row gap-2">
                 <h2 class="text-slate-600 font-bold">Users: </h2>
-                <ul class="text-white">
+                <ul class="text-white pl-[20px] list-disc">
                     <li v-for="user in users" :key="user.id">{{ user.username }}</li>
                 </ul>
             </div>
@@ -33,11 +33,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-ul {
-  list-style-type: disc; /* Standard bullet points */
-  padding-left: 20px; /* Ensure there's space for bullet points */
-}
-</style>
-

@@ -16,8 +16,7 @@ type User = {
   room: string;
 };
 
-const message = ref('');
-const chats = ref<Chat[]>([{ username: 'Alice', text: 'Hello, how are you?', time: '10:00 AM', room: 'VueRoom' }, { username: 'Bob', text: 'I\'m good, thanks!', time: '10:02 AM', room: 'VueRoom' }]);
+const chats = ref<Chat[]>([]);
 const users = ref<User[]>([]);
 const socket = ref<Socket>();
 const currentRoom = ref('');

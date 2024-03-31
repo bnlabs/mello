@@ -10,7 +10,7 @@ const options: Partial<ServerOptions> = {
 
 export const io = new Server(options);
 
-const botName = "NuxtChatapp Admin"
+const botName = "Notification"
 
 export function initSocket(event: H3Event) {
     // @ts-ignore
@@ -19,7 +19,6 @@ export function initSocket(event: H3Event) {
     io.on('connection', (socket: Socket) => {
         // Join Room
         socket.on('joinRoom', (payload: User) => {
-            console.log("user joined room")
             const user = userJoin({ ...payload, id: socket.id });
             socket.join(user.room);
 
@@ -34,12 +33,10 @@ export function initSocket(event: H3Event) {
 
         })
 
-
         // Handle Chat Message
         socket.on('chatMessage', (payload: string) => {
             const user = getCurrentUser(socket.id)
             if (user) {
-                console.log("payload: ", payload)
                 io.to(user.room).emit('message', formnatMessage(user.username, payload))
 
             }
@@ -48,7 +45,6 @@ export function initSocket(event: H3Event) {
 
         // Disconeect
         socket.on('disconnect', () => {
-
             const user = userLeave(socket.id);
             if (user) {
 
@@ -72,9 +68,7 @@ export function initSocket(event: H3Event) {
             }
         })
         
-
         return socket.id;
-
     })
 
 }

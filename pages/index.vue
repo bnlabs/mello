@@ -20,19 +20,19 @@
 
     export default {
         components: {
-        InputText
+            InputText
         },
         data() {
-        return {
-            username: '', // This will bind to the username input
-            room: '' // This will bind to the room input
-        };
+            return {
+                username: '', // This will bind to the username input
+                room: '' // This will bind to the room input
+            };
         },
         methods: {
-        joinRoom() {
-            // Navigate to /room with query parameters
-            this.$router.push({ path: '/room', query: { username: this.username, room: this.room } });
-        }
+            joinRoom() {
+                // Navigate to /room with query parameters
+                this.$router.push({ path: '/room', query: { username: this.username, room: this.room } });
+            }
         }
     }
 </script>
