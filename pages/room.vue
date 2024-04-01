@@ -49,7 +49,6 @@ const route = useRoute()
 const router = useRouter()
 
 const sendMessage = async (message: String) => {
-	console.log()
 	socket.value?.emit("chatMessage", message)
 }
 
@@ -65,13 +64,10 @@ onMounted(() => {
 		path: "/api/socket.io",
 	})
 
-	console.log("isHost: ", isHost)
 	// Join ChatRoom
 	if (isHost === "true") {
-		console.log("hosting room")
 		socket.value.emit("hostRoom", { username, room })
 	} else if (isHost === "false") {
-		console.log("joining room")
 		socket.value.emit("joinRoom", { username, room })
 	}
 
@@ -82,7 +78,6 @@ onMounted(() => {
 	socket.value.on(
 		"roomUsers",
 		(response: { room: string; users: User[]; host: string }) => {
-			console.log("new user joined ", response.host)
 			currentRoom.value = response.room
 			users.value = response.users
 			if (response.host) {
@@ -98,7 +93,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-	console.log("Disconnect Block")
 	socket.value?.disconnect()
 })
 </script>
