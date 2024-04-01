@@ -1,19 +1,41 @@
 <template>
     <div class="flex h-screen items-center justify-center bg-green-600">
       <div class="flex flex-col w-[650px] h-[500px] gap-4 items-center justify-center shadow-2xl rounded-2xl bg-black">
-        <div class="flex flex-col gap-2 text-white w-3/6">
-            <label for="username">Username</label>
-            <InputText class="w-full" id="username" v-model="username" @focus="setUsernameTouched" @input="setUsernameTouched" aria-describedby="username-help" />
-            <!-- Validation message for username -->
-            <p v-if="showUsernameValidation" class="text-red-500 text-sm">Username must be between 1 and 30 characters.</p>
+        <!-- Wrap the input fields and submit button in a <form> element -->
+        <form v-focustrap @submit.prevent="joinRoom" class="flex flex-col gap-2 text-white w-3/6 items-center">
+            <div class="w-full">
+                <label for="username">Username</label>
+                <InputText
+                    class="w-full"
+                    id="username"
+                    v-model="username"
+                    @focus="setUsernameTouched"
+                    aria-describedby="username-help"
+                />
+                <!-- Validation message for username -->
+                <p v-if="showUsernameValidation" class="text-red-500 text-sm">Username must be between 1 and 30 characters.</p>
+            </div>
           
-            <label for="room">Room</label>
-            <InputText class="w-full" id="room" v-model="room" @focus="setRoomTouched" @input="setRoomTouched" aria-describedby="room-help" />
-            <!-- Validation message for room -->
-            <p v-if="showRoomValidation" class="text-red-500 text-sm">Room name must be between 1 and 30 characters.</p>
-        </div>
-  
-        <input type="submit" value="Join Room" @click="joinRoom" class="bg-green-600 text-white rounded-md h-12 w-32">
+            <div class="w-full">
+                <label for="room">Room</label>
+                <InputText
+                  class="w-full"
+                  id="room"
+                  v-model="room"
+                  @focus="setRoomTouched"
+                  aria-describedby="room-help"
+                />
+                <!-- Validation message for room -->
+                <p v-if="showRoomValidation" class="text-red-500 text-sm">Room name must be between 1 and 30 characters.</p>
+            </div>
+            
+            <!-- Submit button -->
+            <input
+              type="submit"
+              value="Join Room"
+              class="bg-green-600 text-white rounded-md h-12 w-32 cursor-pointer"
+            />
+        </form>
       </div>
     </div>
 </template>
