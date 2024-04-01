@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="chat-container flex max-w-full flex-col overflow-y-auto border-2 border-solid border-slate-500 bg-black p-2.5"
+		class="chat-container flex max-w-full flex-col overflow-y-auto border-y-2 border-r-2 border-solid border-slate-500 bg-black p-2.5"
 	>
 		<ul class="flex-1 list-none overflow-y-auto p-0">
 			<li v-for="chat in chats" :key="chat.time" class="chat-message mb-3.5">
