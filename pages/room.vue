@@ -65,7 +65,7 @@ onBeforeUnmount(() => {
 		<div class="flex h-[90%] flex-row gap-0">
 			<video
 				controls
-				class="w-5/6 border-2 border-solid border-slate-500"
+				class="w-5/6 border-y-2 border-l-2 border-solid border-slate-500"
 			></video>
 
 			<Chat :chats class="w-1/6"> </Chat>
