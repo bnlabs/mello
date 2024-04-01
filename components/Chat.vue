@@ -2,7 +2,10 @@
 	<div
 		class="chat-container flex max-w-full flex-col overflow-y-auto border-y-2 border-r-2 border-solid border-slate-500 bg-black p-2.5"
 	>
-		<ul class="flex-1 list-none overflow-y-auto p-0">
+		<ul
+			ref="messagesContainer"
+			class="hide-scrollbar flex-1 list-none overflow-y-auto p-0"
+		>
 			<li v-for="chat in chats" :key="chat.time" class="chat-message mb-3.5">
 				<div class="message-header mb-1.5 flex justify-between">
 					<span class="username font-bold text-gray-400">
@@ -23,6 +26,8 @@
 </template>
 
 <script setup lang="ts">
+import { watch, nextTick } from "vue"
+
 interface Chat {
 	username: string
 	text: string
@@ -30,7 +35,29 @@ interface Chat {
 	room?: string
 }
 
+const messagesContainer = ref<HTMLElement | null>(null)
+const scrollToBottom = () => {
+	nextTick(() => {
+		if (messagesContainer.value) {
+			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+		}
+	})
+}
+
 const props = defineProps<{
 	chats: Chat[]
 }>()
+
+watch(() => props.chats, scrollToBottom, { deep: true })
 </script>
+
+<style>
+.hide-scrollbar::-webkit-scrollbar {
+	display: none; /* Hide scrollbar for Webkit browsers */
+}
+
+.hide-scrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+</style>
