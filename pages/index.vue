@@ -91,7 +91,7 @@ export default {
 			this.attemptedToJoin = true // Set the flag to true to indicate an attempt to submit
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				alert(
-					"Both username and room name must be between 1 and 30 characters."
+					"Both username and room name must be between 1 and 30 characters.",
 				)
 				return
 			}
