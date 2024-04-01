@@ -10,7 +10,12 @@
 		</div>
 
 		<div class="h-[10%]">
-			<RoomInfo :roomName="currentRoom" :users="users" :username="username" />
+			<RoomInfo
+				:roomName="currentRoom"
+				:users="users"
+				:username="username"
+				:host="currentHost"
+			/>
 		</div>
 	</div>
 </template>
@@ -25,6 +30,7 @@ interface Chat {
 	text: string
 	time: string
 	room?: string
+	isHost: string
 }
 
 type User = {
@@ -37,6 +43,7 @@ const chats = ref<Chat[]>([])
 const users = ref<User[]>([])
 const socket = ref<Socket>()
 const currentRoom = ref("")
+const currentHost = ref("")
 
 const route = useRoute()
 const router = useRouter()
@@ -48,9 +55,9 @@ const sendMessage = async (message: String) => {
 
 provide("sendMessage", sendMessage)
 
-const { username, room } = route.query as Partial<Chat>
+const { username, room, isHost } = route.query as Partial<Chat>
 onMounted(() => {
-	if (!username || !room) {
+	if (!username || !room || !isHost) {
 		router.push("/")
 	}
 
@@ -58,16 +65,35 @@ onMounted(() => {
 		path: "/api/socket.io",
 	})
 
+	console.log("isHost: ", isHost)
 	// Join ChatRoom
-	socket.value.emit("joinRoom", { username, room })
+	if (isHost === "true") {
+		console.log("hosting room")
+		socket.value.emit("hostRoom", { username, room })
+	} else if (isHost === "false") {
+		console.log("joining room")
+		socket.value.emit("joinRoom", { username, room })
+	}
 
 	socket.value.on("message", (response: Chat) => {
 		chats.value.push(response)
 	})
 
-	socket.value.on("roomUsers", (response: { room: string; users: User[] }) => {
-		currentRoom.value = response.room
-		users.value = response.users
+	socket.value.on(
+		"roomUsers",
+		(response: { room: string; users: User[]; host: string }) => {
+			console.log("new user joined ", response.host)
+			currentRoom.value = response.room
+			users.value = response.users
+			if (response.host) {
+				currentHost.value = response.host
+			}
+		},
+	)
+
+	socket.value.on("hostingOrJoiningFailed", (response: { reason: String }) => {
+		alert(`Hosting/Joining room failed, error message: ${response.reason}`)
+		router.push("/")
 	})
 })
 

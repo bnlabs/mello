@@ -14,6 +14,11 @@
 			</div>
 
 			<div class="flex flex-row gap-2">
+				<h2 class="font-bold text-slate-600">Host:</h2>
+				<span class="text-white"> {{ host }}</span>
+			</div>
+
+			<div class="flex flex-row gap-2">
 				<h2 class="font-bold text-slate-600">Users:</h2>
 				<ul class="list-disc pl-[20px] text-white">
 					<li v-for="user in users" :key="user.id">{{ user.username }}</li>
@@ -29,6 +34,7 @@ export default {
 		roomName: String,
 		users: Array,
 		username: String,
+		host: String,
 	},
 }
 </script>

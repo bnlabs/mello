@@ -47,12 +47,18 @@
 					class="h-12 w-32 cursor-pointer rounded-md bg-green-600 text-white"
 				/>
 			</form>
+
+			<Divider />
+
+			<Button @click="hostRoom"> Host Room </Button>
 		</div>
 	</div>
 </template>
 
 <script>
 import InputText from "primevue/inputtext"
+import Button from "primevue/button"
+import Divider from "primevue/divider"
 
 export default {
 	components: {
@@ -98,7 +104,28 @@ export default {
 			}
 			this.$router.push({
 				path: "/room",
-				query: { username: this.username.trim(), room: this.room.trim() },
+				query: {
+					username: this.username.trim(),
+					room: this.room.trim(),
+					isHost: false,
+				},
+			})
+		},
+		hostRoom() {
+			this.attemptedToJoin = true
+			if (!this.isUsernameValid || !this.isRoomValid) {
+				alert(
+					"Both username and room name must be between 1 and 30 characters.",
+				)
+				return
+			}
+			this.$router.push({
+				path: "/room",
+				query: {
+					username: this.username.trim(),
+					room: this.room.trim(),
+					isHost: true,
+				},
 			})
 		},
 		setUsernameTouched() {
