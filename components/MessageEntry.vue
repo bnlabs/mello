@@ -42,4 +42,8 @@ const sendOnEnter = (event: KeyboardEvent) => {
 		send()
 	}
 }
+
+onMounted(() => {
+	if (textarea.value !== null) (textarea.value as HTMLTextAreaElement).focus()
+})
 </script>
