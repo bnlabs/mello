@@ -20,9 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, onMounted } from "vue"
+import { ref, inject } from "vue"
 
-const sendMessage = inject("sendMessage")
+type SendMessageFunction = (message: string) => void
+
+const sendMessage = inject<SendMessageFunction>("sendMessage")
 const message = ref("")
 const textarea = ref(null)
 
@@ -34,14 +36,10 @@ const send = () => {
 	}
 }
 
-const sendOnEnter = (event) => {
+const sendOnEnter = (event: KeyboardEvent) => {
 	if (event.key === "Enter" && !event.shiftKey) {
 		event.preventDefault() // Prevent adding a new line
 		send()
 	}
 }
-
-onMounted(() => {
-	textarea.value.focus()
-})
 </script>
