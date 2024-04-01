@@ -1,26 +1,19 @@
 <template>
 	<div class="messaging-text-area flex flex-col items-end">
-		<textarea
+		<Textarea
+			autofocus
 			v-model="message"
-			ref="textarea"
-			placeholder="Type your message here..."
-			rows="3"
-			class="text-area mb-[10px] box-border w-full rounded-[4px] border-[1px] border-solid border-[#ccc] bg-[#A3A1A1] p-[8px]"
+			rows="2"
+			cols="17"
 			@keydown.enter.prevent="send"
 			@keydown.exact="sendOnEnter"
-		>
-		</textarea>
-		<button
-			@click="send"
-			class="send-button rounded-[4px] border-0 border-none bg-[#007bff] px-3 py-1.5 text-[#FFFFFF] hover:bg-[#0056b3]"
-		>
-			Send
-		</button>
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject } from "vue"
+import Textarea from "primevue/textarea"
 
 type SendMessageFunction = (message: string) => void
 
@@ -43,7 +36,5 @@ const sendOnEnter = (event: KeyboardEvent) => {
 	}
 }
 
-onMounted(() => {
-	if (textarea.value !== null) (textarea.value as HTMLTextAreaElement).focus()
-})
+onMounted(() => {})
 </script>

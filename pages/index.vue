@@ -12,6 +12,7 @@
 				<div class="w-full">
 					<label for="username">Username</label>
 					<InputText
+						autofocus
 						class="w-full"
 						id="username"
 						v-model="username"
