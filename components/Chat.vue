@@ -1,14 +1,14 @@
 <template>
 	<div
-		class="chat-container max-w-full overflow-y-auto bg-black p-2.5 border-solid border-2 border-slate-500 flex flex-col"
+		class="chat-container flex max-w-full flex-col overflow-y-auto border-2 border-solid border-slate-500 bg-black p-2.5"
 	>
-		<ul class="list-none p-0 flex-1 overflow-y-auto">
+		<ul class="flex-1 list-none overflow-y-auto p-0">
 			<li v-for="chat in chats" :key="chat.time" class="chat-message mb-3.5">
-				<div class="message-header flex justify-between mb-1.5">
+				<div class="message-header mb-1.5 flex justify-between">
 					<span class="username font-bold text-gray-400">
 						{{ chat.username }}
 					</span>
-					<span class="time text-sm text-[0.8rem] text-[#777]">{{
+					<span class="time text-[0.8rem] text-sm text-[#777]">{{
 						chat.time
 					}}</span>
 				</div>

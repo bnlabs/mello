@@ -1,13 +1,13 @@
 <template>
 	<div class="flex h-screen items-center justify-center bg-green-600">
 		<div
-			class="flex flex-col w-[650px] h-[500px] gap-4 items-center justify-center shadow-2xl rounded-2xl bg-black"
+			class="flex h-[500px] w-[650px] flex-col items-center justify-center gap-4 rounded-2xl bg-black shadow-2xl"
 		>
 			<!-- Wrap the input fields and submit button in a <form> element -->
 			<form
 				v-focustrap
 				@submit.prevent="joinRoom"
-				class="flex flex-col gap-2 text-white w-3/6 items-center"
+				class="flex w-3/6 flex-col items-center gap-2 text-white"
 			>
 				<div class="w-full">
 					<label for="username">Username</label>
@@ -19,7 +19,7 @@
 						aria-describedby="username-help"
 					/>
 					<!-- Validation message for username -->
-					<p v-if="showUsernameValidation" class="text-red-500 text-sm">
+					<p v-if="showUsernameValidation" class="text-sm text-red-500">
 						Username must be between 1 and 30 characters.
 					</p>
 				</div>
@@ -34,7 +34,7 @@
 						aria-describedby="room-help"
 					/>
 					<!-- Validation message for room -->
-					<p v-if="showRoomValidation" class="text-red-500 text-sm">
+					<p v-if="showRoomValidation" class="text-sm text-red-500">
 						Room name must be between 1 and 30 characters.
 					</p>
 				</div>
@@ -43,7 +43,7 @@
 				<input
 					type="submit"
 					value="Join Room"
-					class="bg-green-600 text-white rounded-md h-12 w-32 cursor-pointer"
+					class="h-12 w-32 cursor-pointer rounded-md bg-green-600 text-white"
 				/>
 			</form>
 		</div>

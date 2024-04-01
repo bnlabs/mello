@@ -61,11 +61,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	<div class="bg-black h-screen">
-		<div class="flex flex-row gap-0 h-[90%]">
+	<div class="h-screen bg-black">
+		<div class="flex h-[90%] flex-row gap-0">
 			<video
 				controls
-				class="w-5/6 border-solid border-2 border-slate-500"
+				class="w-5/6 border-2 border-solid border-slate-500"
 			></video>
 
 			<Chat :chats class="w-1/6"> </Chat>

@@ -29,6 +29,9 @@
 	"prettier": {
 		"semi": false,
 		"singleQuote": false,
-		"useTabs": true
+		"useTabs": true,
+		"plugins": [
+			"prettier-plugin-tailwindcss"
+		]
 	}
 }

@@ -1,21 +1,21 @@
 <template>
 	<div
-		class="h-full flex items-center pl-4 border-solid border-x-2 border-b-2 border-slate-500"
+		class="flex h-full items-center border-x-2 border-b-2 border-solid border-slate-500 pl-4"
 	>
-		<div class="flex flex-row gap-5 h-full border-solid items-center">
+		<div class="flex h-full flex-row items-center gap-5 border-solid">
 			<div class="flex flex-row gap-2">
-				<h2 class="text-slate-600 font-bold">Room:</h2>
+				<h2 class="font-bold text-slate-600">Room:</h2>
 				<span class="text-white"> {{ roomName }}</span>
 			</div>
 
 			<div class="flex flex-row gap-2">
-				<h2 class="text-slate-600 font-bold">Username:</h2>
+				<h2 class="font-bold text-slate-600">Username:</h2>
 				<span class="text-white"> {{ username }}</span>
 			</div>
 
 			<div class="flex flex-row gap-2">
-				<h2 class="text-slate-600 font-bold">Users:</h2>
-				<ul class="text-white pl-[20px] list-disc">
+				<h2 class="font-bold text-slate-600">Users:</h2>
+				<ul class="list-disc pl-[20px] text-white">
 					<li v-for="user in users" :key="user.id">{{ user.username }}</li>
 				</ul>
 			</div>

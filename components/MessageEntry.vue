@@ -5,14 +5,14 @@
 			ref="textarea"
 			placeholder="Type your message here..."
 			rows="3"
-			class="text-area w-full mb-[10px] p-[8px] box-border rounded-[4px] border-[1px] border-solid border-[#ccc] bg-[#A3A1A1]"
+			class="text-area mb-[10px] box-border w-full rounded-[4px] border-[1px] border-solid border-[#ccc] bg-[#A3A1A1] p-[8px]"
 			@keydown.enter.prevent="send"
 			@keydown.exact="sendOnEnter"
 		>
 		</textarea>
 		<button
 			@click="send"
-			class="send-button border-0 rounded-[4px] bg-[#007bff] text-[#FFFFFF] border-none py-1.5 px-3 hover:bg-[#0056b3]"
+			class="send-button rounded-[4px] border-0 border-none bg-[#007bff] px-3 py-1.5 text-[#FFFFFF] hover:bg-[#0056b3]"
 		>
 			Send
 		</button>
