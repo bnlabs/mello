@@ -16,7 +16,7 @@
 			</li>
 		</ul>
 
-		<div class="mt-auto">
+		<div class="mt-auto w-full">
 			<MessageEntry />
 		</div>
 	</div>
@@ -30,7 +30,6 @@ interface Chat {
 	room?: string
 }
 
-// Using defineProps to define the component's props
 const props = defineProps<{
 	chats: Chat[]
 }>()

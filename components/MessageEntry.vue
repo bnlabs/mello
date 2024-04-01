@@ -1,6 +1,7 @@
 <template>
-	<div class="messaging-text-area flex flex-col items-end">
+	<div class="messaging-text-area flex w-full flex-col items-end">
 		<Textarea
+			class="w-full"
 			autofocus
 			v-model="message"
 			rows="2"
@@ -19,11 +20,9 @@ type SendMessageFunction = (message: string) => void
 
 const sendMessage = inject<SendMessageFunction>("sendMessage")
 const message = ref("")
-const textarea = ref(null)
 
 const send = () => {
 	if (sendMessage && message.value.trim()) {
-		// Trim message to avoid sending just whitespace
 		sendMessage(message.value)
 		message.value = ""
 	}
@@ -31,10 +30,8 @@ const send = () => {
 
 const sendOnEnter = (event: KeyboardEvent) => {
 	if (event.key === "Enter" && !event.shiftKey) {
-		event.preventDefault() // Prevent adding a new line
+		event.preventDefault()
 		send()
 	}
 }
-
-onMounted(() => {})
 </script>

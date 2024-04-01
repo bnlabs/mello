@@ -1,7 +1,24 @@
+<template>
+	<div class="h-screen bg-black">
+		<div class="flex h-[90%] flex-row gap-0">
+			<video
+				controls
+				class="w-5/6 border-2 border-solid border-slate-500"
+			></video>
+
+			<Chat :chats class="w-1/6"> </Chat>
+		</div>
+
+		<div class="h-[10%]">
+			<RoomInfo :roomName="currentRoom" :users="users" :username="username" />
+		</div>
+	</div>
+</template>
+
 <script setup lang="ts">
 import { io, type Socket } from "socket.io-client"
-import { ref, nextTick, onMounted, onBeforeUnmount, provide } from "vue"
-import { useRoute, useRouter } from "vue-router" // Import useRouter
+import { ref, onMounted, onBeforeUnmount, provide } from "vue"
+import { useRoute, useRouter } from "vue-router"
 
 interface Chat {
 	username: string
@@ -22,7 +39,7 @@ const socket = ref<Socket>()
 const currentRoom = ref("")
 
 const route = useRoute()
-const router = useRouter() // Use useRouter to get the router instance
+const router = useRouter()
 
 const sendMessage = async (message: String) => {
 	console.log()
@@ -34,7 +51,7 @@ provide("sendMessage", sendMessage)
 const { username, room } = route.query as Partial<Chat>
 onMounted(() => {
 	if (!username || !room) {
-		router.push("/") // Corrected to use router.push
+		router.push("/")
 	}
 
 	socket.value = io({
@@ -59,20 +76,3 @@ onBeforeUnmount(() => {
 	socket.value?.disconnect()
 })
 </script>
-
-<template>
-	<div class="h-screen bg-black">
-		<div class="flex h-[90%] flex-row gap-0">
-			<video
-				controls
-				class="w-5/6 border-2 border-solid border-slate-500"
-			></video>
-
-			<Chat :chats class="w-1/6"> </Chat>
-		</div>
-
-		<div class="h-[10%]">
-			<RoomInfo :roomName="currentRoom" :users="users" :username="username" />
-		</div>
-	</div>
-</template>

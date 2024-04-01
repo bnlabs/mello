@@ -43,7 +43,7 @@ export function initSocket(event: H3Event) {
 			}
 		})
 
-		// Disconeect
+		// Disconnect
 		socket.on("disconnect", () => {
 			const user = userLeave(socket.id)
 			if (user) {
