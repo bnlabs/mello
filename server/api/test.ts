@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
-    return  {
-        result: 200
-    }
-  })
-  
+	return {
+		result: 200,
+	}
+})
