@@ -1,5 +1,7 @@
 export default defineEventHandler(async (event) => {
+	initSocket(event)
+
 	return {
-		result: 200,
+		result: 300,
 	}
 })
