@@ -20,8 +20,10 @@ function isRoomOccupied(roomName: string): boolean {
 	return users.some((user) => user.room === roomName)
 }
 
-function isUsernameTaken(username: String, roomName: String) {
-	return users.some((user) => user.username === username)
+function isUsernameTaken(username: string, roomName: string) {
+	return users.some(
+		(user) => user.username === username && user.room == roomName,
+	)
 }
 
 export function initSocket(event: H3Event) {
@@ -40,7 +42,7 @@ export function initSocket(event: H3Event) {
 					.to(user.room)
 					.emit(
 						"message",
-						formnatMessage(botName, `${user.username} has joined the chat`),
+						formatMessage(botName, `${user.username} has joined the chat`),
 					)
 
 				io.to(user.room).emit("roomUsers", {
@@ -57,6 +59,12 @@ export function initSocket(event: H3Event) {
 
 		// host Room
 		socket.on("hostRoom", (payload: User) => {
+			if (!payload.room || !payload.username) {
+				socket.emit("hostingOrJoiningFailed", {
+					reason: "Missing parameter: Must have both username and room name",
+				})
+			}
+
 			const roomOccupied = isRoomOccupied(payload.room)
 			if (!roomOccupied) {
 				const user = userJoin({ ...payload, id: socket.id, isHost: true })
@@ -66,7 +74,7 @@ export function initSocket(event: H3Event) {
 					.to(user.room)
 					.emit(
 						"message",
-						formnatMessage(botName, `${user.username} has joined the chat`),
+						formatMessage(botName, `${user.username} has joined the chat`),
 					)
 
 				io.to(user.room).emit("roomUsers", {
@@ -85,7 +93,7 @@ export function initSocket(event: H3Event) {
 		socket.on("chatMessage", (payload: string) => {
 			const user = getCurrentUser(socket.id)
 			if (user) {
-				io.to(user.room).emit("message", formnatMessage(user.username, payload))
+				io.to(user.room).emit("message", formatMessage(user.username, payload))
 			}
 		})
 
@@ -95,7 +103,7 @@ export function initSocket(event: H3Event) {
 			if (user) {
 				io.to(user.room).emit(
 					"message",
-					formnatMessage(botName, `${user.username} has left the chat`),
+					formatMessage(botName, `${user.username} has left the chat`),
 				)
 
 				io.to(user.room).emit("roomUsers", {
@@ -110,7 +118,7 @@ export function initSocket(event: H3Event) {
 			if (user) {
 				io.to(user.room).emit(
 					"receiveWebRTCMessage",
-					formnatMessage(user.username, payload),
+					formatMessage(user.username, payload),
 				)
 			}
 		})
@@ -119,7 +127,7 @@ export function initSocket(event: H3Event) {
 	})
 }
 
-export function formnatMessage(username: string, text: string) {
+export function formatMessage(username: string, text: string) {
 	return {
 		username,
 		text,
