@@ -49,7 +49,7 @@ export function initSocket(event: H3Event) {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: findHostInRoom(user.room)?.username,
-					newUser: user
+					newUser: user,
 				})
 			} else {
 				socket.emit("hostingOrJoiningFailed", {
@@ -82,7 +82,7 @@ export function initSocket(event: H3Event) {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: user.username,
-					newUser: user
+					newUser: user,
 				})
 			} else {
 				socket.emit("hostingOrJoiningFailed", {
@@ -138,10 +138,14 @@ export function formatMessage(username: string, text: string) {
 	}
 }
 
-export function formatWebRTCResponse(username: string, payload:string, socketId:string) {
+export function formatWebRTCResponse(
+	username: string,
+	payload: string,
+	socketId: string,
+) {
 	return {
 		username,
 		payload,
-		socketId
+		socketId,
 	}
 }
