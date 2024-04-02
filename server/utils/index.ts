@@ -49,6 +49,7 @@ export function initSocket(event: H3Event) {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: findHostInRoom(user.room)?.username,
+					newUser: user
 				})
 			} else {
 				socket.emit("hostingOrJoiningFailed", {
@@ -70,17 +71,18 @@ export function initSocket(event: H3Event) {
 				const user = userJoin({ ...payload, id: socket.id, isHost: true })
 				socket.join(user.room)
 
-				socket.broadcast
-					.to(user.room)
-					.emit(
-						"message",
-						formatMessage(botName, `${user.username} has joined the chat`),
-					)
+				// socket.broadcast
+				// 	.to(user.room)
+				// 	.emit(
+				// 		"message",
+				// 		formatMessage(botName, `${user.username} has joined the chat`),
+				// 	)
 
 				io.to(user.room).emit("roomUsers", {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: user.username,
+					newUser: user
 				})
 			} else {
 				socket.emit("hostingOrJoiningFailed", {
@@ -113,12 +115,13 @@ export function initSocket(event: H3Event) {
 			}
 		})
 
-		socket.on("sendWebRTCMessage", (payload: string) => {
-			const user = getCurrentUser(socket.id)
-			if (user) {
-				io.to(user.room).emit(
+		socket.on("sendWebRTCMessage", (payload: string, uid: string) => {
+			const user = getCurrentUser(uid)
+			const sender = getCurrentUser(socket.id)
+			if (user && sender) {
+				io.to(user.id).emit(
 					"receiveWebRTCMessage",
-					formatMessage(user.username, payload),
+					formatWebRTCResponse(sender.username, payload, socket.id),
 				)
 			}
 		})
@@ -132,5 +135,13 @@ export function formatMessage(username: string, text: string) {
 		username,
 		text,
 		time: moment().format("h:mm a"),
+	}
+}
+
+export function formatWebRTCResponse(username: string, payload:string, socketId:string) {
+	return {
+		username,
+		payload,
+		socketId
 	}
 }
