@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { io, type Socket } from "socket.io-client"
 import { ref, onMounted, onBeforeUnmount, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { useSocketIo } from "@/composables/useSocketIo"
 
 interface Chat {
 	username: string
@@ -41,7 +41,7 @@ type User = {
 
 const chats = ref<Chat[]>([])
 const users = ref<User[]>([])
-const socket = ref<Socket>()
+const { socket } = useSocketIo()
 const currentRoom = ref("")
 const currentHost = ref("")
 
@@ -49,7 +49,7 @@ const route = useRoute()
 const router = useRouter()
 
 const sendMessage = async (message: String) => {
-	socket.value?.emit("chatMessage", message)
+	socket.emit("chatMessage", message)
 }
 
 provide("sendMessage", sendMessage)
@@ -60,22 +60,18 @@ onMounted(() => {
 		router.push("/")
 	}
 
-	socket.value = io({
-		path: "/api/socket.io",
-	})
-
 	// Join ChatRoom
 	if (isHost === "true") {
-		socket.value.emit("hostRoom", { username, room })
+		socket.emit("hostRoom", { username, room })
 	} else if (isHost === "false") {
-		socket.value.emit("joinRoom", { username, room })
+		socket.emit("joinRoom", { username, room })
 	}
 
-	socket.value.on("message", (response: Chat) => {
+	socket.on("message", (response: Chat) => {
 		chats.value.push(response)
 	})
 
-	socket.value.on(
+	socket.on(
 		"roomUsers",
 		(response: { room: string; users: User[]; host: string }) => {
 			currentRoom.value = response.room
@@ -86,13 +82,9 @@ onMounted(() => {
 		},
 	)
 
-	socket.value.on("hostingOrJoiningFailed", (response: { reason: String }) => {
+	socket.on("hostingOrJoiningFailed", (response: { reason: String }) => {
 		alert(`Hosting/Joining room failed, error message: ${response.reason}`)
 		router.push("/")
 	})
-})
-
-onBeforeUnmount(() => {
-	socket.value?.disconnect()
 })
 </script>
