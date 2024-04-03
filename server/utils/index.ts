@@ -71,13 +71,6 @@ export function initSocket(event: H3Event) {
 				const user = userJoin({ ...payload, id: socket.id, isHost: true })
 				socket.join(user.room)
 
-				// socket.broadcast
-				// 	.to(user.room)
-				// 	.emit(
-				// 		"message",
-				// 		formatMessage(botName, `${user.username} has joined the chat`),
-				// 	)
-
 				io.to(user.room).emit("roomUsers", {
 					room: user.room,
 					users: getRoomUsers(user.room),
