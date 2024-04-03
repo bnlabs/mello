@@ -140,22 +140,54 @@ export function useWebRtc() {
 		}
 	}
 
-	// const createOfferToLobby = async (room: string, videoPlayer : HTMLMediaElement) => {
-	//     await createPeerConnection(videoPlayer);
+	const createOfferToLobby = async (
+		userIds: string[],
+		videoPlayer: HTMLMediaElement,
+	) => {
+		userIds.forEach(async (uid) => {
+			await createPeerConnection(uid, videoPlayer)
+			if (peerConnection) {
+				const offer = await peerConnection.createOffer()
+				await peerConnection.setLocalDescription(offer)
+				const payload = JSON.stringify({ type: "offer", offer: offer })
+				socket.emit("sendWebRTCMessage", payload, uid)
+			}
+		})
+	}
 
-	//     if(peerConnection)
-	//     {
-	//         const offer = await peerConnection.createOffer();
-	//         await peerConnection.setLocalDescription(offer);
-	//         const text = JSON.stringify({'type': 'offer', 'offer': offer});
-	//         socket.emit("sendWebRTCMessage", text)
-	//     }
-	// }
+	const toggleStream = async (
+		userIds: string[],
+		videoPlayer: HTMLMediaElement,
+	) => {
+		// Check if localStream exists and if it has video tracks
+		const videoTrack = localStream && localStream.getVideoTracks()[0]
+
+		// If videoTrack exists and is still active, stop the stream.
+		if (videoTrack && videoTrack.readyState !== "ended") {
+			await endStream()
+		} else {
+			// If videoTrack is ended or doesn't exist, try to acquire the stream
+			try {
+				createOfferToLobby(userIds, videoPlayer)
+			} catch (err) {
+				console.error("Error acquiring stream: ", err)
+			}
+		}
+	}
+
+	const endStream = async () => {
+		const videoTrack = localStream && localStream.getVideoTracks()[0]
+		if (videoTrack && videoTrack.readyState !== "ended") {
+			localStream?.getTracks().forEach((track) => track.stop())
+			localStream = null
+		}
+	}
 
 	return {
 		getPeerConnection,
 		createOffer,
 		createAnswer,
 		addAnswer,
+		toggleStream,
 	}
 }

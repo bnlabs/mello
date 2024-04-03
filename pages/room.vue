@@ -2,11 +2,12 @@
 	<div class="h-screen bg-black">
 		<div class="flex h-[90%] flex-row gap-0">
 			<video
+				autoPlay
+				playsInline
 				ref="videoPlayer"
 				controls
 				class="w-5/6 border-2 border-solid border-slate-500"
 			></video>
-
 			<Chat :chats class="w-1/6"> </Chat>
 		</div>
 
@@ -22,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, provide } from "vue"
+import { ref, onMounted, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useSocketIo } from "@/composables/useSocketIo"
 import { useWebRtc } from "@/composables/useWebRtc"
@@ -45,7 +46,13 @@ type User = {
 const chats = ref<Chat[]>([])
 const users = ref<User[]>([])
 const { socket } = useSocketIo()
-const { getPeerConnection, createOffer, createAnswer, addAnswer } = useWebRtc()
+const {
+	getPeerConnection,
+	createOffer,
+	createAnswer,
+	addAnswer,
+	toggleStream,
+} = useWebRtc()
 const currentRoom = ref("")
 const currentHost = ref("")
 const videoPlayer = ref<HTMLMediaElement | null>(null)
@@ -57,7 +64,25 @@ const sendMessage = async (message: String) => {
 	socket.emit("chatMessage", message)
 }
 
+const leaveRoom = () => {
+	router.push("/")
+}
+
+const handleToggleStream = () => {
+	const userIds = computed(() =>
+		users.value
+			.filter((user) => user.username !== username)
+			.map((user) => user.id),
+	)
+
+	if (videoPlayer.value) {
+		toggleStream(userIds.value, videoPlayer.value)
+	}
+}
+
 provide("sendMessage", sendMessage)
+provide("handleToggleStream", handleToggleStream)
+provide("leaveRoom", leaveRoom)
 
 const { username, room, isHost } = route.query as Partial<Chat>
 onMounted(() => {
@@ -96,14 +121,6 @@ onMounted(() => {
 				isHost === "true" &&
 				response.newUser.username !== username
 			) {
-				// test
-				// const payload = JSON.stringify({
-				// 	type: "candidate",
-				// 	candidate: null
-				// })
-				// socket.emit("sendWebRTCMessage", payload, response.newUser.id)
-				// console.log(`new user id: ${response.newUser.id}`)
-
 				createOffer(videoPlayer.value, response.newUser.id)
 			}
 		},

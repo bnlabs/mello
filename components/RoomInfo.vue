@@ -24,17 +24,26 @@
 					<li v-for="user in users" :key="user.id">{{ user.username }}</li>
 				</ul>
 			</div>
+
+			<Button @click="toggleStream">Stream</Button>
+			<Button @click="leaveRoom" severity="secondary">Leave Room</Button>
 		</div>
 	</div>
 </template>
 
-<script>
-export default {
-	props: {
-		roomName: String,
-		users: Array,
-		username: String,
-		host: String,
-	},
-}
+<script setup lang="ts">
+import { ref, inject } from "vue"
+
+const props = defineProps<{
+	roomName: string
+	users: Array<User>
+	username: string
+	host: string
+}>()
+
+type ToggleStreamFunction = () => void
+type LeaveRoomFunction = () => void
+
+const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
+const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 </script>
