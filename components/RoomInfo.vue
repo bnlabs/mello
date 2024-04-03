@@ -25,7 +25,7 @@
 				</ul>
 			</div>
 
-			<Button @click="toggleStream">Stream</Button>
+			<Button v-if="isHost === 'true'" @click="toggleStream">Stream</Button>
 			<Button @click="leaveRoom" severity="secondary">Leave Room</Button>
 		</div>
 	</div>
@@ -39,6 +39,7 @@ const props = defineProps<{
 	users: Array<User>
 	username: string
 	host: string
+	isHost: string
 }>()
 
 type ToggleStreamFunction = () => void

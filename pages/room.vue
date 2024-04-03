@@ -17,6 +17,7 @@
 				:users="users"
 				:username="username"
 				:host="currentHost"
+        :isHost="isHost"
 			/>
 		</div>
 	</div>
