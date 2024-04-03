@@ -7,6 +7,7 @@
 				ref="videoPlayer"
 				controls
 				class="w-5/6 border-2 border-solid border-slate-500"
+				:muted="isHost === 'true'"
 			></video>
 			<Chat :chats class="w-1/6"> </Chat>
 		</div>
@@ -17,7 +18,7 @@
 				:users="users"
 				:username="username"
 				:host="currentHost"
-        :isHost="isHost"
+				:isHost="isHost"
 			/>
 		</div>
 	</div>
@@ -53,6 +54,7 @@ const {
 	createAnswer,
 	addAnswer,
 	toggleStream,
+	isStreaming,
 } = useWebRtc()
 const currentRoom = ref("")
 const currentHost = ref("")
@@ -116,11 +118,11 @@ onMounted(() => {
 				currentHost.value = response.host
 			}
 
-			console.log(response.users)
 			if (
 				videoPlayer.value &&
 				isHost === "true" &&
-				response.newUser.username !== username
+				response.newUser.username !== username &&
+				isStreaming()
 			) {
 				createOffer(videoPlayer.value, response.newUser.id)
 			}
@@ -143,10 +145,10 @@ onMounted(() => {
 				createAnswer(response.socketId, message.offer, videoPlayer.value)
 			}
 			if (message.type === "answer") {
-				addAnswer(message.answer)
+				addAnswer(message.answer, response.socketId)
 			}
 			if (message.type === "candidate") {
-				const pc = getPeerConnection()
+				const pc = getPeerConnection(response.socketId)
 				if (pc) {
 					pc.addIceCandidate(message.candidate)
 				}
