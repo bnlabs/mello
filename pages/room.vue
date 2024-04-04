@@ -16,9 +16,9 @@
 			<RoomInfo
 				:roomName="currentRoom"
 				:users="users"
-				:username="username"
+				:username="username ?? ''"
 				:host="currentHost"
-				:isHost="isHost"
+				:isHost="isHost ?? ''"
 			/>
 		</div>
 	</div>
