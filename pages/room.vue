@@ -6,7 +6,7 @@
 				playsInline
 				ref="videoPlayer"
 				controls
-				class="w-5/6 border-2 border-solid border-slate-500"
+				class="w-5/6"
 				:muted="isHost === 'true'"
 			></video>
 			<Chat :chats class="w-1/6"> </Chat>
