@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex h-full items-center border-x-2 border-b-2 border-solid border-slate-500 pl-4"
+		class="flex h-full justify-between items-center border-x-2 border-b-2 border-solid border-slate-500 pl-4"
 	>
 		<div class="flex h-full flex-row items-center gap-5 border-solid">
 			<div class="flex flex-row gap-2">
@@ -24,9 +24,11 @@
 					<li v-for="user in users" :key="user.id">{{ user.username }}</li>
 				</ul>
 			</div>
+		</div>
 
-			<Button v-if="isHost === 'true'" @click="toggleStream">Stream</Button>
-			<Button @click="leaveRoom" severity="secondary">Leave Room</Button>
+		<div class="flex flex-row gap-5 pr-3">
+			<Button v-if="isHost === 'true'" @click="toggleStream" outlined>Stream</Button>
+			<Button @click="leaveRoom" severity="danger" outlined>Leave Room</Button>
 		</div>
 	</div>
 </template>
