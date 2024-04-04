@@ -47,8 +47,10 @@ export function useWebRtc() {
 		videoPlayer: HTMLMediaElement,
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
-
-		localStream = await navigator.mediaDevices.getDisplayMedia(streamSetting)
+        if(!localStream)
+        {
+            localStream = await navigator.mediaDevices.getDisplayMedia(streamSetting)
+        }
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream
 		}
@@ -145,8 +147,8 @@ export function useWebRtc() {
 		userIds: string[],
 		videoPlayer: HTMLMediaElement,
 	) => {
+        await clearPeerConnection()
 		userIds.forEach(async (uid) => {
-			clearPeerConnection()
 			const pCon = await createPeerConnection(uid, videoPlayer)
 			if (pCon) {
 				const offer = await pCon.createOffer()
@@ -198,8 +200,8 @@ export function useWebRtc() {
 	const clearPeerConnection = async () => {
 		peerConnections.value.forEach((pc, socketId) => {
 			pc.close()
-			peerConnections.value.delete(socketId)
 		})
+        peerConnections.value.clear()
 	}
 
 	// Cleanup on component unmount
