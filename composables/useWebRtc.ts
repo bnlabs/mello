@@ -81,7 +81,10 @@ export function useWebRtc() {
 		videoPlayer: HTMLMediaElement,
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
-		localStream = new MediaStream()
+
+		if (!localStream) {
+			localStream = new MediaStream()
+		}
 
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream

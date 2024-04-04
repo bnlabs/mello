@@ -135,17 +135,24 @@ onMounted(() => {
 			console.log(
 				`message type is ${message.type} and is sent by ${response.username}`,
 			)
-			if (message.type === "offer" && videoPlayer.value) {
-				createAnswer(response.socketId, message.offer, videoPlayer.value)
-			}
-			if (message.type === "answer") {
-				addAnswer(message.answer, response.socketId)
-			}
-			if (message.type === "candidate") {
-				const pc = getPeerConnection(response.socketId)
-				if (pc) {
-					pc.addIceCandidate(message.candidate)
-				}
+			switch (message.type) {
+				case "offer":
+					if (videoPlayer.value) {
+						createAnswer(response.socketId, message.offer, videoPlayer.value)
+					}
+					break
+				case "answer":
+					addAnswer(message.answer, response.socketId)
+					break
+				case "candidate":
+					const pc = getPeerConnection(response.socketId)
+					if (pc) {
+						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+					}
+					break
+				// Optionally, you can add a default case if there are other types that might not be handled
+				// default:
+				//     console.log(`Unhandled message type: ${message.type}`);
 			}
 		},
 	)
