@@ -32,7 +32,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from "vue"
+import { inject } from "vue"
+import { type User } from "~/server/types"
 
 const props = defineProps<{
 	roomName: string

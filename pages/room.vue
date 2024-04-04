@@ -29,6 +29,7 @@ import { ref, onMounted, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useSocketIo } from "@/composables/useSocketIo"
 import { useWebRtc } from "@/composables/useWebRtc"
+import { type User } from "~/server/types"
 
 interface Chat {
 	username: string
@@ -36,13 +37,6 @@ interface Chat {
 	time: string
 	room?: string
 	isHost: string
-}
-
-type User = {
-	id: string
-	username: string
-	room: string
-	isHost: boolean
 }
 
 const chats = ref<Chat[]>([])
