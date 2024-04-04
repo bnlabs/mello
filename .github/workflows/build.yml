@@ -1,0 +1,28 @@
+name: CI/CD Pipeline for Nuxt.js
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+        types: [opened, synchronize, reopened]
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
