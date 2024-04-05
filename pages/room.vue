@@ -49,6 +49,7 @@ const {
 	addAnswer,
 	toggleStream,
 	isStreaming,
+	removePeerConnection,
 } = useWebRtc()
 const currentRoom = ref("")
 const currentHost = ref("")
@@ -105,6 +106,7 @@ onMounted(() => {
 			users: User[]
 			host: string
 			newUser: User
+			oldUser: User
 		}) => {
 			currentRoom.value = response.room
 			users.value = response.users
@@ -113,12 +115,18 @@ onMounted(() => {
 			}
 
 			if (
+				response.newUser &&
+				response.newUser.username !== username &&
 				videoPlayer.value &&
 				isHost === "true" &&
-				response.newUser.username !== username &&
 				isStreaming()
 			) {
 				createOffer(videoPlayer.value, response.newUser.id)
+			}
+
+			if (response.oldUser) {
+				//console.log("USER DISCONNECTED")
+				removePeerConnection(response.oldUser.id)
 			}
 		},
 	)
@@ -150,9 +158,6 @@ onMounted(() => {
 						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
 					}
 					break
-				// Optionally, you can add a default case if there are other types that might not be handled
-				// default:
-				//     console.log(`Unhandled message type: ${message.type}`);
 			}
 		},
 	)

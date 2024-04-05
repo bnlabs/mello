@@ -82,9 +82,7 @@ export function useWebRtc() {
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 
-		if (!localStream) {
-			localStream = new MediaStream()
-		}
+		localStream = new MediaStream()
 
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream
@@ -150,15 +148,23 @@ export function useWebRtc() {
 		videoPlayer: HTMLMediaElement,
 	) => {
 		await clearPeerConnection()
-		userIds.forEach(async (uid) => {
-			const pCon = await createPeerConnection(uid, videoPlayer)
+		for (const userId of userIds) {
+			const pCon = await createPeerConnection(userId, videoPlayer)
 			if (pCon) {
 				const offer = await pCon.createOffer()
 				await pCon.setLocalDescription(offer)
 				const payload = JSON.stringify({ type: "offer", offer: offer })
-				socket.emit("sendWebRTCMessage", payload, uid)
+				socket.emit("sendWebRTCMessage", payload, userId)
 			}
-		})
+		}
+	}
+
+	const removePeerConnection = async (uid: string) => {
+		//console.log("PEER CONNECTION COUNT: ",peerConnections.value.size)
+		//console.log("REMOVING PEER USER CONNECTION")
+		peerConnections.value.delete(uid)
+
+		//console.log("PEER CONNECTION COUNT: ",peerConnections.value.size)
 	}
 
 	const toggleStream = async (
@@ -218,5 +224,6 @@ export function useWebRtc() {
 		addAnswer,
 		toggleStream,
 		isStreaming,
+		removePeerConnection,
 	}
 }

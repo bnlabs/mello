@@ -104,6 +104,7 @@ export function initSocket(event: H3Event) {
 				io.to(user.room).emit("roomUsers", {
 					room: user.room,
 					users: getRoomUsers(user.room),
+					oldUser: user,
 				})
 			}
 		})
