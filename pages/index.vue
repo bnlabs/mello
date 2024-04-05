@@ -184,16 +184,6 @@ export default {
 		},
 	},
 }
-
-useHead({
-	title: "Mello",
-	meta: [
-		{
-			name: "Mello",
-			content: "Screen sharing site",
-		},
-	],
-})
 </script>
 
 <style>
