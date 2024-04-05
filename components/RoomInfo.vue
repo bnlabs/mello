@@ -1,8 +1,6 @@
 <template>
-	<div
-		class="flex h-full items-center border-x-2 border-b-2 border-solid border-slate-500 pl-4"
-	>
-		<div class="flex h-full flex-row items-center gap-5 border-solid">
+	<div class="flex h-full items-center justify-between pl-4">
+		<div class="flex h-full flex-row items-center gap-5">
 			<div class="flex flex-row gap-2">
 				<h2 class="font-bold text-slate-600">Room:</h2>
 				<span class="text-white"> {{ roomName }}</span>
@@ -25,16 +23,31 @@
 				</ul>
 			</div>
 		</div>
+
+		<div class="flex flex-row gap-5 pr-3">
+			<Button v-if="isHost === 'true'" @click="toggleStream" outlined
+				>Stream</Button
+			>
+			<Button @click="leaveRoom" severity="danger" outlined>Leave Room</Button>
+		</div>
 	</div>
 </template>
 
-<script>
-export default {
-	props: {
-		roomName: String,
-		users: Array,
-		username: String,
-		host: String,
-	},
-}
+<script setup lang="ts">
+import { inject } from "vue"
+import { type User } from "~/server/types"
+
+const props = defineProps<{
+	roomName: string
+	users: Array<User>
+	username: string
+	host: string
+	isHost: string
+}>()
+
+type ToggleStreamFunction = () => void
+type LeaveRoomFunction = () => void
+
+const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
+const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 </script>

@@ -1,7 +1,12 @@
 <template>
 	<div
-		class="chat-container flex max-w-full flex-col overflow-y-auto border-y-2 border-r-2 border-solid border-slate-500 bg-black p-2.5"
+		class="chat-container flex max-w-full flex-col overflow-y-auto border-l-2 border-slate-600 bg-black p-2.5"
 	>
+		<div
+			class="text-slate-30000 flex w-full flex-row justify-center border-b-2 border-solid border-slate-600 text-lg"
+		>
+			Room Chat
+		</div>
 		<ul
 			ref="messagesContainer"
 			class="hide-scrollbar flex-1 list-none overflow-y-auto p-0"
