@@ -83,6 +83,15 @@ provide("handleToggleStream", handleToggleStream)
 provide("leaveRoom", leaveRoom)
 
 const { username, room, isHost } = route.query as Partial<Chat>
+useHead({
+	title: "Mello",
+	meta: [
+		{
+			name: "Mello",
+			content: "Screen sharing site",
+		},
+	],
+})
 onMounted(() => {
 	if (!username || !room || !isHost) {
 		router.push("/")
