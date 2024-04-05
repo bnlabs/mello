@@ -81,18 +81,18 @@ export function useWebRtc() {
 		videoPlayer: HTMLMediaElement,
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
-
-		localStream = new MediaStream()
+		let remoteStream: MediaStream | null
+		remoteStream = new MediaStream()
 
 		if (videoPlayer) {
-			videoPlayer.srcObject = localStream
+			videoPlayer.srcObject = remoteStream
 		}
 
 		newPeerConnection.ontrack = (event) => {
 			event.streams[0].getTracks().forEach((track) => {
-				localStream?.addTrack(track)
+				remoteStream?.addTrack(track)
 				track.onended = function () {
-					localStream = null
+					remoteStream = null
 				}
 			})
 		}
@@ -160,11 +160,7 @@ export function useWebRtc() {
 	}
 
 	const removePeerConnection = async (uid: string) => {
-		//console.log("PEER CONNECTION COUNT: ",peerConnections.value.size)
-		//console.log("REMOVING PEER USER CONNECTION")
 		peerConnections.value.delete(uid)
-
-		//console.log("PEER CONNECTION COUNT: ",peerConnections.value.size)
 	}
 
 	const toggleStream = async (

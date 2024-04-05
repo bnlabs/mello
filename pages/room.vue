@@ -125,7 +125,6 @@ onMounted(() => {
 			}
 
 			if (response.oldUser) {
-				//console.log("USER DISCONNECTED")
 				removePeerConnection(response.oldUser.id)
 			}
 		},
@@ -140,9 +139,6 @@ onMounted(() => {
 		"receiveWebRTCMessage",
 		(response: { username: string; payload: string; socketId: string }) => {
 			const message = JSON.parse(response.payload)
-			console.log(
-				`message type is ${message.type} and is sent by ${response.username}`,
-			)
 			switch (message.type) {
 				case "offer":
 					if (videoPlayer.value) {
