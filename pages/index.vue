@@ -108,6 +108,93 @@ import InputText from "primevue/inputtext"
 import TabView from "primevue/tabview"
 import TabPanel from "primevue/tabpanel"
 
+const foodList = [
+	"apple",
+	"mango",
+	"olive",
+	"lemon",
+	"peach",
+	"berry",
+	"chard",
+	"dates",
+	"grape",
+	"melon",
+	"guava",
+	"onion",
+	"chili",
+	"sushi",
+	"bread",
+	"pasta",
+	"lychee",
+	"bagel",
+	"bacon",
+	"trout",
+	"steak",
+	"fries",
+	"herbs",
+	"honey",
+	"kiwi",
+	"prune",
+	"squid",
+	"tofu",
+	"wheat",
+	"basil",
+	"curry",
+	"thyme",
+	"beans",
+	"cream",
+	"patty",
+	"jelly",
+	"pizza",
+	"salad",
+	"rices",
+	"maize",
+	"pears",
+	"plums",
+	"cocoa",
+	"limes",
+	"yeast",
+	"seeds",
+	"chips",
+	"salsa",
+	"cakes",
+	"mints",
+	"wafer",
+	"broth",
+	"stews",
+	"soups",
+	"syrup",
+	"tarts",
+	"rolls",
+	"romesco",
+	"tapas",
+	"kabob",
+	"naans",
+	"tacos",
+	"nacho",
+	"queso",
+	"vegan",
+	"meat",
+	"spice",
+	"scone",
+	"latte",
+	"juice",
+	"pepsi",
+	"water",
+	"wines",
+	"beers",
+	"toast",
+	"cider",
+	"pesto",
+	"sauce",
+	"cheese",
+	"pumpkin",
+	"pho",
+	"pepper",
+	"paprika",
+	"brownie",
+]
+
 export default {
 	components: {
 		InputText,
@@ -160,6 +247,13 @@ export default {
 			})
 		},
 		hostRoom() {
+			if (!this.room) {
+				this.room = foodList[Math.floor(Math.random() * foodList.length)]
+			}
+
+			if (!this.username) {
+				this.username = foodList[Math.floor(Math.random() * foodList.length)]
+			}
 			this.attemptedToJoin = true
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				alert(

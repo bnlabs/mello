@@ -2,7 +2,7 @@ import { Server, type ServerOptions, type Socket } from "socket.io"
 import moment from "moment"
 import type { H3Event } from "h3"
 import type { User } from "../types"
-import { userJoin, getRoomUsers, userLeave } from "./users"
+import { userJoin, getRoomUsers, userLeave, roomExist } from "./users"
 const options: Partial<ServerOptions> = {
 	path: "/api/socket.io",
 	serveClient: false,
@@ -33,36 +33,51 @@ export function initSocket(event: H3Event) {
 	io.on("connection", (socket: Socket) => {
 		// Join Room
 		socket.on("joinRoom", (payload: User) => {
-			const usernameTaken = isUsernameTaken(payload.username, payload.room)
-			if (!usernameTaken) {
-				const user = userJoin({ ...payload, id: socket.id, isHost: false })
-				socket.join(user.room)
-
-				socket.broadcast
-					.to(user.room)
-					.emit(
-						"message",
-						formatMessage(botName, `${user.username} has joined the chat`),
-					)
-
-				io.to(user.room).emit("roomUsers", {
-					room: user.room,
-					users: getRoomUsers(user.room),
-					host: findHostInRoom(user.room)?.username,
-					newUser: user,
+			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
+				socket.emit("hostingOrJoiningFailed", {
+					reason:
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
 				})
-			} else {
+			}
+			const usernameTaken = isUsernameTaken(payload.username, payload.room)
+			if (usernameTaken) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason: "There is already a user with that name in this room.",
 				})
+				return
 			}
+
+			if (!roomExist(payload.room)) {
+				socket.emit("hostingOrJoiningFailed", {
+					reason: "That Room does not exist",
+				})
+				return
+			}
+
+			const user = userJoin({ ...payload, id: socket.id, isHost: false })
+			socket.join(user.room)
+
+			socket.broadcast
+				.to(user.room)
+				.emit(
+					"message",
+					formatMessage(botName, `${user.username} has joined the chat`),
+				)
+
+			io.to(user.room).emit("roomUsers", {
+				room: user.room,
+				users: getRoomUsers(user.room),
+				host: findHostInRoom(user.room)?.username,
+				newUser: user,
+			})
 		})
 
 		// host Room
 		socket.on("hostRoom", (payload: User) => {
-			if (!payload.room || !payload.username) {
+			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
-					reason: "Missing parameter: Must have both username and room name",
+					reason:
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
 				})
 			}
 
@@ -122,6 +137,14 @@ export function initSocket(event: H3Event) {
 
 		return socket.id
 	})
+}
+
+export function isUsernameValid(username: string) {
+	return username.trim().length > 0 && username.trim().length <= 30
+}
+
+export function isRoomValid(room: string) {
+	return room.trim().length > 0 && room.trim().length <= 30
 }
 
 export function formatMessage(username: string, text: string) {
