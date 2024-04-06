@@ -1,101 +1,103 @@
 <template>
-	<div class="flex h-screen items-center justify-center bg-green-600">
+	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView>
 			<TabPanel header="Join Room">
 				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center gap-4"
+					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
 				>
 					<form
 						v-focustrap
 						@submit.prevent="joinRoom"
-						class="flex w-3/6 flex-col items-center gap-2 text-white"
+						class="flex w-3/6 flex-col items-center gap-8 text-white"
 					>
-						<div class="w-full">
-							<label for="username">Username</label>
-							<InputText
-								autofocus
-								class="w-full"
-								id="username"
-								v-model="username"
-								@focus="setUsernameTouched"
-								aria-describedby="username-help"
-							/>
-							<!-- Validation message for username -->
-							<p v-if="showUsernameValidation" class="text-sm text-red-500">
-								Username must be between 1 and 30 characters.
-							</p>
+						<div class="flex flex-col gap-2">
+							<div class="w-full">
+								<label for="username">Username</label>
+								<InputText
+									autofocus
+									class="w-full"
+									id="username"
+									v-model="username"
+									@focus="setUsernameTouched"
+									aria-describedby="username-help"
+								/>
+								<!-- Validation message for username -->
+								<p v-if="showUsernameValidation" class="text-sm text-red-500">
+									Username must be between 1 and 30 characters.
+								</p>
+							</div>
+							<div class="w-full">
+								<label for="room">Room</label>
+								<InputText
+									class="w-full"
+									id="room"
+									v-model="room"
+									@focus="setRoomTouched"
+									aria-describedby="room-help"
+								/>
+								<!-- Validation message for room -->
+								<p v-if="showRoomValidation" class="text-sm text-red-500">
+									Room name must be between 1 and 30 characters.
+								</p>
+							</div>
 						</div>
-
-						<div class="w-full">
-							<label for="room">Room</label>
-							<InputText
-								class="w-full"
-								id="room"
-								v-model="room"
-								@focus="setRoomTouched"
-								aria-describedby="room-help"
-							/>
-							<!-- Validation message for room -->
-							<p v-if="showRoomValidation" class="text-sm text-red-500">
-								Room name must be between 1 and 30 characters.
-							</p>
-						</div>
-
 						<!-- Submit button -->
-						<input
+						<button
 							type="submit"
-							value="Join Room"
-							class="h-12 w-32 cursor-pointer rounded-md bg-green-600 text-white"
-						/>
+							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
+						>
+							Join Room
+						</button>
 					</form>
 				</div>
 			</TabPanel>
 			<TabPanel header="Host Room">
 				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center gap-4"
+					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
 				>
 					<form
 						v-focustrap
 						@submit.prevent="hostRoom"
-						class="flex w-3/6 flex-col items-center gap-2 text-white"
+						class="flex w-3/6 flex-col items-center gap-8 text-white"
 					>
-						<div class="w-full">
-							<label for="username">Username</label>
-							<InputText
-								autofocus
-								class="w-full"
-								id="username"
-								v-model="username"
-								@focus="setUsernameTouched"
-								aria-describedby="username-help"
-							/>
-							<!-- Validation message for username -->
-							<p v-if="showUsernameValidation" class="text-sm text-red-500">
-								Username must be between 1 and 30 characters.
-							</p>
+						<div class="flex flex-col gap-2">
+							<div class="w-full">
+								<label for="username">Username</label>
+								<InputText
+									autofocus
+									class="w-full"
+									id="username"
+									v-model="username"
+									@focus="setUsernameTouched"
+									aria-describedby="username-help"
+								/>
+								<!-- Validation message for username -->
+								<p v-if="showUsernameValidation" class="text-sm text-red-500">
+									Username must be between 1 and 30 characters.
+								</p>
+							</div>
+							<div class="w-full">
+								<label for="room">Room</label>
+								<InputText
+									class="w-full"
+									id="room"
+									v-model="room"
+									@focus="setRoomTouched"
+									aria-describedby="room-help"
+								/>
+								<!-- Validation message for room -->
+								<p v-if="showRoomValidation" class="text-sm text-red-500">
+									Room name must be between 1 and 30 characters.
+								</p>
+							</div>
 						</div>
-
-						<div class="w-full">
-							<label for="room">Room</label>
-							<InputText
-								class="w-full"
-								id="room"
-								v-model="room"
-								@focus="setRoomTouched"
-								aria-describedby="room-help"
-							/>
-							<!-- Validation message for room -->
-							<p v-if="showRoomValidation" class="text-sm text-red-500">
-								Room name must be between 1 and 30 characters.
-							</p>
-						</div>
-
 						<!-- Submit button -->
-						<input
+						<button
 							type="submit"
-							value="Host Room"
-							class="h-12 w-32 cursor-pointer rounded-md bg-green-600 text-white"
-						/>
+							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
+						>
+							Host Room
+						</button>
 					</form>
 				</div>
 			</TabPanel>
@@ -282,10 +284,6 @@ export default {
 
 <style>
 /* Ensures the tab headers fill the entire width of the tab panel container */
-.p-tabview .p-tabview-nav li {
-	width: 50%; /* As you have two tabs, setting each tab's width to 50% */
-	flex: 1 1 0%; /* Use flexbox to make tabs flexible and evenly distributed */
-	text-align: center; /* Optional: Center the tab titles */
 .p-tabview-nav li {
 	width: 100%;
 }
@@ -299,5 +297,8 @@ export default {
 	border-top-right-radius: 6px;
 	border-top-left-radius: 6px;
 }
+
+.p-tabview-nav-content {
+	background-color: #1f2937;
 }
 </style>
