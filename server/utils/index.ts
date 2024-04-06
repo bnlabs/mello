@@ -60,9 +60,10 @@ export function initSocket(event: H3Event) {
 
 		// host Room
 		socket.on("hostRoom", (payload: User) => {
-			if (!payload.room || !payload.username) {
+			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
-					reason: "Missing parameter: Must have both username and room name",
+					reason:
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
 				})
 			}
 
@@ -122,6 +123,14 @@ export function initSocket(event: H3Event) {
 
 		return socket.id
 	})
+}
+
+export function isUsernameValid(username: string) {
+	return username.trim().length > 0 && username.trim().length <= 30
+}
+
+export function isRoomValid(room: string) {
+	return room.trim().length > 0 && room.trim().length <= 30
 }
 
 export function formatMessage(username: string, text: string) {

@@ -175,7 +175,6 @@ const foodList = [
 	"queso",
 	"vegan",
 	"meat",
-	"fruit",
 	"spice",
 	"scone",
 	"latte",
@@ -193,7 +192,7 @@ const foodList = [
 	"pho",
 	"pepper",
 	"paprika",
-	"brownie",
+	"brownie"
 ]
 
 export default {
