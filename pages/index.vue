@@ -286,5 +286,18 @@ export default {
 	width: 50%; /* As you have two tabs, setting each tab's width to 50% */
 	flex: 1 1 0%; /* Use flexbox to make tabs flexible and evenly distributed */
 	text-align: center; /* Optional: Center the tab titles */
+.p-tabview-nav li {
+	width: 100%;
+}
+
+.p-tabview-nav li a span {
+	width: 100%;
+	text-align: center;
+}
+
+.p-tabview-nav-content {
+	border-top-right-radius: 6px;
+	border-top-left-radius: 6px;
+}
 }
 </style>
