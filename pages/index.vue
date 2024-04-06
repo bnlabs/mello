@@ -192,7 +192,7 @@ const foodList = [
 	"pho",
 	"pepper",
 	"paprika",
-	"brownie"
+	"brownie",
 ]
 
 export default {

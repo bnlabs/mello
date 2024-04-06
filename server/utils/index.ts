@@ -2,7 +2,7 @@ import { Server, type ServerOptions, type Socket } from "socket.io"
 import moment from "moment"
 import type { H3Event } from "h3"
 import type { User } from "../types"
-import { userJoin, getRoomUsers, userLeave } from "./users"
+import { userJoin, getRoomUsers, userLeave, roomExist } from "./users"
 const options: Partial<ServerOptions> = {
 	path: "/api/socket.io",
 	serveClient: false,
@@ -34,28 +34,36 @@ export function initSocket(event: H3Event) {
 		// Join Room
 		socket.on("joinRoom", (payload: User) => {
 			const usernameTaken = isUsernameTaken(payload.username, payload.room)
-			if (!usernameTaken) {
-				const user = userJoin({ ...payload, id: socket.id, isHost: false })
-				socket.join(user.room)
-
-				socket.broadcast
-					.to(user.room)
-					.emit(
-						"message",
-						formatMessage(botName, `${user.username} has joined the chat`),
-					)
-
-				io.to(user.room).emit("roomUsers", {
-					room: user.room,
-					users: getRoomUsers(user.room),
-					host: findHostInRoom(user.room)?.username,
-					newUser: user,
-				})
-			} else {
+			if (usernameTaken) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason: "There is already a user with that name in this room.",
 				})
+				return
 			}
+
+			if (!roomExist(payload.room)) {
+				socket.emit("hostingOrJoiningFailed", {
+					reason: "That Room does not exist",
+				})
+				return
+			}
+
+			const user = userJoin({ ...payload, id: socket.id, isHost: false })
+			socket.join(user.room)
+
+			socket.broadcast
+				.to(user.room)
+				.emit(
+					"message",
+					formatMessage(botName, `${user.username} has joined the chat`),
+				)
+
+			io.to(user.room).emit("roomUsers", {
+				room: user.room,
+				users: getRoomUsers(user.room),
+				host: findHostInRoom(user.room)?.username,
+				newUser: user,
+			})
 		})
 
 		// host Room
