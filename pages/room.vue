@@ -78,6 +78,26 @@ const handleToggleStream = () => {
 	}
 }
 
+const adjustVolume = (event: KeyboardEvent) => {
+	if (!videoPlayer.value) return
+
+	const volumeChangeAmount = 0.1
+	switch (event.key) {
+		case "ArrowUp":
+			videoPlayer.value.volume = Math.min(
+				videoPlayer.value.volume + volumeChangeAmount,
+				1,
+			)
+			break
+		case "ArrowDown":
+			videoPlayer.value.volume = Math.max(
+				videoPlayer.value.volume - volumeChangeAmount,
+				0,
+			)
+			break
+	}
+}
+
 provide("sendMessage", sendMessage)
 provide("handleToggleStream", handleToggleStream)
 provide("leaveRoom", leaveRoom)
@@ -157,5 +177,11 @@ onMounted(() => {
 			}
 		},
 	)
+
+	window.addEventListener("keydown", adjustVolume)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener("keydown", adjustVolume)
 })
 </script>
