@@ -4,7 +4,7 @@ export default defineNuxtConfig({
 		head: {
 			title: "Mello",
 			meta: [{ name: "description", content: "Screen sharing website" }],
-			link: [{ rel: "icon", type: "image/x-icon", href: "" }],
+			link: [{ rel: "icon", type: "image/png", href: "/bnlab.png" }],
 		},
 	},
 	devtools: { enabled: true },
