@@ -33,6 +33,13 @@ export function initSocket(event: H3Event) {
 	io.on("connection", (socket: Socket) => {
 		// Join Room
 		socket.on("joinRoom", (payload: User) => {
+			if(!isRoomValid(payload.room) || !isUsernameValid(payload.username))
+			{
+				socket.emit("hostingOrJoiningFailed", {
+					reason:
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
+				})
+			}
 			const usernameTaken = isUsernameTaken(payload.username, payload.room)
 			if (usernameTaken) {
 				socket.emit("hostingOrJoiningFailed", {
