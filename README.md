@@ -5,7 +5,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bnlabs_mello&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bnlabs_mello)
 [![CodeFactor](https://www.codefactor.io/repository/github/bnlabs/mello/badge)](https://www.codefactor.io/repository/github/bnlabs/mello)
 # What is Mello?
-Mello is a web app for screen sharing through web
+Mello is a web app for screen sharing through web browser.
 This service works by using the webrtc protocol and websocket to establish the connection between users. After the connection is established, streaming is peer-to-peer.
 
 
