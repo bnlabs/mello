@@ -299,9 +299,6 @@ export default {
 .p-tabview-nav-content {
 	border-top-right-radius: 6px;
 	border-top-left-radius: 6px;
-}
-
-.p-tabview-nav-content {
 	background-color: #1f2937;
 }
 </style>
