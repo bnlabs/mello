@@ -42,12 +42,12 @@
 							</div>
 						</div>
 						<!-- Submit button -->
-						<button
+
+						<Button
+							label="Join Room"
 							type="submit"
 							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
-						>
-							Join Room
-						</button>
+						/>
 					</form>
 				</div>
 			</TabPanel>
@@ -91,13 +91,12 @@
 								</p>
 							</div>
 						</div>
-						<!-- Submit button -->
-						<button
+
+						<Button
+							label="Host Room"
 							type="submit"
 							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
-						>
-							Host Room
-						</button>
+						/>
 					</form>
 				</div>
 			</TabPanel>
@@ -300,5 +299,9 @@ export default {
 	border-top-right-radius: 6px;
 	border-top-left-radius: 6px;
 	background-color: #1f2937;
+}
+
+.p-button-label {
+	font-weight: 400;
 }
 </style>
