@@ -1,107 +1,3 @@
-<template>
-	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
-		<TabView class="shadow-2xl">
-			<TabPanel header="Join Room">
-				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
-				>
-					<form
-						v-focustrap
-						@submit.prevent="joinRoom"
-						class="flex w-3/6 flex-col items-center gap-8 text-white"
-					>
-						<div class="flex flex-col gap-2">
-							<div class="w-full">
-								<label for="username">Username</label>
-								<InputText
-									autofocus
-									class="w-full"
-									id="username"
-									v-model="username"
-									@focus="setUsernameTouched"
-									aria-describedby="username-help"
-								/>
-								<!-- Validation message for username -->
-								<p v-if="showUsernameValidation" class="text-sm text-red-500">
-									Username must be between 1 and 30 characters.
-								</p>
-							</div>
-							<div class="w-full">
-								<label for="room">Room</label>
-								<InputText
-									class="w-full"
-									id="room"
-									v-model="room"
-									@focus="setRoomTouched"
-									aria-describedby="room-help"
-								/>
-								<!-- Validation message for room -->
-								<p v-if="showRoomValidation" class="text-sm text-red-500">
-									Room name must be between 1 and 30 characters.
-								</p>
-							</div>
-						</div>
-						<!-- Submit button -->
-						<Button
-							label="Join Room"
-							type="submit"
-							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
-						/>
-					</form>
-				</div>
-			</TabPanel>
-			<TabPanel header="Host Room">
-				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
-				>
-					<form
-						v-focustrap
-						@submit.prevent="hostRoom"
-						class="flex w-3/6 flex-col items-center gap-8 text-white"
-					>
-						<div class="flex flex-col gap-2">
-							<div class="w-full">
-								<label for="username">Username</label>
-								<InputText
-									autofocus
-									class="w-full"
-									id="username"
-									v-model="username"
-									@focus="setUsernameTouched"
-									aria-describedby="username-help"
-								/>
-								<!-- Validation message for username -->
-								<p v-if="showUsernameValidation" class="text-sm text-red-500">
-									Username must be between 1 and 30 characters.
-								</p>
-							</div>
-							<div class="w-full">
-								<label for="room">Room</label>
-								<InputText
-									class="w-full"
-									id="room"
-									v-model="room"
-									@focus="setRoomTouched"
-									aria-describedby="room-help"
-								/>
-								<!-- Validation message for room -->
-								<p v-if="showRoomValidation" class="text-sm text-red-500">
-									Room name must be between 1 and 30 characters.
-								</p>
-							</div>
-						</div>
-						<Button
-							label="Host Room"
-							type="submit"
-							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
-						/>
-					</form>
-				</div>
-			</TabPanel>
-		</TabView>
-	</div>
-</template>
-
 <script>
 import InputText from "primevue/inputtext"
 import TabView from "primevue/tabview"
@@ -281,6 +177,110 @@ export default {
 	},
 }
 </script>
+
+<template>
+	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
+		<TabView class="shadow-2xl">
+			<TabPanel header="Join Room">
+				<div
+					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
+				>
+					<form
+						v-focustrap
+						@submit.prevent="joinRoom"
+						class="flex w-3/6 flex-col items-center gap-8 text-white"
+					>
+						<div class="flex flex-col gap-2">
+							<div class="w-full">
+								<label for="username">Username</label>
+								<InputText
+									autofocus
+									class="w-full"
+									id="username"
+									v-model="username"
+									@focus="setUsernameTouched"
+									aria-describedby="username-help"
+								/>
+								<!-- Validation message for username -->
+								<p v-if="showUsernameValidation" class="text-sm text-red-500">
+									Username must be between 1 and 30 characters.
+								</p>
+							</div>
+							<div class="w-full">
+								<label for="room">Room</label>
+								<InputText
+									class="w-full"
+									id="room"
+									v-model="room"
+									@focus="setRoomTouched"
+									aria-describedby="room-help"
+								/>
+								<!-- Validation message for room -->
+								<p v-if="showRoomValidation" class="text-sm text-red-500">
+									Room name must be between 1 and 30 characters.
+								</p>
+							</div>
+						</div>
+						<!-- Submit button -->
+						<Button
+							label="Join Room"
+							type="submit"
+							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
+						/>
+					</form>
+				</div>
+			</TabPanel>
+			<TabPanel header="Host Room">
+				<div
+					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
+				>
+					<form
+						v-focustrap
+						@submit.prevent="hostRoom"
+						class="flex w-3/6 flex-col items-center gap-8 text-white"
+					>
+						<div class="flex flex-col gap-2">
+							<div class="w-full">
+								<label for="username">Username</label>
+								<InputText
+									autofocus
+									class="w-full"
+									id="username"
+									v-model="username"
+									@focus="setUsernameTouched"
+									aria-describedby="username-help"
+								/>
+								<!-- Validation message for username -->
+								<p v-if="showUsernameValidation" class="text-sm text-red-500">
+									Username must be between 1 and 30 characters.
+								</p>
+							</div>
+							<div class="w-full">
+								<label for="room">Room</label>
+								<InputText
+									class="w-full"
+									id="room"
+									v-model="room"
+									@focus="setRoomTouched"
+									aria-describedby="room-help"
+								/>
+								<!-- Validation message for room -->
+								<p v-if="showRoomValidation" class="text-sm text-red-500">
+									Room name must be between 1 and 30 characters.
+								</p>
+							</div>
+						</div>
+						<Button
+							label="Host Room"
+							type="submit"
+							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
+						/>
+					</form>
+				</div>
+			</TabPanel>
+		</TabView>
+	</div>
+</template>
 
 <style>
 /* Ensures the tab headers fill the entire width of the tab panel container */

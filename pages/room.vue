@@ -1,28 +1,3 @@
-<template>
-	<div class="h-screen bg-black">
-		<div class="flex h-[90%] flex-row gap-0">
-			<video
-				autoPlay
-				playsInline
-				ref="videoPlayer"
-				class="w-5/6"
-				:muted="isHost === 'true'"
-			></video>
-			<Chat :chats class="w-1/6"> </Chat>
-		</div>
-
-		<div class="h-[10%]">
-			<RoomInfo
-				:roomName="currentRoom"
-				:users="users"
-				:username="username ?? ''"
-				:host="currentHost"
-				:isHost="isHost ?? ''"
-			/>
-		</div>
-	</div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
@@ -229,3 +204,28 @@ onBeforeUnmount(() => {
 	}
 })
 </script>
+
+<template>
+	<div class="h-screen bg-black">
+		<div class="flex h-[90%] flex-row gap-0">
+			<video
+				autoPlay
+				playsInline
+				ref="videoPlayer"
+				class="w-5/6"
+				:muted="isHost === 'true'"
+			></video>
+			<Chat :chats class="w-1/6"> </Chat>
+		</div>
+
+		<div class="h-[10%]">
+			<RoomInfo
+				:roomName="currentRoom"
+				:users="users"
+				:username="username ?? ''"
+				:host="currentHost"
+				:isHost="isHost ?? ''"
+			/>
+		</div>
+	</div>
+</template>

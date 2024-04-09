@@ -1,3 +1,29 @@
+<script setup lang="ts">
+import { watch, nextTick } from "vue"
+
+interface Chat {
+	username: string
+	text: string
+	time: string
+	room?: string
+}
+
+const messagesContainer = ref<HTMLElement | null>(null)
+const scrollToBottom = () => {
+	nextTick(() => {
+		if (messagesContainer.value) {
+			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+		}
+	})
+}
+
+const props = defineProps<{
+	chats: Chat[]
+}>()
+
+watch(() => props.chats, scrollToBottom, { deep: true })
+</script>
+
 <template>
 	<div
 		class="chat-container flex max-w-full flex-col overflow-y-auto bg-black p-2.5"
@@ -29,32 +55,6 @@
 		</div>
 	</div>
 </template>
-
-<script setup lang="ts">
-import { watch, nextTick } from "vue"
-
-interface Chat {
-	username: string
-	text: string
-	time: string
-	room?: string
-}
-
-const messagesContainer = ref<HTMLElement | null>(null)
-const scrollToBottom = () => {
-	nextTick(() => {
-		if (messagesContainer.value) {
-			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-		}
-	})
-}
-
-const props = defineProps<{
-	chats: Chat[]
-}>()
-
-watch(() => props.chats, scrollToBottom, { deep: true })
-</script>
 
 <style>
 .hide-scrollbar::-webkit-scrollbar {

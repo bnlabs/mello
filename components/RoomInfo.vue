@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import { inject } from "vue"
+import { type User } from "~/server/types"
+
+defineProps<{
+	roomName: string
+	users: Array<User>
+	username: string
+	host: string
+	isHost: string
+}>()
+
+type ToggleStreamFunction = () => void
+type LeaveRoomFunction = () => void
+
+const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
+const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+</script>
+
 <template>
 	<div class="flex h-full items-center justify-between pl-4">
 		<div class="flex h-full items-center gap-3">
@@ -24,22 +43,3 @@
 		</div>
 	</div>
 </template>
-
-<script setup lang="ts">
-import { inject } from "vue"
-import { type User } from "~/server/types"
-
-defineProps<{
-	roomName: string
-	users: Array<User>
-	username: string
-	host: string
-	isHost: string
-}>()
-
-type ToggleStreamFunction = () => void
-type LeaveRoomFunction = () => void
-
-const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
-</script>
