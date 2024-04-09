@@ -13,13 +13,7 @@
 				<span class="text-black"> {{ host }}</span>
 			</RoomInfoSlot>
 
-			<RoomInfoSlot title="Users">
-				<ul class="flex gap-2 text-white">
-					<span class="text-black">{{
-						users.map((user) => user.username).join(", ")
-					}}</span>
-				</ul>
-			</RoomInfoSlot>
+			<RoomUserList :users="users" />
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">
