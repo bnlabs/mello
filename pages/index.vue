@@ -1,6 +1,6 @@
 <template>
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
-		<TabView>
+		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">
 				<div
 					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
@@ -42,7 +42,6 @@
 							</div>
 						</div>
 						<!-- Submit button -->
-
 						<Button
 							label="Join Room"
 							type="submit"
@@ -91,7 +90,6 @@
 								</p>
 							</div>
 						</div>
-
 						<Button
 							label="Host Room"
 							type="submit"
