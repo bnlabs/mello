@@ -122,7 +122,7 @@ onMounted(() => {
 	// Join ChatRoom
 	if (isHost === "true") {
 		socket.emit("hostRoom", { username, room })
-	} else if (isHost === "false") {
+	} else {
 		socket.emit("joinRoom", { username, room })
 	}
 
