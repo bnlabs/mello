@@ -17,7 +17,7 @@
 						{{ chat.username }}
 					</span>
 					<span class="time text-[0.8rem] text-sm text-[#777]">{{
-						chat.time
+						convertToLocaleTime(chat.time)
 					}}</span>
 				</div>
 				<p class="text m-0 text-white">{{ chat.text }}</p>
@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
 import { watch, nextTick } from "vue"
+import moment from "moment"
 
 interface Chat {
 	username: string
@@ -47,6 +48,10 @@ const scrollToBottom = () => {
 			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
 		}
 	})
+}
+
+const convertToLocaleTime = (utcTime: string) => {
+	return moment.utc(utcTime).local().format("h:mm a")
 }
 
 const props = defineProps<{
