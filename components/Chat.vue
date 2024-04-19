@@ -1,29 +1,3 @@
-<script setup lang="ts">
-import { watch, nextTick } from "vue"
-
-interface Chat {
-	username: string
-	text: string
-	time: string
-	room?: string
-}
-
-const messagesContainer = ref<HTMLElement | null>(null)
-const scrollToBottom = () => {
-	nextTick(() => {
-		if (messagesContainer.value) {
-			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-		}
-	})
-}
-
-const props = defineProps<{
-	chats: Chat[]
-}>()
-
-watch(() => props.chats, scrollToBottom, { deep: true })
-</script>
-
 <template>
 	<div
 		class="chat-container flex max-w-full flex-col overflow-y-auto bg-black p-2.5"
@@ -43,7 +17,7 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 						{{ chat.username }}
 					</span>
 					<span class="time text-[0.8rem] text-sm text-[#777]">{{
-						chat.time
+						convertToLocaleTime(chat.time)
 					}}</span>
 				</div>
 				<p class="text m-0 text-white">{{ chat.text }}</p>
@@ -55,6 +29,37 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 		</div>
 	</div>
 </template>
+
+<script setup lang="ts">
+import { watch, nextTick } from "vue"
+import moment from "moment"
+
+interface Chat {
+	username: string
+	text: string
+	time: string
+	room?: string
+}
+
+const messagesContainer = ref<HTMLElement | null>(null)
+const scrollToBottom = () => {
+	nextTick(() => {
+		if (messagesContainer.value) {
+			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+		}
+	})
+}
+
+const convertToLocaleTime = (utcTime: string) => {
+	return moment.utc(utcTime).local().format("h:mm a")
+}
+
+const props = defineProps<{
+	chats: Chat[]
+}>()
+
+watch(() => props.chats, scrollToBottom, { deep: true })
+</script>
 
 <style>
 .hide-scrollbar::-webkit-scrollbar {
