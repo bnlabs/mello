@@ -10,7 +10,7 @@ export function useSocketIo() {
 		socketInstance = io({
 			path: "/api/socket.io",
 			reconnection: true, // Enable reconnection
-			reconnectionAttempts: 5, // Number of reconnection attempts
+			reconnectionAttempts: 10, // Number of reconnection attempts
 			reconnectionDelay: 1000, // Delay between reconnection attempts in milliseconds
 			reconnectionDelayMax: 5000, // Maximum delay between reconnection attempts
 			randomizationFactor: 0.5 // Randomization factor for the reconnection delay

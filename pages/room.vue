@@ -191,6 +191,10 @@ onMounted(() => {
 		},
 	)
 
+	socket.on('reconnect_attempt', (attemptNumber) => {
+		console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
+	});
+	
 	window.addEventListener("keydown", adjustVolume)
 	if (videoPlayer.value) {
 		// Add click event listener to prevent play/pause
