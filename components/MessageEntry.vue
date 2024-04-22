@@ -1,17 +1,3 @@
-<template>
-	<div class="messaging-text-area flex w-full flex-col items-end">
-		<Textarea
-			class="w-full"
-			autofocus
-			v-model="message"
-			rows="2"
-			cols="17"
-			@keydown.enter.prevent="send"
-			@keydown.exact="sendOnEnter"
-		/>
-	</div>
-</template>
-
 <script setup lang="ts">
 import { ref, inject } from "vue"
 import Textarea from "primevue/textarea"
@@ -35,3 +21,17 @@ const sendOnEnter = (event: KeyboardEvent) => {
 	}
 }
 </script>
+
+<template>
+	<div class="messaging-text-area flex w-full flex-col items-end">
+		<Textarea
+			class="w-full"
+			autofocus
+			v-model="message"
+			rows="2"
+			cols="17"
+			@keydown.enter.prevent="send"
+			@keydown.exact="sendOnEnter"
+		/>
+	</div>
+</template>

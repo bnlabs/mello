@@ -1,29 +1,3 @@
-<template>
-	<div class="h-screen bg-black">
-		<div class="flex h-[90%] flex-row gap-0">
-			<video
-				autoPlay
-				playsInline
-				ref="videoPlayer"
-				controls
-				class="w-5/6"
-				:muted="isHost === 'true'"
-			></video>
-			<Chat :chats class="w-1/6"> </Chat>
-		</div>
-
-		<div class="h-[10%]">
-			<RoomInfo
-				:roomName="currentRoom"
-				:users="users"
-				:username="username ?? ''"
-				:host="currentHost"
-				:isHost="isHost ?? ''"
-			/>
-		</div>
-	</div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
@@ -54,6 +28,8 @@ const {
 const currentRoom = ref("")
 const currentHost = ref("")
 const videoPlayer = ref<HTMLMediaElement | null>(null)
+const dialogVisible = useState<boolean>('diaglogVisible', () => false)
+const failureMessage = useState<string>('failureMessage', () => "")
 
 const route = useRoute()
 const router = useRouter()
@@ -78,6 +54,63 @@ const handleToggleStream = () => {
 	}
 }
 
+const adjustVolume = (event: KeyboardEvent) => {
+	if (!videoPlayer.value) return
+
+	const volumeChangeAmount = 0.1
+	switch (event.key) {
+		case "ArrowUp":
+			videoPlayer.value.volume = Math.min(
+				videoPlayer.value.volume + volumeChangeAmount,
+				1,
+			)
+			break
+		case "ArrowDown":
+			videoPlayer.value.volume = Math.max(
+				videoPlayer.value.volume - volumeChangeAmount,
+				0,
+			)
+			break
+	}
+}
+
+const toggleFullScreen = (): void => {
+	if (!videoPlayer.value) return
+
+	if (!document.fullscreenElement) {
+		if (videoPlayer.value.requestFullscreen) {
+			videoPlayer.value.requestFullscreen()
+		} else if ((videoPlayer.value as any).mozRequestFullScreen) {
+			/* Firefox */
+			;(videoPlayer.value as any).mozRequestFullScreen()
+		} else if ((videoPlayer.value as any).webkitRequestFullscreen) {
+			/* Chrome, Safari & Opera */
+			;(videoPlayer.value as any).webkitRequestFullscreen()
+		} else if ((videoPlayer.value as any).msRequestFullscreen) {
+			/* IE/Edge */
+			;(videoPlayer.value as any).msRequestFullscreen()
+		}
+	} else {
+		if (document.exitFullscreen) {
+			document.exitFullscreen()
+		} else if ((document as any).mozCancelFullScreen) {
+			/* Firefox */
+			;(document as any).mozCancelFullScreen()
+		} else if ((document as any).webkitExitFullscreen) {
+			/* Chrome, Safari and Opera */
+			;(document as any).webkitExitFullscreen()
+		} else if ((document as any).msExitFullscreen) {
+			/* IE/Edge */
+			;(document as any).msExitFullscreen()
+		}
+	}
+}
+
+const preventPlayPause = (event: MouseEvent): void => {
+	event.preventDefault()
+	toggleFullScreen()
+}
+
 provide("sendMessage", sendMessage)
 provide("handleToggleStream", handleToggleStream)
 provide("leaveRoom", leaveRoom)
@@ -91,7 +124,7 @@ onMounted(() => {
 	// Join ChatRoom
 	if (isHost === "true") {
 		socket.emit("hostRoom", { username, room })
-	} else if (isHost === "false") {
+	} else {
 		socket.emit("joinRoom", { username, room })
 	}
 
@@ -130,9 +163,9 @@ onMounted(() => {
 		},
 	)
 
-	socket.on("hostingOrJoiningFailed", (response: { reason: String }) => {
-		alert(`Hosting/Joining room failed, error message: ${response.reason}`)
-		router.push("/")
+	socket.on("hostingOrJoiningFailed", (response: { reason: string }) => {
+		failureMessage.value = response.reason
+		dialogVisible.value = true;
 	})
 
 	socket.on(
@@ -157,5 +190,53 @@ onMounted(() => {
 			}
 		},
 	)
+
+	socket.on('reconnect_attempt', (attemptNumber) => {
+		console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
+	});
+	
+	window.addEventListener("keydown", adjustVolume)
+	if (videoPlayer.value) {
+		// Add click event listener to prevent play/pause
+		videoPlayer.value.addEventListener("click", preventPlayPause)
+	}
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener("keydown", adjustVolume)
+	if (videoPlayer.value) {
+		// Remove the click event listener
+		videoPlayer.value.removeEventListener("click", preventPlayPause)
+	}
 })
 </script>
+
+<template>
+	<div class="h-screen bg-black">
+		<div class="flex h-[90%] flex-row gap-0">
+			<video
+				autoPlay
+				playsInline
+				ref="videoPlayer"
+				class="w-5/6"
+				:muted="isHost === 'true'"
+			></video>
+			<Chat :chats class="w-1/6"> </Chat>
+		</div>
+
+		<div class="h-[10%]">
+			<RoomInfo
+				:roomName="currentRoom"
+				:users="users"
+				:username="username ?? ''"
+				:host="currentHost"
+				:isHost="isHost ?? ''"
+			/>
+		</div>
+		<!-- Dialog component -->
+		<Dialog v-model="dialogVisible" header="Failed to join/host" :visible="dialogVisible" @hide="() => {dialogVisible = false}">
+			<p>Hosting/Joining room failed, error message: {{failureMessage}}</p>
+			<Button type="button" @click="router.push('/')">Close</Button>
+		</Dialog>
+	</div>
+</template>
