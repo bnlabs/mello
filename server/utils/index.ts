@@ -64,7 +64,7 @@ export function initSocket(event: H3Event) {
 					formatMessage(botName, `${user.username} has joined the chat`),
 				)
 
-			io.to(user.room).emit("roomUsers", {
+			io.to(user.room).emit("userJoin", {
 				room: user.room,
 				users: getRoomUsers(user.room),
 				host: findHostInRoom(user.room)?.username,
@@ -86,7 +86,7 @@ export function initSocket(event: H3Event) {
 				const user = userJoin({ ...payload, id: socket.id, isHost: true })
 				socket.join(user.room)
 
-				io.to(user.room).emit("roomUsers", {
+				io.to(user.room).emit("userJoin", {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: user.username,
@@ -111,15 +111,11 @@ export function initSocket(event: H3Event) {
 		socket.on("disconnect", () => {
 			const user = userLeave(socket.id)
 			if (user) {
-				io.to(user.room).emit(
-					"message",
-					formatMessage(botName, `${user.username} has left the chat`),
-				)
 
-				io.to(user.room).emit("roomUsers", {
+				io.to(user.room).emit("userDisconnect", {
 					room: user.room,
 					users: getRoomUsers(user.room),
-					oldUser: user,
+					oldUser: user
 				})
 			}
 		})

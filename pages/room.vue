@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router"
 import { useSocketIo } from "@/composables/useSocketIo"
 import { useWebRtc } from "@/composables/useWebRtc"
 import { type User } from "~/server/types"
+import moment from "moment"
 
 interface Chat {
 	username: string
@@ -133,13 +134,12 @@ onMounted(() => {
 	})
 
 	socket.on(
-		"roomUsers",
+		"userJoin",
 		(response: {
 			room: string
 			users: User[]
 			host: string
 			newUser: User
-			oldUser: User
 		}) => {
 			currentRoom.value = response.room
 			users.value = response.users
@@ -156,10 +156,29 @@ onMounted(() => {
 			) {
 				createOffer(videoPlayer.value, response.newUser.id)
 			}
+		},
+	)
+
+	socket.on(
+		"userDisconnect",
+		(response: {
+			room: string
+			users: User[]
+			oldUser: User
+		}) => {
+			users.value = response.users
 
 			if (response.oldUser) {
 				removePeerConnection(response.oldUser.id)
 			}
+
+			const notifMessage: Chat = {
+				username: "Notification",
+				text: `${response.oldUser.username} has left the chat`,
+				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+				isHost: ""
+			}
+			chats.value.push(notifMessage)
 		},
 	)
 
