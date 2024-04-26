@@ -3,4 +3,5 @@ export type User = {
 	username: string
 	room: string
 	isHost: boolean
+	peerConnection: RTCPeerConnection
 }

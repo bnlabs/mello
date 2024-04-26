@@ -25,11 +25,19 @@ const {
 	isStreaming,
 	removePeerConnection,
 } = useWebRtc()
+const {
+	createOfferSFU,
+	addAnswerSFU,
+	addIceCandidateSFU,
+	toggleStreamSFU,
+	isStreamingSFU
+} = useSFUWebRtc()
 const currentRoom = ref("")
 const currentHost = ref("")
 const videoPlayer = ref<HTMLMediaElement | null>(null)
 const dialogVisible = useState<boolean>('diaglogVisible', () => false)
 const failureMessage = useState<string>('failureMessage', () => "")
+const useSFU = ref<boolean>(false)
 
 const route = useRoute()
 const router = useRouter()
@@ -49,8 +57,11 @@ const handleToggleStream = () => {
 			.map((user) => user.id),
 	)
 
-	if (videoPlayer.value) {
+	if (videoPlayer.value && !useSFU.value) {
 		toggleStream(userIds.value, videoPlayer.value)
+	}
+	else if(videoPlayer.value && useSFU.value){
+		toggleStreamSFU(videoPlayer.value)
 	}
 }
 
@@ -133,13 +144,12 @@ onMounted(() => {
 	})
 
 	socket.on(
-		"roomUsers",
+		"userJoin",
 		(response: {
 			room: string
 			users: User[]
 			host: string
 			newUser: User
-			oldUser: User
 		}) => {
 			currentRoom.value = response.room
 			users.value = response.users
@@ -152,16 +162,33 @@ onMounted(() => {
 				response.newUser.username !== username &&
 				videoPlayer.value &&
 				isHost === "true" &&
-				isStreaming()
+				(isStreaming() || isStreamingSFU())
 			) {
-				createOffer(videoPlayer.value, response.newUser.id)
+				switch(useSFU.value){
+					case true:
+						createOfferSFU(videoPlayer.value)
+						break
+					case false:
+						createOffer(videoPlayer.value, response.newUser.id)
+						break
+
+				}
 			}
+		},
+	)
+
+	socket.on("userDisconnect", (response: {
+			room: string
+			users: User[]
+			oldUser: User
+		}) => {
+			currentRoom.value = response.room
+			users.value = response.users
 
 			if (response.oldUser) {
 				removePeerConnection(response.oldUser.id)
 			}
-		},
-	)
+	})
 
 	socket.on("hostingOrJoiningFailed", (response: { reason: string }) => {
 		failureMessage.value = response.reason
@@ -191,6 +218,26 @@ onMounted(() => {
 		},
 	)
 
+	socket.on(
+		"receiveWebRtcMessageSFU",
+		async (response: { payload:string}) => {
+			const message = JSON.parse(response.payload)
+			switch (message.type) {
+				// case "offer":
+				// 	if (videoPlayer.value) {
+				// 		createAnswer(response.socketId, message.offer, videoPlayer.value)
+				// 	}
+				// 	break
+				case "answer":
+					await addAnswerSFU(message.answer)
+					break
+				case "candidate":
+					await addIceCandidateSFU(message.candidate)
+					break
+			}
+		}
+	)
+
 	socket.on('reconnect_attempt', (attemptNumber) => {
 		console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
 	});
@@ -209,6 +256,12 @@ onBeforeUnmount(() => {
 		videoPlayer.value.removeEventListener("click", preventPlayPause)
 	}
 })
+
+const handleSwitchToggled = (newValue: boolean) => {
+  useSFU.value = newValue
+  console.log('Parent switch value:', useSFU.value)
+}
+
 </script>
 
 <template>
@@ -231,6 +284,8 @@ onBeforeUnmount(() => {
 				:username="username ?? ''"
 				:host="currentHost"
 				:isHost="isHost ?? ''"
+				v-model="useSFU"
+				@switch-toggled="handleSwitchToggled"
 			/>
 		</div>
 		<!-- Dialog component -->

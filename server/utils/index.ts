@@ -3,6 +3,7 @@ import moment from "moment"
 import type { H3Event } from "h3"
 import type { User } from "../types"
 import { userJoin, getRoomUsers, userLeave, roomExist } from "./users"
+import { createAnswer, getPeerConnection } from "./webRtc"
 const options: Partial<ServerOptions> = {
 	path: "/api/socket.io",
 	serveClient: false,
@@ -64,7 +65,7 @@ export function initSocket(event: H3Event) {
 					formatMessage(botName, `${user.username} has joined the chat`),
 				)
 
-			io.to(user.room).emit("roomUsers", {
+			io.to(user.room).emit("userJoin", {
 				room: user.room,
 				users: getRoomUsers(user.room),
 				host: findHostInRoom(user.room)?.username,
@@ -86,7 +87,7 @@ export function initSocket(event: H3Event) {
 				const user = userJoin({ ...payload, id: socket.id, isHost: true })
 				socket.join(user.room)
 
-				io.to(user.room).emit("roomUsers", {
+				io.to(user.room).emit("userJoin", {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					host: user.username,
@@ -116,7 +117,7 @@ export function initSocket(event: H3Event) {
 					formatMessage(botName, `${user.username} has left the chat`),
 				)
 
-				io.to(user.room).emit("roomUsers", {
+				io.to(user.room).emit("userDisconnect", {
 					room: user.room,
 					users: getRoomUsers(user.room),
 					oldUser: user,
@@ -132,6 +133,26 @@ export function initSocket(event: H3Event) {
 					"receiveWebRTCMessage",
 					formatWebRTCResponse(sender.username, payload, socket.id),
 				)
+			}
+		})
+
+		socket.on("sendWebRTCMessageSFU", async (payload: string) => {
+			const message = JSON.parse(payload)
+
+			switch (message.type) {
+				case "offer":
+					await createAnswer(socket.id, message.offer, socket)
+					break
+				// case "answer":
+				// 	addAnswer(message.answer, response.socketId)
+				// 	break
+				case "candidate":
+					const pc = await getPeerConnection(socket.id)
+					if (pc) {
+						console.log("peer connection found, adding Ice candidate")
+						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+					}
+					break
 			}
 		})
 
