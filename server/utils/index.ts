@@ -55,7 +55,6 @@ export function initSocket(event: H3Event) {
 			const user = await userJoin({ ...payload, id: socket.id, isHost: false })
 			socket.join(user.room)
 
-
 			const host = await findHostInRoom(user.room)
 			io.to(user.room).emit("userJoin", {
 				room: user.room,

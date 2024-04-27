@@ -11,7 +11,7 @@ interface Chat {
 	text: string
 	time: string
 	room?: string
-	isHost: string
+	isHost?: string
 }
 
 const chats = ref<Chat[]>([])
@@ -218,11 +218,52 @@ onMounted(() => {
 		},
 	)
 
+	socket.on("reconnect", (attemptNumber) => {
+		const notifMessage: Chat = {
+			username: botName,
+			text: `Reconnected to the server after ${attemptNumber} attempts.`,
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+		}
+		chats.value.push(notifMessage)
+	})
+
 	socket.on("reconnect_attempt", (attemptNumber) => {
-		console.log(`Attempting to reconnect (attempt ${attemptNumber})`)
+		const notifMessage: Chat = {
+			username: botName,
+			text: `Attempting to reconnect (attempt ${attemptNumber})`,
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+		}
+		chats.value.push(notifMessage)
+	})
+
+	socket.on("disconnect", (reason) => {
+		const notifMessage: Chat = {
+			username: botName,
+			text: `Disconnected: ${reason}`,
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+		}
+
+		chats.value.push(notifMessage)
+
+		// Optionally, attempt to reconnect based on the reason
+		if (reason === "io server disconnect") {
+			// The disconnection was initiated by the server, you need to reconnect manually
+			socket.connect()
+		}
+	})
+
+	socket.on("error", (error) => {
+		const notifMessage: Chat = {
+			username: botName,
+			text: `Connection Error: ${error}`,
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+		}
+
+		chats.value.push(notifMessage)
 	})
 
 	window.addEventListener("keydown", adjustVolume)
+
 	if (videoPlayer.value) {
 		// Add click event listener to prevent play/pause
 		videoPlayer.value.addEventListener("click", preventPlayPause)
