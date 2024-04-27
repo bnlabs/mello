@@ -32,6 +32,7 @@ const videoPlayer = ref<HTMLMediaElement | null>(null)
 const dialogVisible = useState<boolean>("diaglogVisible", () => false)
 const failureMessage = useState<string>("failureMessage", () => "")
 
+const botName = "Notification"
 const route = useRoute()
 const router = useRouter()
 
@@ -141,11 +142,22 @@ onMounted(() => {
 			host: string
 			newUser: User
 		}) => {
+			// necessary for when user start hosting a room
 			currentRoom.value = response.room
+
 			users.value = response.users
 			if (response.host) {
 				currentHost.value = response.host
 			}
+
+			const notificationMessage: Chat = {
+				username: botName,
+				text: `${response.newUser.username} has joined the chat`,
+				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+				isHost: "",
+			}
+
+			chats.value.push(notificationMessage)
 
 			if (
 				response.newUser &&
@@ -169,7 +181,7 @@ onMounted(() => {
 			}
 
 			const notifMessage: Chat = {
-				username: "Notification",
+				username: botName,
 				text: `${response.oldUser.username} has left the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
 				isHost: "",
