@@ -8,7 +8,10 @@ import {
 	QueryCommand,
 } from "@aws-sdk/lib-dynamodb"
 
-const client = new DynamoDBClient({})
+const client = new DynamoDBClient({
+	region: "us-east-1"
+})
+
 const docClient = DynamoDBDocumentClient.from(client)
 
 const connectedUserTable = "mello-connected-users"
