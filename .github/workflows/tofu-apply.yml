@@ -1,4 +1,4 @@
-name: Tofu plan
+name: Tofu Apply
 
 on:
     push:
@@ -26,9 +26,10 @@ jobs:
       - name: Setup Tofu
         uses: opentofu/setup-opentofu@v1
 
-      - name: Tofu plan
+      - name: Tofu Apply
         run: |
           cd tofu
           tofu init
           tofu refresh
-          tofu plan
+          tofu validate
+          tofu apply -auto-approve
