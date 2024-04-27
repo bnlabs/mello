@@ -13,7 +13,7 @@ export function useSocketIo() {
 			reconnectionAttempts: 10, // Number of reconnection attempts
 			reconnectionDelay: 1000, // Delay between reconnection attempts in milliseconds
 			reconnectionDelayMax: 5000, // Maximum delay between reconnection attempts
-			randomizationFactor: 0.5 // Randomization factor for the reconnection delay
+			randomizationFactor: 0.5, // Randomization factor for the reconnection delay
 		})
 	}
 

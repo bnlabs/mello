@@ -2,7 +2,15 @@ import { Server, type ServerOptions, type Socket } from "socket.io"
 import moment from "moment"
 import type { H3Event } from "h3"
 import type { User } from "../types"
-import { userJoin, getRoomUsers, userLeave, roomExist } from "./users"
+import {
+	userJoin,
+	getRoomUsers,
+	userLeave,
+	isUsernameTaken,
+	findHostInRoom,
+	isRoomOccupied,
+	roomExist,
+} from "./users"
 const options: Partial<ServerOptions> = {
 	path: "/api/socket.io",
 	serveClient: false,
@@ -12,34 +20,23 @@ export const io = new Server(options)
 
 const botName = "Notification"
 
-function findHostInRoom(roomName: string): User | undefined {
-	return users.find((user) => user.isHost === true && user.room === roomName)
-}
-
-function isRoomOccupied(roomName: string): boolean {
-	return users.some((user) => user.room === roomName)
-}
-
-function isUsernameTaken(username: string, roomName: string) {
-	return users.some(
-		(user) => user.username === username && user.room == roomName,
-	)
-}
-
 export function initSocket(event: H3Event) {
 	// @ts-ignore
 	io.attach(event.node.res.socket?.server)
 
 	io.on("connection", (socket: Socket) => {
 		// Join Room
-		socket.on("joinRoom", (payload: User) => {
+		socket.on("joinRoom", async (payload: User) => {
 			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason:
 						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
 				})
 			}
-			const usernameTaken = isUsernameTaken(payload.username, payload.room)
+			const usernameTaken: boolean | undefined = await isUsernameTaken(
+				payload.username,
+				payload.room,
+			)
 			if (usernameTaken) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason: "There is already a user with that name in this room.",
@@ -47,14 +44,15 @@ export function initSocket(event: H3Event) {
 				return
 			}
 
-			if (!roomExist(payload.room)) {
+			const roomAlreadyExist = await roomExist(payload.room)
+			if (!roomAlreadyExist) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason: "That Room does not exist",
 				})
 				return
 			}
 
-			const user = userJoin({ ...payload, id: socket.id, isHost: false })
+			const user = await userJoin({ ...payload, id: socket.id, isHost: false })
 			socket.join(user.room)
 
 			socket.broadcast
@@ -64,16 +62,17 @@ export function initSocket(event: H3Event) {
 					formatMessage(botName, `${user.username} has joined the chat`),
 				)
 
+			const host = await findHostInRoom(user.room)
 			io.to(user.room).emit("userJoin", {
 				room: user.room,
-				users: getRoomUsers(user.room),
-				host: findHostInRoom(user.room)?.username,
+				users: await getRoomUsers(user.room),
+				host: host?.username,
 				newUser: user,
 			})
 		})
 
 		// host Room
-		socket.on("hostRoom", (payload: User) => {
+		socket.on("hostRoom", async (payload: User) => {
 			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason:
@@ -81,14 +80,14 @@ export function initSocket(event: H3Event) {
 				})
 			}
 
-			const roomOccupied = isRoomOccupied(payload.room)
+			const roomOccupied = await isRoomOccupied(payload.room)
 			if (!roomOccupied) {
-				const user = userJoin({ ...payload, id: socket.id, isHost: true })
+				const user = await userJoin({ ...payload, id: socket.id, isHost: true })
 				socket.join(user.room)
 
 				io.to(user.room).emit("userJoin", {
 					room: user.room,
-					users: getRoomUsers(user.room),
+					users: await getRoomUsers(user.room),
 					host: user.username,
 					newUser: user,
 				})
@@ -100,35 +99,32 @@ export function initSocket(event: H3Event) {
 		})
 
 		// Handle Chat Message
-		socket.on("chatMessage", (payload: string) => {
-			const user = getCurrentUser(socket.id)
+		socket.on("chatMessage", async (payload: string) => {
+			const user = await getCurrentUser(socket.id)
 			if (user) {
 				io.to(user.room).emit("message", formatMessage(user.username, payload))
 			}
 		})
 
 		// Disconnect
-		socket.on("disconnect", () => {
-			const user = userLeave(socket.id)
+		socket.on("disconnect", async () => {
+			const user = await userLeave(socket.id)
 			if (user) {
-
 				io.to(user.room).emit("userDisconnect", {
 					room: user.room,
-					users: getRoomUsers(user.room),
-					oldUser: user
+					users: await getRoomUsers(user.room),
+					oldUser: user,
 				})
 			}
 		})
 
-		socket.on("sendWebRTCMessage", (payload: string, uid: string) => {
-			const user = getCurrentUser(uid)
-			const sender = getCurrentUser(socket.id)
-			if (user && sender) {
-				io.to(user.id).emit(
-					"receiveWebRTCMessage",
-					formatWebRTCResponse(sender.username, payload, socket.id),
-				)
-			}
+		socket.on("sendWebRTCMessage", async (payload: string, uid: string) => {
+			const user = await getCurrentUser(uid)
+			const sender = await getCurrentUser(socket.id)
+			io.to(user?.id ?? "").emit(
+				"receiveWebRTCMessage",
+				formatWebRTCResponse(sender?.username ?? "", payload, socket.id),
+			)
 		})
 
 		return socket.id

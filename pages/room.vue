@@ -29,8 +29,8 @@ const {
 const currentRoom = ref("")
 const currentHost = ref("")
 const videoPlayer = ref<HTMLMediaElement | null>(null)
-const dialogVisible = useState<boolean>('diaglogVisible', () => false)
-const failureMessage = useState<string>('failureMessage', () => "")
+const dialogVisible = useState<boolean>("diaglogVisible", () => false)
+const failureMessage = useState<string>("failureMessage", () => "")
 
 const route = useRoute()
 const router = useRouter()
@@ -161,11 +161,7 @@ onMounted(() => {
 
 	socket.on(
 		"userDisconnect",
-		(response: {
-			room: string
-			users: User[]
-			oldUser: User
-		}) => {
+		(response: { room: string; users: User[]; oldUser: User }) => {
 			users.value = response.users
 
 			if (response.oldUser) {
@@ -176,7 +172,7 @@ onMounted(() => {
 				username: "Notification",
 				text: `${response.oldUser.username} has left the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
-				isHost: ""
+				isHost: "",
 			}
 			chats.value.push(notifMessage)
 		},
@@ -184,7 +180,7 @@ onMounted(() => {
 
 	socket.on("hostingOrJoiningFailed", (response: { reason: string }) => {
 		failureMessage.value = response.reason
-		dialogVisible.value = true;
+		dialogVisible.value = true
 	})
 
 	socket.on(
@@ -210,10 +206,10 @@ onMounted(() => {
 		},
 	)
 
-	socket.on('reconnect_attempt', (attemptNumber) => {
-		console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
-	});
-	
+	socket.on("reconnect_attempt", (attemptNumber) => {
+		console.log(`Attempting to reconnect (attempt ${attemptNumber})`)
+	})
+
 	window.addEventListener("keydown", adjustVolume)
 	if (videoPlayer.value) {
 		// Add click event listener to prevent play/pause
@@ -253,8 +249,17 @@ onBeforeUnmount(() => {
 			/>
 		</div>
 		<!-- Dialog component -->
-		<Dialog v-model="dialogVisible" header="Failed to join/host" :visible="dialogVisible" @hide="() => {dialogVisible = false}">
-			<p>Hosting/Joining room failed, error message: {{failureMessage}}</p>
+		<Dialog
+			v-model="dialogVisible"
+			header="Failed to join/host"
+			:visible="dialogVisible"
+			@hide="
+				() => {
+					dialogVisible = false
+				}
+			"
+		>
+			<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
 			<Button type="button" @click="router.push('/')">Close</Button>
 		</Dialog>
 	</div>
