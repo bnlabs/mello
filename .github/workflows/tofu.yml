@@ -1,9 +1,11 @@
-name: Tofu
+name: Tofu plan
 
 on:
     push:
       branches:
-        - refactor-websocket-endpoint
+        - main
+    pull_request:
+      types: [opened, synchronize, reopened]
     workflow_dispatch:
 
 jobs:
@@ -24,7 +26,7 @@ jobs:
       - name: Setup Tofu
         uses: opentofu/setup-opentofu@v1
 
-      - name: Run Tofu
+      - name: Tofu plan
         run: |
           cd tofu
           tofu init
