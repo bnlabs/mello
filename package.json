@@ -11,6 +11,8 @@
 		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\""
 	},
 	"dependencies": {
+		"@aws-sdk/client-dynamodb": "^3.564.0",
+		"@aws-sdk/lib-dynamodb": "^3.564.0",
 		"moment": "^2.30.1",
 		"nuxt": "^3.11.1",
 		"primevue": "^3.50.0",
