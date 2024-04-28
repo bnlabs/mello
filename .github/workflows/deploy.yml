@@ -40,6 +40,9 @@ jobs:
               docker rm Mello
               docker pull ${{ secrets.DOCKER_USERNAME }}/mello:latest
               docker run -d --restart=always \
-              -p 127.0.0.1:4003:3000 \
-              --name Mello \
-              ${{ secrets.DOCKER_USERNAME }}/mello:latest
+                -p 127.0.0.1:4003:3000 \
+                --name Mello \
+                -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+                -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+                ${{ secrets.DOCKER_USERNAME }}/mello:latest
+
