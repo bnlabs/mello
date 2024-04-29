@@ -32,11 +32,11 @@ jobs:
             env:
               ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
               ECR_REPOSITORY: mello  # Replace with your ECR repository name
-              IMAGE_TAG: ${{ github.sha }}  # Use the SHA hash as the image tag or change as necessary
+              IMAGE_TAG: latest  # Use the SHA hash as the image tag or change as necessary
             run: |
               docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
           - name: Output the image name
             run: |
-              echo "Image pushed: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+              echo "ECR Registry URL: ${{ steps.login-ecr.outputs.registry }}"
