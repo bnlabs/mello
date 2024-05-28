@@ -18,8 +18,6 @@ const options: Partial<ServerOptions> = {
 
 export const io = new Server(options)
 
-const botName = "Notification"
-
 export function initSocket(event: H3Event) {
 	// @ts-ignore
 	io.attach(event.node.res.socket?.server)
