@@ -81,18 +81,17 @@ export function useWebRtc() {
 		videoPlayer: HTMLMediaElement,
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
-		let remoteStream: MediaStream | null
-		remoteStream = new MediaStream()
+		localStream = new MediaStream()
 
 		if (videoPlayer) {
-			videoPlayer.srcObject = remoteStream
+			videoPlayer.srcObject = localStream
 		}
 
 		newPeerConnection.ontrack = (event) => {
 			event.streams[0].getTracks().forEach((track) => {
-				remoteStream?.addTrack(track)
+				localStream?.addTrack(track)
 				track.onended = function () {
-					remoteStream = null
+					localStream = null
 				}
 			})
 		}
