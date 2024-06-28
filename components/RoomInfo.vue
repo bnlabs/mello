@@ -12,9 +12,11 @@ defineProps<{
 
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
+type ToggleChat = () => void
 
 const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
 const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+const toggleChat = inject<ToggleChat>("ToggleChat")
 </script>
 
 <template>
@@ -36,6 +38,7 @@ const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">
+			<Button @click="toggleChat" severity="info" outlined> Hide Chat</Button>
 			<Button v-if="isHost === 'true'" @click="toggleStream" outlined
 				>Stream</Button
 			>

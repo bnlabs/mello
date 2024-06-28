@@ -16,6 +16,7 @@ interface Chat {
 
 const chats = ref<Chat[]>([])
 const users = ref<User[]>([])
+const chatIsOpen = ref(true)
 const { socket } = useSocketIo()
 const {
 	getPeerConnection,
@@ -42,6 +43,10 @@ const sendMessage = async (message: String) => {
 
 const leaveRoom = () => {
 	router.push("/")
+}
+
+const handleToggleChat = () => {
+	chatIsOpen.value = !chatIsOpen.value
 }
 
 const handleToggleStream = () => {
@@ -115,6 +120,7 @@ const preventPlayPause = (event: MouseEvent): void => {
 
 provide("sendMessage", sendMessage)
 provide("handleToggleStream", handleToggleStream)
+provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leaveRoom)
 
 const { username, room, isHost } = route.query as Partial<Chat>
@@ -286,10 +292,15 @@ onBeforeUnmount(() => {
 				autoPlay
 				playsInline
 				ref="videoPlayer"
-				class="w-5/6"
+				:class="chatIsOpen ? 'w-5/6 border-2' : 'w-full'"
 				:muted="isHost === 'true'"
 			></video>
-			<Chat :chats class="w-1/6"> </Chat>
+			<Chat 
+				v-if="chatIsOpen"
+				:chats 
+				class=" 'w-1/6' : 'w-0'"
+			>
+			</Chat>
 		</div>
 
 		<div class="h-[10%]">
