@@ -292,10 +292,11 @@ onBeforeUnmount(() => {
 				autoPlay
 				playsInline
 				ref="videoPlayer"
-				:class="chatIsOpen ? 'w-5/6 border-2' : 'w-full'"
+				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
 			></video>
-			<Chat v-if="chatIsOpen" :chats class="'w-1/6' : 'w-0'"> </Chat>
+			<Chat v-if="chatIsOpen" :chats :class="chatIsOpen ? 'w-1/6' : 'w-0'">
+			</Chat>
 		</div>
 
 		<div class="h-[10%]">
