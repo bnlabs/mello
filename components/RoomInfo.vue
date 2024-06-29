@@ -38,7 +38,7 @@ const toggleChat = inject<ToggleChat>("ToggleChat")
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">
-			<Button @click="toggleChat" severity="info" outlined> Hide Chat</Button>
+			<Button @click="toggleChat" severity="secondary" outlined> Toggle Chat </Button>
 			<Button v-if="isHost === 'true'" @click="toggleStream" outlined
 				>Stream</Button
 			>
