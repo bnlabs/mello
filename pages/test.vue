@@ -53,6 +53,7 @@ const { toggleScreenshare, hostRoom, leaveRoom, joinRoom, currentUsername, parti
 
 const { username, room, isHost } = route.query as Partial<UrlParam>
 const localVideo = ref<HTMLMediaElement | null>(null)
+const chats = ref<ChatMessage[]>([])
 
 onMounted(async () => {
 	console.log(username)

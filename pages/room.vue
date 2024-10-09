@@ -3,18 +3,9 @@ import { ref, onMounted, provide } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useSocketIo } from "@/composables/useSocketIo"
 import { useWebRtc } from "@/composables/useWebRtc"
-import { type User } from "~/server/types"
 import moment from "moment"
 
-interface Chat {
-	username: string
-	text: string
-	time: string
-	room?: string
-	isHost?: string
-}
-
-const chats = ref<Chat[]>([])
+const chats = ref<ChatMessage[]>([])
 const users = ref<User[]>([])
 const chatIsOpen = ref(true)
 const { socket } = useSocketIo()
@@ -123,7 +114,7 @@ provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leaveRoom)
 
-const { username, room, isHost } = route.query as Partial<Chat>
+const { username, room, isHost } = route.query as Partial<ChatMessage>
 onMounted(() => {
 	if (!username || !room || !isHost) {
 		router.push("/")
@@ -136,7 +127,7 @@ onMounted(() => {
 		socket.emit("joinRoom", { username, room })
 	}
 
-	socket.on("message", (response: Chat) => {
+	socket.on("message", (response: ChatMessage) => {
 		chats.value.push(response)
 	})
 
@@ -156,7 +147,7 @@ onMounted(() => {
 				currentHost.value = response.host
 			}
 
-			const notificationMessage: Chat = {
+			const notificationMessage: ChatMessage = {
 				username: botName,
 				text: `${response.newUser.username} has joined the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
@@ -186,7 +177,7 @@ onMounted(() => {
 				removePeerConnection(response.oldUser.id)
 			}
 
-			const notifMessage: Chat = {
+			const notifMessage: ChatMessage = {
 				username: botName,
 				text: `${response.oldUser.username} has left the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
@@ -225,7 +216,7 @@ onMounted(() => {
 	)
 
 	socket.on("reconnect", (attemptNumber) => {
-		const notifMessage: Chat = {
+		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Reconnected to the server after ${attemptNumber} attempts.`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
@@ -234,7 +225,7 @@ onMounted(() => {
 	})
 
 	socket.on("reconnect_attempt", (attemptNumber) => {
-		const notifMessage: Chat = {
+		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Attempting to reconnect (attempt ${attemptNumber})`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
@@ -243,7 +234,7 @@ onMounted(() => {
 	})
 
 	socket.on("disconnect", (reason) => {
-		const notifMessage: Chat = {
+		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Disconnected: ${reason}`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
@@ -259,7 +250,7 @@ onMounted(() => {
 	})
 
 	socket.on("error", (error) => {
-		const notifMessage: Chat = {
+		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Connection Error: ${error}`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
