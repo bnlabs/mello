@@ -16,7 +16,6 @@ export default {
 				username: false,
 				room: false,
 			},
-			attemptedToJoin: false, // Flag for tracking form submission attempt,
 			isServerSideStreaming: false,
 		}
 	},
@@ -31,16 +30,16 @@ export default {
 		},
 		showUsernameValidation() {
 			return (
-				(this.touched.username || this.attemptedToJoin) && !this.isUsernameValid
+				(this.touched.username) && !this.isUsernameValid
 			)
 		},
 		showRoomValidation() {
-			return (this.touched.room || this.attemptedToJoin) && !this.isRoomValid
+			return (this.touched.room) && !this.isRoomValid
 		},
 	},
 	methods: {
 		joinRoom() {
-			this.attemptedToJoin = true // Set the flag to true to indicate an attempt to submit
+
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
@@ -61,7 +60,6 @@ export default {
 			if (!this.username) {
 				this.username = foodList[Math.floor(Math.random() * foodList.length)]
 			}
-			this.attemptedToJoin = true
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
