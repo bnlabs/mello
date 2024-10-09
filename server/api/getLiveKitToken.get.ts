@@ -1,6 +1,6 @@
 import { AccessToken } from "livekit-server-sdk"
 
-export default defineEventHandler(async (event: any) => {
+export default defineEventHandler(async (event) => {
 
 	const query = getQuery(event)
 	const room:string = query.room?.toString() ?? ""
