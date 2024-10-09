@@ -130,6 +130,7 @@ export default {
 						<Button
 							label="Join Room"
 							type="submit"
+							:disabled="!isUsernameValid || !isRoomValid"
 							class="h-12 w-32 cursor-pointer rounded-md bg-[rgb(99,160,177)] text-black"
 						/>
 					</form>
