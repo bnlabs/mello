@@ -5,11 +5,14 @@
 				autoPlay
 				playsInline
 				ref="localVideo"
-				class="w-5/6 bg-black"
+				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
 			/>
 
-			<Chat class="w-1/6" :chats="[]" />
+			<Chat v-if="chatIsOpen"
+				:chats="[]"
+			 	:class="chatIsOpen ? 'w-1/6' : 'w-0'"
+			/>
 		</div>
 
 		<div
@@ -32,7 +35,7 @@
 			</div>
 
 			<div class="flex flex-row gap-5 pr-3">
-				<Button severity="info" outlined> Hide Chat</Button>
+				<Button severity="info" @click="handleToggleChat" outlined> Hide Chat</Button>
 				<Button v-if="isHost === 'true'" @click="screenshare" outlined
 					>Stream</Button
 				>
@@ -60,9 +63,15 @@ const {
 	participantNames,
 } = useLiveKit()
 
+// URL param
 const { username, room, isHost } = route.query as Partial<UrlParam>
+
+// page data
 const localVideo = ref<HTMLMediaElement | null>(null)
 const chats = ref<ChatMessage[]>([])
+
+// UI state
+const chatIsOpen = ref(true)
 
 onMounted(async () => {
 	console.log(username)
@@ -100,8 +109,13 @@ const screenshare = async () => {
 	}
 }
 
+const handleToggleChat = () => {
+	chatIsOpen.value = !chatIsOpen.value
+}
+
 provide("sendMessageSfu", () => {}) // TODO: implement
 provide("handleToggleStreamSfu", screenshare)
-provide("ToggleChatSfu", () => {}) // TODO: implement
+provide("ToggleChatSfu", handleToggleChat)
 provide("leaveRoomSfu", leave)
+
 </script>
