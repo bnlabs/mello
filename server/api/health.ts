@@ -1,6 +1,6 @@
 
 export default defineEventHandler(async () => {
-    const options:any = { 
+    const options:Intl.DateTimeFormatOptions = { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric', 
