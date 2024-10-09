@@ -1,5 +1,5 @@
 
-export default defineEventHandler(async (_) => {
+export default defineEventHandler(async () => {
     const options:any = { 
         year: 'numeric', 
         month: 'long', 
