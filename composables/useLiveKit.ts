@@ -69,7 +69,7 @@ export function useLiveKit() {
 
 	const leaveRoom = async () => {
 		if (currentRoom.value) {
-			currentRoom.value?.disconnect()
+			await currentRoom.value?.disconnect()
 		}
 	}
 
