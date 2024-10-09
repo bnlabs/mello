@@ -16,7 +16,8 @@ export default {
 				username: false,
 				room: false,
 			},
-			attemptedToJoin: false, // Flag for tracking form submission attempt
+			attemptedToJoin: false, // Flag for tracking form submission attempt,
+			isServerSideStreaming: false,
 		}
 	},
 	computed: {
@@ -145,6 +146,12 @@ export default {
 						@submit.prevent="hostRoom"
 						class="flex w-3/6 flex-col items-center gap-8 text-white"
 					>
+						<div class="flex justify-end gap-2 items-center">
+							<div>
+								Server Side Streaming
+							</div>
+							<ToggleButton v-model="isServerSideStreaming"/>
+						</div>
 						<div class="flex flex-col gap-2">
 							<div class="w-full">
 								<label for="username">Username</label>
