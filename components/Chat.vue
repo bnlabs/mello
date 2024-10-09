@@ -2,12 +2,7 @@
 import { watch, nextTick } from "vue"
 import moment from "moment"
 
-interface Chat {
-	username: string
-	text: string
-	time: string
-	room?: string
-}
+
 
 const messagesContainer = ref<HTMLElement | null>(null)
 const scrollToBottom = () => {
@@ -23,7 +18,7 @@ const convertToLocaleTime = (utcTime: string) => {
 }
 
 const props = defineProps<{
-	chats: Chat[]
+	chats: ChatMessage[]
 }>()
 
 watch(() => props.chats, scrollToBottom, { deep: true })
