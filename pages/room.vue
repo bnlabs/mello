@@ -114,7 +114,13 @@ provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leaveRoom)
 
-const { username, room, isHost } = route.query as Partial<ChatMessage>
+interface UrlParam {
+	username: string
+	room: string
+	isHost: string
+}
+
+const { username, room, isHost } = route.query as Partial<UrlParam>
 onMounted(() => {
 	if (!username || !room || !isHost) {
 		router.push("/")
