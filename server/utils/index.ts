@@ -1,7 +1,6 @@
 import { Server, type ServerOptions, type Socket } from "socket.io"
 import moment from "moment"
 import type { H3Event } from "h3"
-import type { User } from "../types"
 import {
 	userJoin,
 	getRoomUsers,
