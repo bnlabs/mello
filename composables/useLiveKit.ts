@@ -15,6 +15,8 @@ export function useLiveKit() {
 	const currentUsername = ref<string>("")
 	const participants = ref<Participant[]>([])
 
+	const { pushMessage } = useChatMessage()
+
 	const fetchToken = async (
 		roomName: string,
 		username: string,
@@ -95,6 +97,7 @@ export function useLiveKit() {
 
 	const handleParticipantJoin = async (participant: Participant) => {
 		participants.value.push(participant)
+		await pushMessage(`${participant.name} has joined the chat`)
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
@@ -105,6 +108,8 @@ export function useLiveKit() {
 			if (index !== -1) {
 				participants.value.splice(index, 1) // Remove the object at the found index
 			}
+
+			await pushMessage(`${participant.name} has left the chat`)
 		}
 	}
 

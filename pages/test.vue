@@ -10,7 +10,7 @@
 			/>
 
 			<Chat v-if="chatIsOpen"
-				:chats="[]"
+				:chats="chatMessages"
 			 	:class="chatIsOpen ? 'w-1/6' : 'w-0'"
 			/>
 		</div>
@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+
 interface UrlParam {
 	username: string
 	room: string
@@ -54,6 +55,7 @@ interface UrlParam {
 
 const route = useRoute()
 const router = useRouter()
+
 const {
 	toggleScreenshare,
 	hostRoom,
@@ -68,15 +70,70 @@ const { username, room, isHost } = route.query as Partial<UrlParam>
 
 // page data
 const localVideo = ref<HTMLMediaElement | null>(null)
-const chats = ref<ChatMessage[]>([])
+const { chatMessages } = useChatMessage()
 
 // UI state
 const chatIsOpen = ref(true)
 
-onMounted(async () => {
-	console.log(username)
-	console.log(room)
+// Video element function
+const toggleFullScreen = (): void => {
+	if (!localVideo.value) return
 
+	if (!document.fullscreenElement) {
+		if (localVideo.value.requestFullscreen) {
+			localVideo.value.requestFullscreen()
+		} else if ((localVideo.value as any).mozRequestFullScreen) {
+			/* Firefox */
+			;(localVideo.value as any).mozRequestFullScreen()
+		} else if ((localVideo.value as any).webkitRequestFullscreen) {
+			/* Chrome, Safari & Opera */
+			;(localVideo.value as any).webkitRequestFullscreen()
+		} else if ((localVideo.value as any).msRequestFullscreen) {
+			/* IE/Edge */
+			;(localVideo.value as any).msRequestFullscreen()
+		}
+	} else {
+		if (document.exitFullscreen) {
+			document.exitFullscreen()
+		} else if ((document as any).mozCancelFullScreen) {
+			/* Firefox */
+			;(document as any).mozCancelFullScreen()
+		} else if ((document as any).webkitExitFullscreen) {
+			/* Chrome, Safari and Opera */
+			;(document as any).webkitExitFullscreen()
+		} else if ((document as any).msExitFullscreen) {
+			/* IE/Edge */
+			;(document as any).msExitFullscreen()
+		}
+	}
+}
+
+const preventPlayPause = (event: MouseEvent): void => {
+	event.preventDefault()
+	toggleFullScreen()
+}
+
+const adjustVolume = (event: KeyboardEvent) => {
+	if (!localVideo.value) return
+
+	const volumeChangeAmount = 0.1
+	switch (event.key) {
+		case "ArrowUp":
+			localVideo.value.volume = Math.min(
+				localVideo.value.volume + volumeChangeAmount,
+				1,
+			)
+			break
+		case "ArrowDown":
+			localVideo.value.volume = Math.max(
+				localVideo.value.volume - volumeChangeAmount,
+				0,
+			)
+			break
+	}
+}
+
+onMounted(async () => {
 	if (!username || !room) {
 		router.push("/")
 		return
@@ -97,10 +154,18 @@ onMounted(async () => {
 	} catch {
 		console.log("ERROR JOINING")
 	}
+
+	window.addEventListener("keydown", adjustVolume)
+
+	if (localVideo.value) {
+		// Add click event listener to prevent play/pause
+		localVideo.value.addEventListener("click", preventPlayPause)
+	}
 })
 
 const leave = async () => {
 	await leaveRoom()
+	router.push("/")
 }
 
 const screenshare = async () => {
