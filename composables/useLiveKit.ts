@@ -38,7 +38,10 @@ export function useLiveKit() {
 			const data = await response.json() // Parse the response to JSON
 			token.value = data.token // Access the token from the parsed data
 
-			return data.token
+			return {
+				token: data.token,
+				host: data.host ?? "",
+			}
 		} else {
 			console.log("error fetching token")
 		}
@@ -68,7 +71,11 @@ export function useLiveKit() {
 			RoomEvent.ParticipantDisconnected,
 			handleParticipantLeave,
 		)
-		currentRoom.value.connect(wsUrl, fetchedToken)
+		currentRoom.value.connect(wsUrl, fetchedToken?.token)
+
+		return {
+			host: fetchedToken?.host,
+		}
 	}
 
 	const leaveRoom = async () => {

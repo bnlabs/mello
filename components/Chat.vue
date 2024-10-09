@@ -2,8 +2,6 @@
 import { watch, nextTick } from "vue"
 import moment from "moment"
 
-
-
 const messagesContainer = ref<HTMLElement | null>(null)
 const scrollToBottom = () => {
 	nextTick(() => {

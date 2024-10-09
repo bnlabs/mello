@@ -9,9 +9,10 @@
 				:muted="isHost === 'true'"
 			/>
 
-			<Chat v-if="chatIsOpen"
+			<Chat
+				v-if="chatIsOpen"
 				:chats="chatMessages"
-			 	:class="chatIsOpen ? 'w-1/6' : 'w-0'"
+				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
 			/>
 		</div>
 
@@ -28,14 +29,16 @@
 				</RoomInfoSlot>
 
 				<RoomInfoSlot title="Host">
-					<span class="text-black"> {{}}</span>
+					<span class="text-black"> {{ currentHost }}</span>
 				</RoomInfoSlot>
 
 				<RoomUserList :users="[]" />
 			</div>
 
 			<div class="flex flex-row gap-5 pr-3">
-				<Button severity="info" @click="handleToggleChat" outlined> Hide Chat</Button>
+				<Button severity="info" @click="handleToggleChat" outlined>
+					Hide Chat</Button
+				>
 				<Button v-if="isHost === 'true'" @click="screenshare" outlined
 					>Stream</Button
 				>
@@ -46,7 +49,6 @@
 </template>
 
 <script setup lang="ts">
-
 interface UrlParam {
 	username: string
 	room: string
@@ -71,6 +73,7 @@ const { username, room, isHost } = route.query as Partial<UrlParam>
 // page data
 const localVideo = ref<HTMLMediaElement | null>(null)
 const { chatMessages } = useChatMessage()
+const currentHost = ref<string>("")
 
 // UI state
 const chatIsOpen = ref(true)
@@ -142,13 +145,15 @@ onMounted(async () => {
 	try {
 		if (isHost === "true") {
 			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+			currentHost.value = username
 		} else {
 			if (localVideo.value) {
-				await joinRoom(
+				const { host } = await joinRoom(
 					room.toString() ?? "",
 					username.toString() ?? "",
 					localVideo.value,
 				)
+				currentHost.value = host
 			}
 		}
 	} catch {
@@ -182,5 +187,4 @@ provide("sendMessageSfu", () => {}) // TODO: implement
 provide("handleToggleStreamSfu", screenshare)
 provide("ToggleChatSfu", handleToggleChat)
 provide("leaveRoomSfu", leave)
-
 </script>
