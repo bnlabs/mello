@@ -10,7 +10,7 @@ import {
 export function useLiveKit() {
 	const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
 	const token = ref<string>("")
-	const room = ref<Room | null>(null)
+	const currentRoom = ref<Room | null>(null)
 	const currentUsername = ref<string>("")
 
 	const fetchToken = async (
@@ -53,37 +53,37 @@ export function useLiveKit() {
 			publication.videoTrack?.attach(remoteVideoElement)
 		}
 
-		room.value?.disconnect()
+		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
 		const fetchedToken = await fetchToken(roomName, username, false, true)
-		room.value = new Room()
-		room.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
-		room.value.connect(wsUrl, fetchedToken)
+		currentRoom.value = new Room()
+		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+		currentRoom.value.connect(wsUrl, fetchedToken)
 	}
 
 	const leaveRoom = async () => {
-		if (room) {
-			room.value?.disconnect()
+		if (currentRoom.value) {
+			currentRoom.value?.disconnect()
 		}
 	}
 
 	const hostRoom = async (roomName: string, username: string) => {
-		room.value?.disconnect()
+		currentRoom.value?.disconnect()
 
 		await fetchToken(roomName, username, true, false)
 		currentUsername.value = username
 
 		const options: RoomOptions = {}
 
-		room.value = new Room(options)
-		await room.value?.connect(wsUrl, token.value)
+		currentRoom.value = new Room(options)
+		await currentRoom.value?.connect(wsUrl, token.value)
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
-		const screenshareEnabled = room.value?.localParticipant.isScreenShareEnabled
+		const screenshareEnabled = currentRoom.value?.localParticipant.isScreenShareEnabled
 		const screensharePub =
-			await room.value?.localParticipant.setScreenShareEnabled(
+			await currentRoom.value?.localParticipant.setScreenShareEnabled(
 				!screenshareEnabled,
 			)
 
@@ -98,6 +98,6 @@ export function useLiveKit() {
 		fetchToken,
 		token,
 		currentUsername,
-		room,
+		currentRoom,
 	}
 }
