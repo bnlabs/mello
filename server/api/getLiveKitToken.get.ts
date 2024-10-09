@@ -30,7 +30,8 @@ const createToken = async (
 		process.env.LIVEKIT_API_SECRET,
 		{
 			identity: username,
-			// Token to expire after 10 minutes
+			// Token to expire after 10 minutes,
+			name: username,
 			ttl: "10m",
 		},
 	)
