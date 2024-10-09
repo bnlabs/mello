@@ -1,4 +1,5 @@
 import {
+	Participant,
 	RemoteParticipant,
 	RemoteTrack,
 	RemoteTrackPublication,
@@ -12,6 +13,7 @@ export function useLiveKit() {
 	const token = ref<string>("")
 	const currentRoom = ref<Room | null>(null)
 	const currentUsername = ref<string>("")
+	const participants = ref<Participant[]>([])
 
 	const fetchToken = async (
 		roomName: string,
@@ -59,7 +61,10 @@ export function useLiveKit() {
 		const fetchedToken = await fetchToken(roomName, username, false, true)
 		currentRoom.value = new Room()
 		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
+		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
 		currentRoom.value.connect(wsUrl, fetchedToken)
+
 	}
 
 	const leaveRoom = async () => {
@@ -77,7 +82,25 @@ export function useLiveKit() {
 		const options: RoomOptions = {}
 
 		currentRoom.value = new Room(options)
+		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
+		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
+
 		await currentRoom.value?.connect(wsUrl, token.value)
+	}
+
+	const handleParticipantJoin = async (participant: Participant) => {
+		participants.value.push(participant)
+	}
+
+	const handleParticipantLeave = async (participant: RemoteParticipant) => {
+		if(participant.name){
+			const name = participant.name
+			const index = participants.value.findIndex(p => p.name === name)
+
+			if (index !== -1) {
+				participants.value.splice(index, 1); // Remove the object at the found index
+			}
+		}
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
@@ -90,6 +113,11 @@ export function useLiveKit() {
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
 
+	const participantNames = computed(() => 
+		participants.value.map(p => p.name)
+	  );
+	  
+
 	return {
 		toggleScreenshare,
 		hostRoom,
@@ -99,5 +127,6 @@ export function useLiveKit() {
 		token,
 		currentUsername,
 		currentRoom,
+		participantNames
 	}
 }
