@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import InputText from "primevue/inputtext"
 import TabView from "primevue/tabview"
 import TabPanel from "primevue/tabpanel"
@@ -16,7 +16,7 @@ export default {
 				username: false,
 				room: false,
 			},
-			isServerSideStreaming: false,
+			serverSideStreaming: false,
 		}
 	},
 	computed: {
@@ -29,26 +29,24 @@ export default {
 			return this.room.trim().length > 0 && this.room.trim().length <= 30
 		},
 		showUsernameValidation() {
-			return (
-				(this.touched.username) && !this.isUsernameValid
-			)
+			return this.touched.username && !this.isUsernameValid
 		},
 		showRoomValidation() {
-			return (this.touched.room) && !this.isRoomValid
+			return this.touched.room && !this.isRoomValid
 		},
 	},
 	methods: {
 		joinRoom() {
-
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
+
 			this.$router.push({
 				path: "/room",
 				query: {
 					username: this.username.trim(),
 					room: this.room.trim(),
-					isHost: false,
+					isHost: "false",
 				},
 			})
 		},
@@ -63,14 +61,26 @@ export default {
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
-			this.$router.push({
-				path: "/room",
-				query: {
-					username: this.username.trim(),
-					room: this.room.trim(),
-					isHost: true,
-				},
-			})
+
+			if (this.serverSideStreaming) {
+				this.$router.push({
+					path: "/test",
+					query: {
+						username: this.username.trim(),
+						room: this.room.trim(),
+						isHost: "true",
+					},
+				})
+			} else {
+				this.$router.push({
+					path: "/room",
+					query: {
+						username: this.username.trim(),
+						room: this.room.trim(),
+						isHost: "true",
+					},
+				})
+			}
 		},
 		setUsernameTouched() {
 			this.touched.username = true
@@ -144,11 +154,11 @@ export default {
 						@submit.prevent="hostRoom"
 						class="flex w-3/6 flex-col items-center gap-8 text-white"
 					>
-						<div class="flex justify-end gap-2 items-center">
+						<div class="flex items-center justify-end gap-2">
 							<div>
 								Server Side Streaming
+								<input type="checkbox" v-model="serverSideStreaming" />
 							</div>
-							<ToggleButton v-model="isServerSideStreaming"/>
 						</div>
 						<div class="flex flex-col gap-2">
 							<div class="w-full">
