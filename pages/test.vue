@@ -1,31 +1,42 @@
 <template>
-	<div class="flex flex-col w-full">
+	<div class="flex flex-col w-full h-screen bg-black">
 
-		<div class="w-full flex flex-row">
+		<div class="w-full flex flex-row h-[90%]">
 			<video
 				autoPlay
 				playsInline
 				ref="localVideo"
-				class= "w-5/6 bg-black rounded-lg"
+				class= "w-5/6 bg-black"
 				:muted="isHost === 'true'"
 			/>
 			
-			<div class="room-info flex flex-col items-center gap-2 border-2 border-solid border-[rgb(40,40,40)] w-1/6">
-				<div class="flex flex-row gap-5 mt-5">
-					<div class="">username: {{ currentUsername }}</div>
-					<div class="">room: {{ room }}</div>
-				</div>
+			<Chat class="w-1/6" :chats="[]"/>
+		</div>
 
-				<div class="flex flex-row gap-2">
-					<Button @click="screenshare" severity="secondary"> screenshare </Button>
-					<Button @click="leave" severity="danger"> disconnect </Button>
-				</div>
+		<div class="Room-Info flex flex-row items-center justify-between pl-4 h-[10%]">
+			<div class="flex h-full items-center gap-3">
+				<RoomInfoSlot title="Room">
+					<span class="text-black"> {{ room }}</span>
+				</RoomInfoSlot>
+
+				<RoomInfoSlot title="Username">
+					<span class="text-black"> {{ currentUsername }}</span>
+				</RoomInfoSlot>
+
+				<RoomInfoSlot title="Host">
+					<span class="text-black"> {{  }}</span>
+				</RoomInfoSlot>
+
+				<RoomUserList :users="[]" />
+			</div>
+
+			<div class="flex flex-row gap-5 pr-3">
+				<Button severity="info" outlined> Hide Chat</Button>
+				<Button v-if="isHost === 'true'" @click="screenshare" outlined>Stream</Button>
+				<Button @click="leave" severity="danger" outlined>Leave Room</Button>
 			</div>
 		</div>
 
-		<div class="Participants">
-			Participants: {{ participantNames }}
-		</div>
 	</div>
 </template>
 
