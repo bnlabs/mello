@@ -1,19 +1,20 @@
 <template>
-	<div class="flex flex-col w-full h-screen bg-black">
-
-		<div class="w-full flex flex-row h-[90%]">
+	<div class="flex h-screen w-full flex-col bg-black">
+		<div class="flex h-[90%] w-full flex-row">
 			<video
 				autoPlay
 				playsInline
 				ref="localVideo"
-				class= "w-5/6 bg-black"
+				class="w-5/6 bg-black"
 				:muted="isHost === 'true'"
 			/>
-			
-			<Chat class="w-1/6" :chats="[]"/>
+
+			<Chat class="w-1/6" :chats="[]" />
 		</div>
 
-		<div class="Room-Info flex flex-row items-center justify-between pl-4 h-[10%]">
+		<div
+			class="Room-Info flex h-[10%] flex-row items-center justify-between pl-4"
+		>
 			<div class="flex h-full items-center gap-3">
 				<RoomInfoSlot title="Room">
 					<span class="text-black"> {{ room }}</span>
@@ -24,7 +25,7 @@
 				</RoomInfoSlot>
 
 				<RoomInfoSlot title="Host">
-					<span class="text-black"> {{  }}</span>
+					<span class="text-black"> {{}}</span>
 				</RoomInfoSlot>
 
 				<RoomUserList :users="[]" />
@@ -32,11 +33,12 @@
 
 			<div class="flex flex-row gap-5 pr-3">
 				<Button severity="info" outlined> Hide Chat</Button>
-				<Button v-if="isHost === 'true'" @click="screenshare" outlined>Stream</Button>
+				<Button v-if="isHost === 'true'" @click="screenshare" outlined
+					>Stream</Button
+				>
 				<Button @click="leave" severity="danger" outlined>Leave Room</Button>
 			</div>
 		</div>
-
 	</div>
 </template>
 
@@ -49,7 +51,14 @@ interface UrlParam {
 
 const route = useRoute()
 const router = useRouter()
-const { toggleScreenshare, hostRoom, leaveRoom, joinRoom, currentUsername, participantNames } = useLiveKit()
+const {
+	toggleScreenshare,
+	hostRoom,
+	leaveRoom,
+	joinRoom,
+	currentUsername,
+	participantNames,
+} = useLiveKit()
 
 const { username, room, isHost } = route.query as Partial<UrlParam>
 const localVideo = ref<HTMLMediaElement | null>(null)
@@ -59,17 +68,21 @@ onMounted(async () => {
 	console.log(username)
 	console.log(room)
 
-	if(!username || !room ) {
+	if (!username || !room) {
 		router.push("/")
 		return
 	}
 
 	try {
-		if(isHost === "true"){
+		if (isHost === "true") {
 			await hostRoom(room.toString() ?? "", username.toString() ?? "")
 		} else {
 			if (localVideo.value) {
-				await joinRoom(room.toString() ?? "", username.toString() ?? "", localVideo.value)
+				await joinRoom(
+					room.toString() ?? "",
+					username.toString() ?? "",
+					localVideo.value,
+				)
 			}
 		}
 	} catch {

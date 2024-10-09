@@ -62,9 +62,11 @@ export function useLiveKit() {
 		currentRoom.value = new Room()
 		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
-		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
+		currentRoom.value.on(
+			RoomEvent.ParticipantDisconnected,
+			handleParticipantLeave,
+		)
 		currentRoom.value.connect(wsUrl, fetchedToken)
-
 	}
 
 	const leaveRoom = async () => {
@@ -83,7 +85,10 @@ export function useLiveKit() {
 
 		currentRoom.value = new Room(options)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
-		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
+		currentRoom.value.on(
+			RoomEvent.ParticipantDisconnected,
+			handleParticipantLeave,
+		)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
 	}
@@ -93,18 +98,19 @@ export function useLiveKit() {
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
-		if(participant.name){
+		if (participant.name) {
 			const name = participant.name
-			const index = participants.value.findIndex(p => p.name === name)
+			const index = participants.value.findIndex((p) => p.name === name)
 
 			if (index !== -1) {
-				participants.value.splice(index, 1); // Remove the object at the found index
+				participants.value.splice(index, 1) // Remove the object at the found index
 			}
 		}
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
-		const screenshareEnabled = currentRoom.value?.localParticipant.isScreenShareEnabled
+		const screenshareEnabled =
+			currentRoom.value?.localParticipant.isScreenShareEnabled
 		const screensharePub =
 			await currentRoom.value?.localParticipant.setScreenShareEnabled(
 				!screenshareEnabled,
@@ -113,10 +119,7 @@ export function useLiveKit() {
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
 
-	const participantNames = computed(() => 
-		participants.value.map(p => p.name)
-	  );
-	  
+	const participantNames = computed(() => participants.value.map((p) => p.name))
 
 	return {
 		toggleScreenshare,
@@ -127,6 +130,6 @@ export function useLiveKit() {
 		token,
 		currentUsername,
 		currentRoom,
-		participantNames
+		participantNames,
 	}
 }

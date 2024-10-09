@@ -14,11 +14,11 @@ type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
 type ToggleChatFunction = () => void
 
-let toggleStream: ToggleStreamFunction | undefined;
-let leaveRoom: LeaveRoomFunction | undefined; 
-let toggleChat: ToggleChatFunction | undefined;
+let toggleStream: ToggleStreamFunction | undefined
+let leaveRoom: LeaveRoomFunction | undefined
+let toggleChat: ToggleChatFunction | undefined
 
-if(props.isSfu){
+if (props.isSfu) {
 	toggleStream = inject<ToggleStreamFunction>("handleToggleStreamSfu")
 	leaveRoom = inject<LeaveRoomFunction>("leaveRoomSfu")
 	toggleChat = inject<ToggleChatFunction>("ToggleChatSfu")
@@ -27,7 +27,6 @@ if(props.isSfu){
 	leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 	toggleChat = inject<ToggleChatFunction>("ToggleChat")
 }
-
 </script>
 
 <template>
