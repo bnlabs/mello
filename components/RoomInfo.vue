@@ -1,21 +1,33 @@
 <script setup lang="ts">
 import { inject } from "vue"
 
-defineProps<{
+const props = defineProps<{
 	roomName: string
 	users: Array<User>
 	username: string
 	host: string
 	isHost: string
+	isSfu: boolean
 }>()
 
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
-type ToggleChat = () => void
+type ToggleChatFunction = () => void
 
-const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
-const toggleChat = inject<ToggleChat>("ToggleChat")
+let toggleStream: ToggleStreamFunction | undefined;
+let leaveRoom: LeaveRoomFunction | undefined; 
+let toggleChat: ToggleChatFunction | undefined;
+
+if(props.isSfu){
+	toggleStream = inject<ToggleStreamFunction>("handleToggleStreamSfu")
+	leaveRoom = inject<LeaveRoomFunction>("leaveRoomSfu")
+	toggleChat = inject<ToggleChatFunction>("ToggleChatSfu")
+} else {
+	toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
+	leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+	toggleChat = inject<ToggleChatFunction>("ToggleChat")
+}
+
 </script>
 
 <template>

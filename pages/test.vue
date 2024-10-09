@@ -86,4 +86,9 @@ const screenshare = async () => {
 		toggleScreenshare(localVideo.value)
 	}
 }
+
+provide("sendMessageSfu", () => {}) // TODO: implement
+provide("handleToggleStreamSfu", screenshare)
+provide("ToggleChatSfu", () => {}) // TODO: implement
+provide("leaveRoomSfu", leave)
 </script>

@@ -297,6 +297,7 @@ onBeforeUnmount(() => {
 				:username="username ?? ''"
 				:host="currentHost"
 				:isHost="isHost ?? ''"
+				:isSfu="false"
 			/>
 		</div>
 		<!-- Dialog component -->
