@@ -1,28 +1,31 @@
 <template>
-	<div class="m-8 flex flex-col items-center justify-center gap-5">
-		<div class="flex flex-row items-center gap-2">
-			<div class="m-5">username: {{ currentUsername }}</div>
-			<div class="m-5">room: {{ room }}</div>
-			<Button @click="host"> host room </Button>
+	<div class="flex flex-col w-full">
 
-			<Button @click="join"> join room </Button>
+		<div class="w-full flex flex-row">
+			<video
+				autoPlay
+				playsInline
+				ref="localVideo"
+				class= "w-5/6 bg-black rounded-lg"
+				:muted="isHost === 'true'"
+			/>
+			
+			<div class="room-info flex flex-col items-center gap-2 border-2 border-solid border-[rgb(40,40,40)] w-1/6">
+				<div class="flex flex-row gap-5 mt-5">
+					<div class="">username: {{ currentUsername }}</div>
+					<div class="">room: {{ room }}</div>
+				</div>
 
-			<Button @click="leave" severity="danger"> disconnect </Button>
-
-			<Button @click="screenshare" severity="secondary"> screenshare </Button>
+				<div class="flex flex-row gap-2">
+					<Button @click="screenshare" severity="secondary"> screenshare </Button>
+					<Button @click="leave" severity="danger"> disconnect </Button>
+				</div>
+			</div>
 		</div>
 
-        <video
-            autoPlay
-            playsInline
-            ref="localVideo"
-            class= "w-5/6 bg-black rounded-lg"
-            :muted="isHost === 'true'"
-		/>
-
-        <div class="flex flex-row gap-2">
-
-        </div>
+		<div class="Participants">
+			Participants: {{ participantNames }}
+		</div>
 	</div>
 </template>
 
@@ -34,29 +37,41 @@ interface UrlParam {
 }
 
 const route = useRoute()
-const { toggleScreenshare, hostRoom, leaveRoom, joinRoom, currentUsername, currentRoom } =
-	useLiveKit()
+const router = useRouter()
+const { toggleScreenshare, hostRoom, leaveRoom, joinRoom, currentUsername, participantNames } = useLiveKit()
 
 const { username, room, isHost } = route.query as Partial<UrlParam>
 const localVideo = ref<HTMLMediaElement | null>(null)
 
-const host = async () => {
-	await hostRoom("t3", "broadcaster")
-}
+onMounted(async () => {
+	console.log(username)
+	console.log(room)
+
+	if(!username || !room ) {
+		router.push("/")
+		return
+	}
+
+	try {
+		if(isHost === "true"){
+			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+		} else {
+			if (localVideo.value) {
+				await joinRoom(room.toString() ?? "", username.toString() ?? "", localVideo.value)
+			}
+		}
+	} catch {
+		console.log("ERROR JOINING")
+	}
+})
 
 const leave = async () => {
-	leaveRoom()
+	await leaveRoom()
 }
 
 const screenshare = async () => {
 	if (localVideo.value) {
 		toggleScreenshare(localVideo.value)
-	}
-}
-
-const join = async () => {
-	if (localVideo.value) {
-		await joinRoom("t3", "audience", localVideo.value)
 	}
 }
 </script>
