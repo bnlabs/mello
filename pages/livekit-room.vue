@@ -46,6 +46,20 @@
 			</div>
 		</div>
 	</div>
+	<!-- Dialog component -->
+	<Dialog
+		v-model="dialogVisible"
+		header="Failed to join/host"
+		:visible="dialogVisible"
+		@hide="
+			() => {
+				dialogVisible = false
+			}
+		"
+	>
+		<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
+		<Button type="button" @click="router.push('/')">Close</Button>
+	</Dialog>
 </template>
 
 <script setup lang="ts">
@@ -77,6 +91,8 @@ const currentHost = ref<string>("")
 
 // UI state
 const chatIsOpen = ref(true)
+const dialogVisible = useState<boolean>("diaglogVisible", () => false)
+const failureMessage = useState<string>("failureMessage", () => "")
 
 // Video element function
 const toggleFullScreen = (): void => {
@@ -142,11 +158,38 @@ onMounted(async () => {
 		return
 	}
 
+	// check if room already exist
+	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+		method: "GET",
+	})
+
+	if (!res.ok) {
+		dialogVisible.value = true
+		failureMessage.value = "Error Checking if room already exist"
+		return
+	}
+
+	const data = await res.json()
+
 	try {
 		if (isHost === "true") {
+			// hosting room
+			if (data.roomExist) {
+				dialogVisible.value = true
+				failureMessage.value = "Room already exist"
+				return
+			}
+
 			await hostRoom(room.toString() ?? "", username.toString() ?? "")
 			currentHost.value = username
 		} else {
+			// joining existing room
+			if (!data.roomExist) {
+				dialogVisible.value = true
+				failureMessage.value = "Room does not exist"
+				return
+			}
+
 			if (localVideo.value) {
 				const { host } = await joinRoom(
 					room.toString() ?? "",

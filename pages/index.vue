@@ -58,7 +58,10 @@ export default {
 			})
 
 			if (!res.ok) {
-				await this.showError("Network Error", "Error occured while checking if server exist.")
+				await this.showError(
+					"Network Error",
+					"Error occured while checking if server exist.",
+				)
 				return
 			}
 
@@ -99,17 +102,19 @@ export default {
 				})
 
 				if (!res.ok) {
-					await this.showError("Network Error", "Error occured while checking if server exist.")
+					await this.showError(
+						"Network Error",
+						"Error occured while checking if server exist.",
+					)
 					return
 				}
 
 				const data = await res.json()
 
-				if(data.roomExist) {
+				if (data.roomExist) {
 					await this.showError("Error Creating Room", "Room Already Exist")
 					return
 				}
-
 			}
 
 			if (!this.username) {
@@ -151,7 +156,7 @@ export default {
 </script>
 
 <template>
-	<Toast/>
+	<Toast />
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">

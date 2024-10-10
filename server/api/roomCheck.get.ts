@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 				statusCode: 200,
 				roomExist: false,
 				roomIsInLK: false,
-				message: "Room does not exist."
+				message: "Room does not exist.",
 			}
 		}
 	} catch (error) {
