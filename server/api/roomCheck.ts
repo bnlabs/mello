@@ -5,9 +5,6 @@ export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
 	const roomName = query.roomName?.toString() ?? ""
 
-	console.log("Received query:", query)
-	console.log("roomName:", roomName)
-
 	// Check if roomName is provided
 	if (!roomName) {
 		return {
