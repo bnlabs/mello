@@ -64,7 +64,7 @@ export default {
 
 			if (this.serverSideStreaming) {
 				this.$router.push({
-					path: "/test",
+					path: "/livekit-room",
 					query: {
 						username: this.username.trim(),
 						room: this.room.trim(),
