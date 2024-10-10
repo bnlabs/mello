@@ -4,7 +4,7 @@ import { livekitApiKey, livekitApiSecret, roomService } from "../utils/livekit"
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
 	const room: string = query.room?.toString() ?? ""
-	const username = query.username?.toString() ?? ""
+	const username:string = query.username?.toString() ?? ""
 	const canPublish: boolean = query.canPublish === "true"
 	const canSubscribe: boolean = query.canSubscribe === "true"
 
