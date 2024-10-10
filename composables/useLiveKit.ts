@@ -6,6 +6,7 @@ import {
 	Room,
 	RoomEvent,
 	type RoomOptions,
+	type ScreenShareCaptureOptions
 } from "livekit-client"
 
 
@@ -95,7 +96,17 @@ export function useLiveKit() {
 		await fetchToken(roomName, username, true, false)
 		currentUsername.value = username
 
-		const options: RoomOptions = {}
+		const options: RoomOptions = {
+			adaptiveStream: false,
+			disconnectOnPageLeave: true,
+			videoCaptureDefaults: {
+				resolution:  {
+					height: 1440,
+					width: 2560,
+					frameRate: 100
+				}
+			}
+		}
 
 		currentRoom.value = new Room(options)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
@@ -128,12 +139,19 @@ export function useLiveKit() {
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
-		const screenshareEnabled =
-			currentRoom.value?.localParticipant.isScreenShareEnabled
-		const screensharePub =
-			await currentRoom.value?.localParticipant.setScreenShareEnabled(
-				!screenshareEnabled,
-			)
+		const screenshareSettings: ScreenShareCaptureOptions = {
+			audio: true,
+			preferCurrentTab: false,
+			resolution:  {
+				height: 1440,
+				width: 2560,
+				frameRate: 60
+			}
+		}
+
+		const screenshareEnabled = currentRoom.value?.localParticipant.isScreenShareEnabled
+
+		const screensharePub = await currentRoom.value?.localParticipant.setScreenShareEnabled(!screenshareEnabled, screenshareSettings)
 
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
