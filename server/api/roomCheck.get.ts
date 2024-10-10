@@ -31,8 +31,10 @@ export default defineEventHandler(async (event) => {
 			}
 		} else {
 			return {
-				statusCode: 404,
-				message: "Room does not exist.",
+				statusCode: 200,
+				roomExist: false,
+				roomIsInLK: false,
+				message: "Room does not exist."
 			}
 		}
 	} catch (error) {

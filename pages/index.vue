@@ -38,11 +38,11 @@ export default {
 		},
 	},
 	methods: {
-		async showError() {
+		async showError(summary: string, detail: string) {
 			this.toast.add({
 				severity: "error",
-				summary: "Room Does Not Exist",
-				detail: "Room not found",
+				summary: summary,
+				detail: detail,
 				life: 3000,
 			})
 		},
@@ -58,14 +58,14 @@ export default {
 			})
 
 			if (!res.ok) {
-				await this.showError()
+				await this.showError("Network Error", "Error occured while checking if server exist.")
 				return
 			}
 
 			const data = await res.json()
 
 			if (!data.roomExist) {
-				await this.showError()
+				await this.showError("Error joining room", "Room does not exist")
 				return
 			}
 
@@ -92,11 +92,30 @@ export default {
 		async hostRoom() {
 			if (!this.room) {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
+			} else {
+				// Check if room already exist
+				const res = await fetch(`/api/roomCheck?roomName=${this.room}`, {
+					method: "GET",
+				})
+
+				if (!res.ok) {
+					await this.showError("Network Error", "Error occured while checking if server exist.")
+					return
+				}
+
+				const data = await res.json()
+
+				if(data.roomExist) {
+					await this.showError("Error Creating Room", "Room Already Exist")
+					return
+				}
+
 			}
 
 			if (!this.username) {
 				this.username = foodList[Math.floor(Math.random() * foodList.length)]
 			}
+
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
