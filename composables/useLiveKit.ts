@@ -62,6 +62,7 @@ export function useLiveKit() {
 			participant: RemoteParticipant,
 		) => {
 			publication.videoTrack?.attach(remoteVideoElement)
+			publication.audioTrack?.attach(remoteVideoElement)
 		}
 
 		currentRoom.value?.disconnect()
@@ -103,8 +104,16 @@ export function useLiveKit() {
 				resolution:  {
 					height: 1440,
 					width: 2560,
-					frameRate: 100
+					frameRate: 60
 				}
+			},
+			audioCaptureDefaults: {
+				autoGainControl: false,
+				noiseSuppression: false,
+				echoCancellation: false,
+				channelCount: 2,
+				sampleRate: 48000,
+				sampleSize: 16
 			}
 		}
 
@@ -140,7 +149,14 @@ export function useLiveKit() {
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
 		const screenshareSettings: ScreenShareCaptureOptions = {
-			audio: true,
+			audio: {
+				autoGainControl: false,
+				noiseSuppression: false,
+				echoCancellation: false,
+				channelCount: 2,
+				sampleRate: 48000,
+				sampleSize: 16
+			},
 			preferCurrentTab: false,
 			resolution:  {
 				height: 1440,

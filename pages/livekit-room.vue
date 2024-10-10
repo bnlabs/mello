@@ -168,6 +168,14 @@ onMounted(async () => {
 	}
 })
 
+onBeforeUnmount(() => {
+	window.removeEventListener("keydown", adjustVolume)
+	if (localVideo.value) {
+		// Remove the click event listener
+		localVideo.value.removeEventListener("click", preventPlayPause)
+	}
+})
+
 const leave = async () => {
 	await leaveRoom()
 	router.push("/")
