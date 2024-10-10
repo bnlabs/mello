@@ -3,6 +3,7 @@ import InputText from "primevue/inputtext"
 import TabView from "primevue/tabview"
 import TabPanel from "primevue/tabpanel"
 import { foodList } from "~/lib/foodList"
+import { useToast } from "primevue/usetoast"
 
 export default {
 	components: {
@@ -17,6 +18,7 @@ export default {
 				room: false,
 			},
 			serverSideStreaming: false,
+			toast: useToast()
 		}
 	},
 	computed: {
@@ -36,6 +38,9 @@ export default {
 		},
 	},
 	methods: {
+		async showError() {
+			this.toast.add({ severity: 'error', summary: 'Room Does Not Exist', detail: 'Room not found', life: 3000 });
+		},
 		async joinRoom() {
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
@@ -47,11 +52,17 @@ export default {
 				method: "GET",
 			})
 
-			if (!res.ok) return
+			if (!res.ok) {
+				await this.showError()
+				return
+			}
 
 			const data = await res.json()
 
-			if (!data.roomExist) return
+			if (!data.roomExist) { 
+				await this.showError()
+				return
+			}
 
 			if (!data.roomIsInLK) {
 				this.$router.push({
@@ -73,7 +84,7 @@ export default {
 				})
 			}
 		},
-		hostRoom() {
+		async hostRoom() {
 			if (!this.room) {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
 			}
@@ -110,12 +121,15 @@ export default {
 		},
 		setRoomTouched() {
 			this.touched.room = true
-		},
+		}
 	},
 }
 </script>
 
 <template>
+	<Toast 
+		pt:root:class="bg-opacity-100"
+	/>
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">
