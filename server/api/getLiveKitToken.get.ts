@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 			}
 		}
 
-		participantNames = res.map((p) => p.name)
+		participantNames = res.map(p => p.name)
 	} catch {
 		// room doesnt exist so we can just continue to generate and return token
 	}

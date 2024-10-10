@@ -8,7 +8,8 @@ import {
 	type RoomOptions,
 } from "livekit-client"
 
-const participants = ref<Participant[]>([])
+
+const participantNames = ref<string[]>([])
 const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
 const token = ref<string>("")
 const currentRoom = ref<Room | null>(null)
@@ -41,9 +42,11 @@ export function useLiveKit() {
 			return {
 				token: data.token,
 				host: data.host ?? "",
+				participantNames: data.participantNames
 			}
+
 		} else {
-			console.log("error fetching token")
+			throw new Error("error fetching token")
 		}
 	}
 
@@ -72,6 +75,8 @@ export function useLiveKit() {
 			handleParticipantLeave,
 		)
 		currentRoom.value.connect(wsUrl, fetchedToken?.token)
+
+		participantNames.value = fetchedToken.participantNames
 
 		return {
 			host: fetchedToken?.host,
@@ -103,21 +108,23 @@ export function useLiveKit() {
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
-		participants.value.push(participant)
+		if(!participant.name) return
+
+		participantNames.value.push(participant.name)
 		await pushMessage(`${participant.name} has joined the chat`)
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
-		if (participant.name) {
-			const name = participant.name
-			const index = participants.value.findIndex((p) => p.name === name)
+		if(!participant.name) return
+		const name = participant.name
+		const index = participantNames.value.findIndex((p: string) => p === name)
 
-			if (index !== -1) {
-				participants.value.splice(index, 1) // Remove the object at the found index
-			}
-
-			await pushMessage(`${participant.name} has left the chat`)
+		if (index !== -1) {
+			participantNames.value.splice(index, 1) // Remove the object at the found index
 		}
+
+		await pushMessage(`${participant.name} has left the chat`)
+		
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
@@ -130,13 +137,6 @@ export function useLiveKit() {
 
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
-
-	const participantNames = computed(
-		() =>
-			participants.value
-				.map((p) => p.name)
-				.filter((name) => name !== undefined), // Filter out undefined names
-	)
 
 	return {
 		toggleScreenshare,
