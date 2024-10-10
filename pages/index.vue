@@ -36,19 +36,43 @@ export default {
 		},
 	},
 	methods: {
-		joinRoom() {
+		async joinRoom() {
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
 
-			this.$router.push({
-				path: "/room",
-				query: {
-					username: this.username.trim(),
-					room: this.room.trim(),
-					isHost: "false",
-				},
+			const room = this.room.trim()
+
+			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+				method: "GET"
 			})
+
+			if(!res.ok) return
+
+			const data = await res.json()
+
+			if(!data.roomExist) return
+
+			if(!data.roomIsInLK) {
+				this.$router.push({
+					path: "/room",
+					query: {
+						username: this.username.trim(),
+						room: room,
+						isHost: "false",
+					},
+				})
+			} else {
+				this.$router.push({
+					path: "/livekit-room",
+					query: {
+						username: this.username.trim(),
+						room: room,
+						isHost: "false",
+					},
+				})
+			}
+
 		},
 		hostRoom() {
 			if (!this.room) {
