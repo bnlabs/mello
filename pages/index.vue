@@ -44,16 +44,16 @@ export default {
 			const room = this.room.trim()
 
 			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
-				method: "GET"
+				method: "GET",
 			})
 
-			if(!res.ok) return
+			if (!res.ok) return
 
 			const data = await res.json()
 
-			if(!data.roomExist) return
+			if (!data.roomExist) return
 
-			if(!data.roomIsInLK) {
+			if (!data.roomIsInLK) {
 				this.$router.push({
 					path: "/room",
 					query: {
@@ -72,7 +72,6 @@ export default {
 					},
 				})
 			}
-
 		},
 		hostRoom() {
 			if (!this.room) {
