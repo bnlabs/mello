@@ -4,7 +4,7 @@ import { livekitApiKey, livekitApiSecret, roomService } from "../utils/livekit"
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
 	const room: string = query.room?.toString() ?? ""
-	const username:string = query.username?.toString() ?? ""
+	const username: string = query.username?.toString() ?? ""
 	const canPublish: boolean = query.canPublish === "true"
 	const canSubscribe: boolean = query.canSubscribe === "true"
 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 			}
 		}
 
-		participantNames = res.map(p => p.name)
+		participantNames = res.map((p) => p.name)
 	} catch {
 		// room doesnt exist so we can just continue to generate and return token
 	}
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
 		statusCode: 200,
 		token: await createToken(room, username, canPublish, canSubscribe),
 		host: publishers.length > 0 ? publishers[0].name : "",
-		participantNames: participantNames
+		participantNames: participantNames,
 	}
 })
 

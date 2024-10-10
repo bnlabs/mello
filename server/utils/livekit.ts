@@ -15,10 +15,10 @@ export const roomService = new RoomServiceClient(
 )
 
 export const roomExistInLiveKit = async (roomName: string) => {
-    roomService.listRooms().then((rooms: Room[]) => {
-        const res = rooms.filter(r => r.name === roomName)
-        return res.length > 0
-      });
+	roomService.listRooms().then((rooms: Room[]) => {
+		const res = rooms.filter((r) => r.name === roomName)
+		return res.length > 0
+	})
 
-    return false
+	return false
 }

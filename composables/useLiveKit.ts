@@ -6,9 +6,8 @@ import {
 	Room,
 	RoomEvent,
 	type RoomOptions,
-	type ScreenShareCaptureOptions
+	type ScreenShareCaptureOptions,
 } from "livekit-client"
-
 
 const participantNames = ref<string[]>([])
 const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
@@ -43,9 +42,8 @@ export function useLiveKit() {
 			return {
 				token: data.token,
 				host: data.host ?? "",
-				participantNames: data.participantNames
+				participantNames: data.participantNames,
 			}
-
 		} else {
 			throw new Error("error fetching token")
 		}
@@ -101,11 +99,11 @@ export function useLiveKit() {
 			adaptiveStream: false,
 			disconnectOnPageLeave: true,
 			videoCaptureDefaults: {
-				resolution:  {
+				resolution: {
 					height: 1440,
 					width: 2560,
-					frameRate: 60
-				}
+					frameRate: 60,
+				},
 			},
 			audioCaptureDefaults: {
 				autoGainControl: false,
@@ -113,8 +111,8 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16
-			}
+				sampleSize: 16,
+			},
 		}
 
 		currentRoom.value = new Room(options)
@@ -128,14 +126,14 @@ export function useLiveKit() {
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
-		if(!participant.name) return
+		if (!participant.name) return
 
 		participantNames.value.push(participant.name)
 		await pushMessage(`${participant.name} has joined the chat`)
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
-		if(!participant.name) return
+		if (!participant.name) return
 		const name = participant.name
 		const index = participantNames.value.findIndex((p: string) => p === name)
 
@@ -144,7 +142,6 @@ export function useLiveKit() {
 		}
 
 		await pushMessage(`${participant.name} has left the chat`)
-		
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
@@ -155,19 +152,24 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16
+				sampleSize: 16,
 			},
 			preferCurrentTab: false,
-			resolution:  {
+			resolution: {
 				height: 1440,
 				width: 2560,
-				frameRate: 60
-			}
+				frameRate: 60,
+			},
 		}
 
-		const screenshareEnabled = currentRoom.value?.localParticipant.isScreenShareEnabled
+		const screenshareEnabled =
+			currentRoom.value?.localParticipant.isScreenShareEnabled
 
-		const screensharePub = await currentRoom.value?.localParticipant.setScreenShareEnabled(!screenshareEnabled, screenshareSettings)
+		const screensharePub =
+			await currentRoom.value?.localParticipant.setScreenShareEnabled(
+				!screenshareEnabled,
+				screenshareSettings,
+			)
 
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
