@@ -18,7 +18,7 @@ export default {
 				room: false,
 			},
 			serverSideStreaming: false,
-			toast: useToast()
+			toast: useToast(),
 		}
 	},
 	computed: {
@@ -39,7 +39,12 @@ export default {
 	},
 	methods: {
 		async showError() {
-			this.toast.add({ severity: 'error', summary: 'Room Does Not Exist', detail: 'Room not found', life: 3000 });
+			this.toast.add({
+				severity: "error",
+				summary: "Room Does Not Exist",
+				detail: "Room not found",
+				life: 3000,
+			})
 		},
 		async joinRoom() {
 			if (!this.isUsernameValid || !this.isRoomValid) {
@@ -59,7 +64,7 @@ export default {
 
 			const data = await res.json()
 
-			if (!data.roomExist) { 
+			if (!data.roomExist) {
 				await this.showError()
 				return
 			}
@@ -121,15 +126,13 @@ export default {
 		},
 		setRoomTouched() {
 			this.touched.room = true
-		}
+		},
 	},
 }
 </script>
 
 <template>
-	<Toast 
-		pt:root:class="bg-opacity-100"
-	/>
+	<Toast/>
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">
