@@ -32,7 +32,7 @@
 					<span class="text-black"> {{ currentHost }}</span>
 				</RoomInfoSlot>
 
-				<RoomUserList :users="[]" />
+				<RoomUserList :users="participantNames" />
 			</div>
 
 			<div class="flex flex-row gap-5 pr-3">

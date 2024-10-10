@@ -8,13 +8,13 @@ import {
 	type RoomOptions,
 } from "livekit-client"
 
-export function useLiveKit() {
-	const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
-	const token = ref<string>("")
-	const currentRoom = ref<Room | null>(null)
-	const currentUsername = ref<string>("")
-	const participants = ref<Participant[]>([])
+const participants = ref<Participant[]>([])
+const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
+const token = ref<string>("")
+const currentRoom = ref<Room | null>(null)
+const currentUsername = ref<string>("")
 
+export function useLiveKit() {
 	const { pushMessage } = useChatMessage()
 
 	const fetchToken = async (
@@ -131,7 +131,12 @@ export function useLiveKit() {
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
 
-	const participantNames = computed(() => participants.value.map((p) => p.name))
+	const participantNames = computed(
+		() =>
+			participants.value
+				.map((p) => p.name)
+				.filter((name) => name !== undefined), // Filter out undefined names
+	)
 
 	return {
 		toggleScreenshare,

@@ -10,6 +10,13 @@ const props = defineProps<{
 	isSfu: boolean
 }>()
 
+const userNames = computed(
+	() =>
+		props.users
+			.map((user: User) => user.username)
+			.filter((username: string) => username), // Optionally filter out undefined or empty names
+)
+
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
 type ToggleChatFunction = () => void
@@ -44,7 +51,7 @@ if (props.isSfu) {
 				<span class="text-black"> {{ host }}</span>
 			</RoomInfoSlot>
 
-			<RoomUserList :users="users" />
+			<RoomUserList :users="userNames" />
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">

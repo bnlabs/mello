@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
 
 	let res: ParticipantInfo[]
 	let publishers: ParticipantInfo[] = []
+	let participantNames: string[] = []
 	// check if host already exist:
 	try {
 		res = await roomService.listParticipants(room)
@@ -28,6 +29,8 @@ export default defineEventHandler(async (event) => {
 				message: "There is already a host for this lobby",
 			}
 		}
+
+		participantNames = res.map((p) => p.name)
 	} catch {
 		// room doesnt exist so we can just continue to generate and return token
 	}
@@ -36,6 +39,7 @@ export default defineEventHandler(async (event) => {
 		statusCode: 200,
 		token: await createToken(room, username, canPublish, canSubscribe),
 		host: publishers.length > 0 ? publishers[0].name : "",
+		participantNames: participantNames
 	}
 })
 
