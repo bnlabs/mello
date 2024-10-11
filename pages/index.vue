@@ -1,7 +1,5 @@
 <script lang="ts">
 import InputText from "primevue/inputtext"
-import TabView from "primevue/tabview"
-import TabPanel from "primevue/tabpanel"
 import { foodList } from "~/lib/foodList"
 import { useToast } from "primevue/usetoast"
 
