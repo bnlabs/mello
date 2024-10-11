@@ -55,9 +55,9 @@ export function useLiveKit() {
 		remoteVideoElement: HTMLMediaElement,
 	) => {
 		const handleTrackSubscribed = async (
-			track: RemoteTrack,
+			_track: RemoteTrack,
 			publication: RemoteTrackPublication,
-			participant: RemoteParticipant,
+			_participant: RemoteParticipant,
 		) => {
 			publication.videoTrack?.attach(remoteVideoElement)
 			publication.audioTrack?.attach(remoteVideoElement)
