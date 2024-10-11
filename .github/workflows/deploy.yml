@@ -46,5 +46,6 @@ jobs:
                 -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
                 -e LIVEKIT_API_KEY=${{ secrets.LIVEKIT_API_KEY }} \
                 -e LIVEKIT_API_SECRET=${{ secrets.LIVEKIT_API_SECRET }} \
+                -e LIVEKIT_WS_URL=${{ secrets.LIVEKIT_WS_URL }} \
                 ${{ secrets.DOCKER_USERNAME }}/mello:latest
 
