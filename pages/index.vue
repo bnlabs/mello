@@ -1,8 +1,7 @@
-<script>
+<script lang="ts">
 import InputText from "primevue/inputtext"
-import TabView from "primevue/tabview"
-import TabPanel from "primevue/tabpanel"
 import { foodList } from "~/lib/foodList"
+import { useToast } from "primevue/usetoast"
 
 export default {
 	components: {
@@ -16,7 +15,8 @@ export default {
 				username: false,
 				room: false,
 			},
-			attemptedToJoin: false, // Flag for tracking form submission attempt
+			serverSideStreaming: false,
+			toast: useToast(),
 		}
 	},
 	computed: {
@@ -29,49 +29,119 @@ export default {
 			return this.room.trim().length > 0 && this.room.trim().length <= 30
 		},
 		showUsernameValidation() {
-			return (
-				(this.touched.username || this.attemptedToJoin) && !this.isUsernameValid
-			)
+			return this.touched.username && !this.isUsernameValid
 		},
 		showRoomValidation() {
-			return (this.touched.room || this.attemptedToJoin) && !this.isRoomValid
+			return this.touched.room && !this.isRoomValid
 		},
 	},
 	methods: {
-		joinRoom() {
-			this.attemptedToJoin = true // Set the flag to true to indicate an attempt to submit
+		async showError(summary: string, detail: string) {
+			this.toast.add({
+				severity: "error",
+				summary: summary,
+				detail: detail,
+				life: 3000,
+			})
+		},
+		async joinRoom() {
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
-			this.$router.push({
-				path: "/room",
-				query: {
-					username: this.username.trim(),
-					room: this.room.trim(),
-					isHost: false,
-				},
+
+			const room = this.room.trim()
+
+			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+				method: "GET",
 			})
+
+			if (!res.ok) {
+				await this.showError(
+					"Network Error",
+					"Error occured while checking if server exist.",
+				)
+				return
+			}
+
+			const data = await res.json()
+
+			if (!data.roomExist) {
+				await this.showError("Error joining room", "Room does not exist")
+				return
+			}
+
+			if (!data.roomIsInLK) {
+				this.$router.push({
+					path: "/room",
+					query: {
+						username: this.username.trim(),
+						room: room,
+						isHost: "false",
+					},
+				})
+			} else {
+				this.$router.push({
+					path: "/livekit-room",
+					query: {
+						username: this.username.trim(),
+						room: room,
+						isHost: "false",
+					},
+				})
+			}
 		},
-		hostRoom() {
+		async hostRoom() {
 			if (!this.room) {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
+			} else {
+				// Check if room already exist
+				const res = await fetch(`/api/roomCheck?roomName=${this.room}`, {
+					method: "GET",
+				})
+
+				if (!res.ok) {
+					await this.showError(
+						"Network Error",
+						"Error occured while checking if server exist.",
+					)
+					return
+				}
+
+				const data = await res.json()
+
+				if (data.roomExist) {
+					await this.showError("Error Creating Room", "Room Already Exist")
+					return
+				}
 			}
 
 			if (!this.username) {
 				this.username = foodList[Math.floor(Math.random() * foodList.length)]
 			}
-			this.attemptedToJoin = true
+
 			if (!this.isUsernameValid || !this.isRoomValid) {
 				return
 			}
-			this.$router.push({
-				path: "/room",
-				query: {
-					username: this.username.trim(),
-					room: this.room.trim(),
-					isHost: true,
-				},
-			})
+
+			if (this.serverSideStreaming) {
+				this.$router.push({
+					path: "/livekit-room",
+					query: {
+						username: this.username.trim(),
+						room: this.room.trim(),
+						isHost: "true",
+					},
+				})
+			} else {
+				this.$router.push({
+					path: "/room",
+					query: {
+						username: this.username.trim(),
+						room: this.room.trim(),
+						isHost: "true",
+					},
+				})
+			}
 		},
 		setUsernameTouched() {
 			this.touched.username = true
@@ -84,6 +154,7 @@ export default {
 </script>
 
 <template>
+	<Toast />
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">
@@ -145,6 +216,12 @@ export default {
 						@submit.prevent="hostRoom"
 						class="flex w-3/6 flex-col items-center gap-8 text-white"
 					>
+						<div class="flex items-center justify-end gap-2">
+							<div>
+								Server Side Streaming
+								<input type="checkbox" v-model="serverSideStreaming" />
+							</div>
+						</div>
 						<div class="flex flex-col gap-2">
 							<div class="w-full">
 								<label for="username">Username</label>

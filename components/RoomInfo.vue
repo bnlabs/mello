@@ -1,22 +1,39 @@
 <script setup lang="ts">
 import { inject } from "vue"
-import { type User } from "~/server/types"
 
-defineProps<{
+const props = defineProps<{
 	roomName: string
 	users: Array<User>
 	username: string
 	host: string
 	isHost: string
+	isSfu: boolean
 }>()
+
+const userNames = computed(
+	() =>
+		props.users
+			.map((user: User) => user.username)
+			.filter((username: string) => username), // Optionally filter out undefined or empty names
+)
 
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
-type ToggleChat = () => void
+type ToggleChatFunction = () => void
 
-const toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-const leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
-const toggleChat = inject<ToggleChat>("ToggleChat")
+let toggleStream: ToggleStreamFunction | undefined
+let leaveRoom: LeaveRoomFunction | undefined
+let toggleChat: ToggleChatFunction | undefined
+
+if (props.isSfu) {
+	toggleStream = inject<ToggleStreamFunction>("handleToggleStreamSfu")
+	leaveRoom = inject<LeaveRoomFunction>("leaveRoomSfu")
+	toggleChat = inject<ToggleChatFunction>("ToggleChatSfu")
+} else {
+	toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
+	leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+	toggleChat = inject<ToggleChatFunction>("ToggleChat")
+}
 </script>
 
 <template>
@@ -34,7 +51,7 @@ const toggleChat = inject<ToggleChat>("ToggleChat")
 				<span class="text-black"> {{ host }}</span>
 			</RoomInfoSlot>
 
-			<RoomUserList :users="users" />
+			<RoomUserList :users="userNames" />
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">

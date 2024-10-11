@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { User } from "~/server/types"
-
 defineProps<{
-	users: User[]
+	users: string[]
 }>()
 </script>
 
@@ -14,7 +12,7 @@ defineProps<{
 		<ul class="flex gap-2">
 			<li v-for="user in users" class="rounded bg-[#82d2e8] p-2">
 				<span class="text-black">
-					{{ user.username }}
+					{{ user }}
 				</span>
 			</li>
 		</ul>

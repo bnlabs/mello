@@ -1,4 +1,3 @@
-import { User } from "../types"
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import {
 	PutCommand,
