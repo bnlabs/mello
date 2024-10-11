@@ -59,6 +59,8 @@ export function useLiveKit() {
 			publication: RemoteTrackPublication,
 			_participant: RemoteParticipant,
 		) => {
+			publication.setVideoQuality(2)
+			publication.setVideoFPS(60)
 			publication.videoTrack?.attach(remoteVideoElement)
 			publication.audioTrack?.attach(remoteVideoElement)
 		}
