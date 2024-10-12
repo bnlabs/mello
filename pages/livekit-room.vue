@@ -201,8 +201,9 @@ onMounted(async () => {
 				currentHost.value = host
 			}
 		}
-	} catch (error) {
-		throw error
+	} catch (err: any) {
+		dialogVisible.value = true
+		failureMessage.value = err.toString()
 	}
 
 	window.addEventListener("keydown", adjustVolume)
