@@ -23,12 +23,6 @@ export default defineEventHandler(async (event) => {
 		res = await roomService.listParticipants(room)
 		publishers = res.filter((participant) => participant.permission?.canPublish)
 
-		if (canPublish && publishers.length > 0) {
-			return {
-				statusCode: 400,
-				message: "There is already a host for this lobby",
-			}
-		}
 
 		participantNames = res.map((p) => p.name)
 	} catch {

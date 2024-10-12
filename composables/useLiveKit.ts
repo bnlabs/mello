@@ -1,4 +1,5 @@
 import {
+	LocalParticipant,
 	Participant,
 	RemoteParticipant,
 	RemoteTrack,
@@ -7,6 +8,7 @@ import {
 	RoomEvent,
 	type RoomOptions,
 	type ScreenShareCaptureOptions,
+	type ChatMessage as LiveKitChatMessage,
 } from "livekit-client"
 
 const participantNames = ref<string[]>([])
@@ -16,7 +18,7 @@ const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")
 
 export function useLiveKit() {
-	const { pushMessage } = useChatMessage()
+	const { pushMessage, pushMessageObject } = useChatMessage()
 
 	const fetchToken = async (
 		roomName: string,
@@ -65,10 +67,14 @@ export function useLiveKit() {
 			publication.audioTrack?.attach(remoteVideoElement)
 		}
 
+		if (!roomName || !username) {
+			throw new Error("missing input")
+		}
+
 		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
-		const fetchedToken = await fetchToken(roomName, username, false, true)
+		const fetchedToken = await fetchToken(roomName, username, true, true)
 		currentRoom.value = new Room()
 		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
@@ -76,9 +82,11 @@ export function useLiveKit() {
 			RoomEvent.ParticipantDisconnected,
 			handleParticipantLeave,
 		)
-		currentRoom.value.connect(wsUrl, fetchedToken?.token)
+		await currentRoom.value.connect(wsUrl, token.value)
 
 		participantNames.value = fetchedToken.participantNames
+
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
 		return {
 			host: fetchedToken?.host,
@@ -94,7 +102,7 @@ export function useLiveKit() {
 	const hostRoom = async (roomName: string, username: string) => {
 		currentRoom.value?.disconnect()
 
-		await fetchToken(roomName, username, true, false)
+		await fetchToken(roomName, username, true, true)
 		currentUsername.value = username
 
 		const options: RoomOptions = {
@@ -125,6 +133,8 @@ export function useLiveKit() {
 		)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
+
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
@@ -144,6 +154,19 @@ export function useLiveKit() {
 		}
 
 		await pushMessage(`${participant.name} has left the chat`)
+	}
+
+	const handleChatMessage = async (
+		message: LiveKitChatMessage,
+		participant?: RemoteParticipant | LocalParticipant | undefined,
+	) => {
+		const mappedMsg: ChatMessage = {
+			username: participant?.name ?? "",
+			text: message.message,
+			time: message.editTimestamp?.toString() ?? Date.now().toString(),
+		}
+
+		pushMessageObject(mappedMsg)
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
@@ -176,6 +199,10 @@ export function useLiveKit() {
 		screensharePub?.videoTrack?.attach(videoElement)
 	}
 
+	const sendMessageLiveKit = async (msg: string) => {
+		await currentRoom.value?.localParticipant.sendChatMessage(msg)
+	}
+
 	return {
 		toggleScreenshare,
 		hostRoom,
@@ -186,5 +213,6 @@ export function useLiveKit() {
 		currentUsername,
 		currentRoom,
 		participantNames,
+		sendMessageLiveKit,
 	}
 }

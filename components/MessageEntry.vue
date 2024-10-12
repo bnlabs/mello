@@ -2,9 +2,15 @@
 import { ref, inject } from "vue"
 import Textarea from "primevue/textarea"
 
+const props = defineProps<{
+	useLiveKit: boolean
+}>()
+
 type SendMessageFunction = (message: string) => void
 
-const sendMessage = inject<SendMessageFunction>("sendMessage")
+const sendMessage = props.useLiveKit
+	? inject<SendMessageFunction>("sendMessageSfu")
+	: inject<SendMessageFunction>("sendMessage")
 const message = ref("")
 
 const send = () => {

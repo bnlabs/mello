@@ -13,6 +13,7 @@
 				v-if="chatIsOpen"
 				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
+				:use-live-kit="true"
 			/>
 		</div>
 
@@ -79,6 +80,7 @@ const {
 	joinRoom,
 	currentUsername,
 	participantNames,
+	sendMessageLiveKit,
 } = useLiveKit()
 
 // URL param
@@ -86,7 +88,7 @@ const { username, room, isHost } = route.query as Partial<UrlParam>
 
 // page data
 const localVideo = ref<HTMLMediaElement | null>(null)
-const { chatMessages } = useChatMessage()
+const { chatMessages, clearMessages } = useChatMessage()
 const currentHost = ref<string>("")
 
 // UI state
@@ -199,8 +201,8 @@ onMounted(async () => {
 				currentHost.value = host
 			}
 		}
-	} catch {
-		console.log("ERROR JOINING")
+	} catch (error) {
+		throw error
 	}
 
 	window.addEventListener("keydown", adjustVolume)
@@ -211,12 +213,15 @@ onMounted(async () => {
 	}
 })
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
 	window.removeEventListener("keydown", adjustVolume)
 	if (localVideo.value) {
 		// Remove the click event listener
 		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
+
+	clearMessages()
+	await leaveRoom()
 })
 
 const leave = async () => {
@@ -234,7 +239,7 @@ const handleToggleChat = () => {
 	chatIsOpen.value = !chatIsOpen.value
 }
 
-provide("sendMessageSfu", () => {}) // TODO: implement
+provide("sendMessageSfu", sendMessageLiveKit)
 provide("handleToggleStreamSfu", screenshare)
 provide("ToggleChatSfu", handleToggleChat)
 provide("leaveRoomSfu", leave)

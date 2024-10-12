@@ -17,6 +17,7 @@ const convertToLocaleTime = (utcTime: string) => {
 
 const props = defineProps<{
 	chats: ChatMessage[]
+	useLiveKit: boolean
 }>()
 
 watch(() => props.chats, scrollToBottom, { deep: true })
@@ -49,7 +50,7 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 		</ul>
 
 		<div class="mt-auto w-full">
-			<MessageEntry />
+			<MessageEntry :use-live-kit="useLiveKit" />
 		</div>
 	</div>
 </template>

@@ -17,9 +17,14 @@ export function useChatMessage() {
 		chatMessages.value = []
 	}
 
+	const pushMessageObject = async (msg: ChatMessage) => {
+		chatMessages.value.push(msg)
+	}
+
 	return {
 		pushMessage,
 		clearMessages,
 		chatMessages,
+		pushMessageObject,
 	}
 }
