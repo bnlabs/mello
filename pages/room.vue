@@ -296,7 +296,7 @@ onBeforeUnmount(() => {
 				v-if="chatIsOpen"
 				:chats
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
-				:use-live-kit="false"
+				:using-live-kit="false"
 			>
 			</Chat>
 		</div>

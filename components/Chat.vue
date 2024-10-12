@@ -12,12 +12,15 @@ const scrollToBottom = () => {
 }
 
 const convertToLocaleTime = (utcTime: string) => {
-	return moment.utc(utcTime).local().format("h:mm a")
+	return moment
+		.utc(utcTime)
+		.local()
+		.format("h:mm a")
 }
 
 const props = defineProps<{
 	chats: ChatMessage[]
-	useLiveKit: boolean
+	usingLiveKit: boolean
 }>()
 
 watch(() => props.chats, scrollToBottom, { deep: true })
@@ -41,16 +44,15 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 					<span class="username font-bold text-gray-400">
 						{{ chat.username }}
 					</span>
-					<span class="time text-[0.8rem] text-sm text-[#777]">{{
-						convertToLocaleTime(chat.time)
-					}}</span>
+					<span class="time text-[0.8rem] text-sm text-[#777]">
+						{{ usingLiveKit ? chat.time : convertToLocaleTime(chat.time) }}</span>
 				</div>
 				<p class="text m-0 text-white">{{ chat.text }}</p>
 			</li>
 		</ul>
 
 		<div class="mt-auto w-full">
-			<MessageEntry :use-live-kit="useLiveKit" />
+			<MessageEntry :use-live-kit="usingLiveKit" />
 		</div>
 	</div>
 </template>

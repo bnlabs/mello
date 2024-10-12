@@ -13,7 +13,7 @@
 				v-if="chatIsOpen"
 				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
-				:use-live-kit="true"
+				:usingLiveKit="true"
 			/>
 		</div>
 

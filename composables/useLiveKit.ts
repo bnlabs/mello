@@ -10,6 +10,7 @@ import {
 	type ScreenShareCaptureOptions,
 	type ChatMessage as LiveKitChatMessage,
 } from "livekit-client"
+import moment from "moment"
 
 const participantNames = ref<string[]>([])
 const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
@@ -160,10 +161,11 @@ export function useLiveKit() {
 		message: LiveKitChatMessage,
 		participant?: RemoteParticipant | LocalParticipant | undefined,
 	) => {
+
 		const mappedMsg: ChatMessage = {
 			username: participant?.name ?? "",
 			text: message.message,
-			time: message.editTimestamp?.toString() ?? Date.now().toString(),
+			time: moment().format("LT")
 		}
 
 		pushMessageObject(mappedMsg)
