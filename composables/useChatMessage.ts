@@ -3,7 +3,7 @@ import moment from "moment"
 const chatMessages = ref<ChatMessage[]>([])
 
 export function useChatMessage() {
-	const pushMessage = async (message: string) => {
+	const pushNotification = async (message: string) => {
 		const msg: ChatMessage = {
 			username: "Notification",
 			text: message,
@@ -17,14 +17,14 @@ export function useChatMessage() {
 		chatMessages.value = []
 	}
 
-	const pushMessageObject = async (msg: ChatMessage) => {
+	const pushMessage = async (msg: ChatMessage) => {
 		chatMessages.value.push(msg)
 	}
 
 	return {
-		pushMessage,
+		pushNotification,
 		clearMessages,
 		chatMessages,
-		pushMessageObject,
+		pushMessage,
 	}
 }

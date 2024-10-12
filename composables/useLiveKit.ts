@@ -19,7 +19,7 @@ const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")
 
 export function useLiveKit() {
-	const { pushMessage, pushMessageObject } = useChatMessage()
+	const { pushNotification, pushMessage } = useChatMessage()
 
 	const fetchToken = async (
 		roomName: string,
@@ -139,7 +139,7 @@ export function useLiveKit() {
 		if (!participant.name) return
 
 		participantNames.value.push(participant.name)
-		await pushMessage(`${participant.name} has joined the chat`)
+		await pushNotification(`${participant.name} has joined the chat`)
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
@@ -151,7 +151,7 @@ export function useLiveKit() {
 			participantNames.value.splice(index, 1) // Remove the object at the found index
 		}
 
-		await pushMessage(`${participant.name} has left the chat`)
+		await pushNotification(`${participant.name} has left the chat`)
 	}
 
 	const handleChatMessage = async (
@@ -165,7 +165,7 @@ export function useLiveKit() {
 			time: moment().format("LT")
 		}
 
-		pushMessageObject(mappedMsg)
+		pushMessage(mappedMsg)
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
