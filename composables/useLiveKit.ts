@@ -48,7 +48,8 @@ export function useLiveKit() {
 				participantNames: data.participantNames,
 			}
 		} else {
-			console.log("Error Fetching Token")
+			throw new Error(`Error fetching token: 
+				HTTP request status ${response.status}`)
 		}
 	}
 
