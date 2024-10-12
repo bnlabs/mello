@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 	if (!room || !username) {
 		return {
 			statusCode: 400,
-			message: "Must provide room and username",
+			message: "Must provide room and username"
 		}
 	}
 
@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
 		res = await roomService.listParticipants(room)
 		publishers = res.filter((participant) => participant.permission?.canPublish)
 
-
 		participantNames = res.map((p) => p.name)
 	} catch {
 		// room doesnt exist so we can just continue to generate and return token
@@ -33,7 +32,7 @@ export default defineEventHandler(async (event) => {
 		statusCode: 200,
 		token: await createToken(room, username, canPublish, canSubscribe),
 		host: publishers.length > 0 ? publishers[0].name : "",
-		participantNames: participantNames,
+		participantNames: participantNames
 	}
 })
 
@@ -41,19 +40,19 @@ const createToken = async (
 	room: string,
 	username: string,
 	canPublish: boolean,
-	canSubscribe: boolean,
+	canSubscribe: boolean
 ) => {
 	const at = new AccessToken(livekitApiKey, livekitApiSecret, {
 		identity: username,
 		// Token to expire after 10 minutes,
 		name: username,
-		ttl: "10m",
+		ttl: "10m"
 	})
 	at.addGrant({
 		roomJoin: true,
 		room: room,
 		canPublish: canPublish,
-		canSubscribe: canSubscribe,
+		canSubscribe: canSubscribe
 	})
 
 	const token = await at.toJwt()

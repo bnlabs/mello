@@ -1,21 +1,21 @@
 name: Build
 
 on:
-    push:
-        branches:
-        - main
-        paths-ignore:
-          - '**.md'
-    pull_request:
-        types: [opened, synchronize, reopened]
-        branches:
-            - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
+  build:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v3
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Dependencies
         run: |

@@ -7,7 +7,7 @@ export function useChatMessage() {
 		const msg: ChatMessage = {
 			username: "Notification",
 			text: message,
-			time: moment().format("LT"),
+			time: moment().format("LT")
 		}
 
 		chatMessages.value.push(msg)
@@ -25,6 +25,6 @@ export function useChatMessage() {
 		pushNotification,
 		clearMessages,
 		chatMessages,
-		pushMessage,
+		pushMessage
 	}
 }

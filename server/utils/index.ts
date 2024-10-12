@@ -8,11 +8,11 @@ import {
 	isUsernameTaken,
 	findHostInRoom,
 	isRoomOccupied,
-	roomExist,
+	roomExist
 } from "./users"
 const options: Partial<ServerOptions> = {
 	path: "/api/socket.io",
-	serveClient: false,
+	serveClient: false
 }
 
 export const io = new Server(options)
@@ -27,16 +27,16 @@ export function initSocket(event: H3Event) {
 			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason:
-						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long"
 				})
 			}
 			const usernameTaken: boolean | undefined = await isUsernameTaken(
 				payload.username,
-				payload.room,
+				payload.room
 			)
 			if (usernameTaken) {
 				socket.emit("hostingOrJoiningFailed", {
-					reason: "There is already a user with that name in this room.",
+					reason: "There is already a user with that name in this room."
 				})
 				return
 			}
@@ -44,7 +44,7 @@ export function initSocket(event: H3Event) {
 			const roomAlreadyExist = await roomExist(payload.room)
 			if (!roomAlreadyExist) {
 				socket.emit("hostingOrJoiningFailed", {
-					reason: "That Room does not exist",
+					reason: "That Room does not exist"
 				})
 				return
 			}
@@ -57,7 +57,7 @@ export function initSocket(event: H3Event) {
 				room: user.room,
 				users: await getRoomUsers(user.room),
 				host: host?.username,
-				newUser: user,
+				newUser: user
 			})
 		})
 
@@ -66,7 +66,7 @@ export function initSocket(event: H3Event) {
 			if (!isRoomValid(payload.room) || !isUsernameValid(payload.username)) {
 				socket.emit("hostingOrJoiningFailed", {
 					reason:
-						"Invalid parameter: Username and Room must be between 1 and 30 characters long",
+						"Invalid parameter: Username and Room must be between 1 and 30 characters long"
 				})
 			}
 
@@ -79,11 +79,11 @@ export function initSocket(event: H3Event) {
 					room: user.room,
 					users: await getRoomUsers(user.room),
 					host: user.username,
-					newUser: user,
+					newUser: user
 				})
 			} else {
 				socket.emit("hostingOrJoiningFailed", {
-					reason: "Room name is already taken.",
+					reason: "Room name is already taken."
 				})
 			}
 		})
@@ -103,7 +103,7 @@ export function initSocket(event: H3Event) {
 				io.to(user.room).emit("userDisconnect", {
 					room: user.room,
 					users: await getRoomUsers(user.room),
-					oldUser: user,
+					oldUser: user
 				})
 			}
 		})
@@ -113,7 +113,7 @@ export function initSocket(event: H3Event) {
 			const sender = await getCurrentUser(socket.id)
 			io.to(user?.id ?? "").emit(
 				"receiveWebRTCMessage",
-				formatWebRTCResponse(sender?.username ?? "", payload, socket.id),
+				formatWebRTCResponse(sender?.username ?? "", payload, socket.id)
 			)
 		})
 
@@ -133,18 +133,18 @@ export function formatMessage(username: string, text: string) {
 	return {
 		username,
 		text,
-		time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+		time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 	}
 }
 
 export function formatWebRTCResponse(
 	username: string,
 	payload: string,
-	socketId: string,
+	socketId: string
 ) {
 	return {
 		username,
 		payload,
-		socketId,
+		socketId
 	}
 }

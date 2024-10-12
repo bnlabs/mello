@@ -5,13 +5,13 @@ export default defineEventHandler(async () => {
 		day: "numeric",
 		hour: "numeric",
 		minute: "numeric",
-		second: "numeric",
+		second: "numeric"
 	}
 
 	const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
-		Date.now(),
+		Date.now()
 	)
 	return {
-		result: `Mello is up and running! ${formattedDate}`,
+		result: `Mello is up and running! ${formattedDate}`
 	}
 })

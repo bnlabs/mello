@@ -1,13 +1,12 @@
 name: Tofu Apply
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   tofu:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v2
 

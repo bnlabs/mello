@@ -8,7 +8,7 @@
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
-		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\""
+		"pretty": "prettier . --write"
 	},
 	"dependencies": {
 		"@aws-sdk/client-dynamodb": "^3.564.0",
@@ -35,6 +35,9 @@
 		"semi": false,
 		"singleQuote": false,
 		"useTabs": true,
+		"trailingComma": "none",
+		"bracketSpacing": true,
+		"arrowParens": "always",
 		"plugins": [
 			"prettier-plugin-tailwindcss"
 		]

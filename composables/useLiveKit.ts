@@ -8,7 +8,7 @@ import {
 	RoomEvent,
 	type RoomOptions,
 	type ScreenShareCaptureOptions,
-	type ChatMessage as LiveKitChatMessage,
+	type ChatMessage as LiveKitChatMessage
 } from "livekit-client"
 import moment from "moment"
 
@@ -25,17 +25,17 @@ export function useLiveKit() {
 		roomName: string,
 		username: string,
 		canPublish: boolean,
-		canSubscribe: boolean,
+		canSubscribe: boolean
 	) => {
 		const params = new URLSearchParams({
 			room: roomName,
 			username: username,
 			canPublish: canPublish.toString(),
-			canSubscribe: canSubscribe.toString(),
+			canSubscribe: canSubscribe.toString()
 		})
 
 		const response = await fetch(`/api/getLiveKitToken?${params.toString()}`, {
-			method: "GET",
+			method: "GET"
 		})
 
 		if (response.ok) {
@@ -45,7 +45,7 @@ export function useLiveKit() {
 			return {
 				token: data.token,
 				host: data.host ?? "",
-				participantNames: data.participantNames,
+				participantNames: data.participantNames
 			}
 		} else {
 			throw new Error(`Error fetching token: 
@@ -56,12 +56,12 @@ export function useLiveKit() {
 	const joinRoom = async (
 		roomName: string,
 		username: string,
-		remoteVideoElement: HTMLMediaElement,
+		remoteVideoElement: HTMLMediaElement
 	) => {
 		const handleTrackSubscribed = async (
 			_track: RemoteTrack,
 			publication: RemoteTrackPublication,
-			_participant: RemoteParticipant,
+			_participant: RemoteParticipant
 		) => {
 			publication.setVideoQuality(2)
 			publication.setVideoFPS(60)
@@ -82,7 +82,7 @@ export function useLiveKit() {
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
-			handleParticipantLeave,
+			handleParticipantLeave
 		)
 		await currentRoom.value.connect(wsUrl, token.value)
 
@@ -91,7 +91,7 @@ export function useLiveKit() {
 		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
 		return {
-			host: fetchedToken?.host,
+			host: fetchedToken?.host
 		}
 	}
 
@@ -114,8 +114,8 @@ export function useLiveKit() {
 				resolution: {
 					height: 1440,
 					width: 2560,
-					frameRate: 60,
-				},
+					frameRate: 60
+				}
 			},
 			audioCaptureDefaults: {
 				autoGainControl: false,
@@ -123,13 +123,16 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16,
-			},
+				sampleSize: 16
+			}
 		}
 
 		currentRoom.value = new Room(options)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
-		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
+		currentRoom.value.on(
+			RoomEvent.ParticipantDisconnected,
+			handleParticipantLeave
+		)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
 
@@ -157,9 +160,8 @@ export function useLiveKit() {
 
 	const handleChatMessage = async (
 		message: LiveKitChatMessage,
-		participant?: RemoteParticipant | LocalParticipant | undefined,
+		participant?: RemoteParticipant | LocalParticipant | undefined
 	) => {
-
 		const mappedMsg: ChatMessage = {
 			username: participant?.name ?? "",
 			text: message.message,
@@ -177,14 +179,14 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16,
+				sampleSize: 16
 			},
 			preferCurrentTab: false,
 			resolution: {
 				height: 1440,
 				width: 2560,
-				frameRate: 60,
-			},
+				frameRate: 60
+			}
 		}
 
 		const screenshareEnabled =
@@ -193,7 +195,7 @@ export function useLiveKit() {
 		const screensharePub =
 			await currentRoom.value?.localParticipant.setScreenShareEnabled(
 				!screenshareEnabled,
-				screenshareSettings,
+				screenshareSettings
 			)
 
 		screensharePub?.videoTrack?.attach(videoElement)
@@ -213,6 +215,6 @@ export function useLiveKit() {
 		currentUsername,
 		currentRoom,
 		participantNames,
-		sendMessageLiveKit,
+		sendMessageLiveKit
 	}
 }

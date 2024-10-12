@@ -4,11 +4,11 @@ import {
 	DynamoDBDocumentClient,
 	GetCommand,
 	DeleteCommand,
-	QueryCommand,
+	QueryCommand
 } from "@aws-sdk/lib-dynamodb"
 
 const client = new DynamoDBClient({
-	region: "us-east-1",
+	region: "us-east-1"
 })
 
 const docClient = DynamoDBDocumentClient.from(client)
@@ -23,8 +23,8 @@ export async function userJoin(user: User): Promise<User> {
 			ID: user.id,
 			username: user.username,
 			room: user.room,
-			isHost: user.isHost,
-		},
+			isHost: user.isHost
+		}
 	})
 
 	await docClient.send(command)
@@ -37,8 +37,8 @@ export async function getCurrentUser(id: string): Promise<User | undefined> {
 	const command = new GetCommand({
 		TableName: connectedUserTable,
 		Key: {
-			ID: id,
-		},
+			ID: id
+		}
 	})
 
 	try {
@@ -49,7 +49,7 @@ export async function getCurrentUser(id: string): Promise<User | undefined> {
 				id: response.Item.ID,
 				username: response.Item.username,
 				room: response.Item.room,
-				isHost: response.Item.isHost,
+				isHost: response.Item.isHost
 			}
 			return user
 		}
@@ -66,8 +66,8 @@ export async function userLeave(id: string): Promise<User | undefined> {
 	const getCommand = new GetCommand({
 		TableName: connectedUserTable,
 		Key: {
-			ID: id,
-		},
+			ID: id
+		}
 	})
 
 	const getResponse = await docClient.send(getCommand)
@@ -75,8 +75,8 @@ export async function userLeave(id: string): Promise<User | undefined> {
 	const deleteCommand = new DeleteCommand({
 		TableName: connectedUserTable,
 		Key: {
-			ID: id,
-		},
+			ID: id
+		}
 	})
 
 	try {
@@ -86,7 +86,7 @@ export async function userLeave(id: string): Promise<User | undefined> {
 				id: getResponse.Item.ID,
 				username: getResponse.Item.username,
 				room: getResponse.Item.room,
-				isHost: getResponse.Item.isHost,
+				isHost: getResponse.Item.isHost
 			}
 			return user
 		}
@@ -104,8 +104,8 @@ export async function getRoomUsers(room: string): Promise<User[] | undefined> {
 		IndexName: "RoomIndex",
 		KeyConditionExpression: "room = :roomName",
 		ExpressionAttributeValues: {
-			":roomName": room,
-		},
+			":roomName": room
+		}
 	})
 
 	try {
@@ -116,7 +116,7 @@ export async function getRoomUsers(room: string): Promise<User[] | undefined> {
 				id: item.ID, // Ensure that the DynamoDB attribute names match what is expected here
 				username: item.username,
 				room: item.room,
-				isHost: item.isHost,
+				isHost: item.isHost
 			}))
 			return users
 		}
@@ -135,15 +135,15 @@ export async function roomExist(room: string): Promise<boolean | undefined> {
 }
 
 export async function findHostInRoom(
-	roomName: string,
+	roomName: string
 ): Promise<User | undefined> {
 	const command = new QueryCommand({
 		TableName: connectedUserTable,
 		IndexName: "RoomIndex",
 		KeyConditionExpression: "room = :roomName",
 		ExpressionAttributeValues: {
-			":roomName": roomName,
-		},
+			":roomName": roomName
+		}
 	})
 
 	try {
@@ -156,7 +156,7 @@ export async function findHostInRoom(
 				id: hostItem.ID,
 				username: hostItem.username,
 				room: hostItem.room,
-				isHost: hostItem.isHost,
+				isHost: hostItem.isHost
 			}
 
 			return res
@@ -171,14 +171,14 @@ export async function findHostInRoom(
 }
 
 export async function isRoomOccupied(
-	roomName: string,
+	roomName: string
 ): Promise<boolean | undefined> {
 	return await roomExist(roomName)
 }
 
 export async function isUsernameTaken(
 	username: string,
-	roomName: string,
+	roomName: string
 ): Promise<boolean | undefined> {
 	const command = new QueryCommand({
 		TableName: connectedUserTable,
@@ -187,9 +187,9 @@ export async function isUsernameTaken(
 		FilterExpression: "username = :username",
 		ExpressionAttributeValues: {
 			":room": roomName,
-			":username": username,
+			":username": username
 		},
-		Limit: 1, // We are checking for the existence of at least one item
+		Limit: 1 // We are checking for the existence of at least one item
 	})
 
 	try {

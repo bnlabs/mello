@@ -11,7 +11,7 @@ if (!livekitHost) {
 export const roomService = new RoomServiceClient(
 	livekitHost,
 	livekitApiKey,
-	livekitApiSecret,
+	livekitApiSecret
 )
 
 export const roomExistInLiveKit = async (roomName: string) => {

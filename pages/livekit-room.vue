@@ -80,7 +80,7 @@ const {
 	joinRoom,
 	currentUsername,
 	participantNames,
-	sendMessageLiveKit,
+	sendMessageLiveKit
 } = useLiveKit()
 
 // URL param
@@ -142,13 +142,13 @@ const adjustVolume = (event: KeyboardEvent) => {
 		case "ArrowUp":
 			localVideo.value.volume = Math.min(
 				localVideo.value.volume + volumeChangeAmount,
-				1,
+				1
 			)
 			break
 		case "ArrowDown":
 			localVideo.value.volume = Math.max(
 				localVideo.value.volume - volumeChangeAmount,
-				0,
+				0
 			)
 			break
 	}
@@ -162,7 +162,7 @@ onMounted(async () => {
 
 	// check if room already exist
 	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
-		method: "GET",
+		method: "GET"
 	})
 
 	if (!res.ok) {
@@ -196,7 +196,7 @@ onMounted(async () => {
 				const { host } = await joinRoom(
 					room.toString() ?? "",
 					username.toString() ?? "",
-					localVideo.value,
+					localVideo.value
 				)
 				currentHost.value = host
 			}
