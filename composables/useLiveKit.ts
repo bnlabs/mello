@@ -48,7 +48,7 @@ export function useLiveKit() {
 				participantNames: data.participantNames,
 			}
 		} else {
-			throw new Error("error fetching token")
+			console.log("Error Fetching Token")
 		}
 	}
 
@@ -85,7 +85,7 @@ export function useLiveKit() {
 		)
 		await currentRoom.value.connect(wsUrl, token.value)
 
-		participantNames.value = fetchedToken.participantNames
+		participantNames.value = fetchedToken?.participantNames
 
 		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
@@ -128,10 +128,7 @@ export function useLiveKit() {
 
 		currentRoom.value = new Room(options)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
-		currentRoom.value.on(
-			RoomEvent.ParticipantDisconnected,
-			handleParticipantLeave,
-		)
+		currentRoom.value.on(RoomEvent.ParticipantDisconnected, handleParticipantLeave)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
 
