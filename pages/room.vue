@@ -210,7 +210,6 @@ onMounted(async () => {
 				currentRoom.value = room
 			}
 
-			//socket.emit("joinRoom", { username, room })
 		}
 	}
 	catch (err: any) {
