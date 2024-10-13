@@ -333,9 +333,8 @@ export function useLiveKit() {
 		) {
 			await endStream()
 		} else {
-
 			// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
-			if(!localStream.value){
+			if (!localStream.value) {
 				localStream.value =
 					await navigator.mediaDevices.getDisplayMedia(streamSetting)
 			}
@@ -377,7 +376,7 @@ export function useLiveKit() {
 		const newPeerConnection = new RTCPeerConnection(servers)
 
 		// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
-		if(!localStream.value){
+		if (!localStream.value) {
 			localStream.value =
 				await navigator.mediaDevices.getDisplayMedia(streamSetting)
 		}
