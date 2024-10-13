@@ -20,6 +20,7 @@ const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
 const token = ref<string>("")
 const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")
+const isServerSideStreaming = ref<boolean>()
 
 // Define a type for the peer connections map
 type PeerConnectionsMap = Map<string, RTCPeerConnection>
@@ -198,7 +199,8 @@ export function useLiveKit() {
 	const hostRoom = async (
 		roomName: string,
 		username: string,
-		serverSideStreaming: boolean
+		serverSideStreaming: boolean,
+		localVideoElement: HTMLMediaElement | null
 	) => {
 		const handleDataReceived = async (
 			payload: Uint8Array<ArrayBufferLike>,
@@ -222,6 +224,27 @@ export function useLiveKit() {
 					break
 			}
 		}
+
+		const handleParticipantJoinAsHost = async (participant: Participant) => {
+			if (!participant.name) return
+
+			participantNames.value.push(participant.name)
+			await pushNotification(`${participant.name} has joined the chat`)
+
+			if (
+				!isServerSideStreaming.value &&
+				localVideoElement && // Video element shouldn't ever be null but type checking cuz typescript
+				localStream.value && // Only send offer to new user if there is a stream on going
+				localStream.value
+					.getTracks()
+					.some((track) => track.readyState === "live" && track.enabled)
+			) {
+				// if is not server side streaming, have to send SDP offer to new user to they can see the stream
+				await createOffer(participant.identity, localVideoElement)
+			}
+		}
+
+		isServerSideStreaming.value = serverSideStreaming
 
 		currentRoom.value?.disconnect()
 
@@ -251,7 +274,10 @@ export function useLiveKit() {
 		currentRoom.value = new Room(options)
 
 		// room event for both P2P and sever-side streaming
-		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
+		currentRoom.value.on(
+			RoomEvent.ParticipantConnected,
+			handleParticipantJoinAsHost
+		)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
 			handleParticipantLeave
@@ -375,7 +401,7 @@ export function useLiveKit() {
 				if (p.name === currentUsername.value) {
 					return
 				}
-				createOffer(p.identity, videoElement)
+				await createOffer(p.identity, videoElement)
 			})
 		}
 	}

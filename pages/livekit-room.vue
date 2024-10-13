@@ -176,7 +176,12 @@ onMounted(async () => {
 				return
 			}
 
-			await hostRoom(room.toString() ?? "", username.toString() ?? "", true)
+			await hostRoom(
+				room.toString() ?? "",
+				username.toString() ?? "",
+				true,
+				localVideo.value
+			)
 			currentHost.value = username
 		} else {
 			// joining existing room

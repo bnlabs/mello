@@ -171,7 +171,12 @@ onMounted(async () => {
 				failureMessage.value = "Room already exist"
 				return
 			}
-			await hostRoom(room.toString() ?? "", username.toString() ?? "", false)
+			await hostRoom(
+				room.toString() ?? "",
+				username.toString() ?? "",
+				false,
+				localVideo.value
+			)
 			currentHost.value = username
 			currentRoom.value = room
 		} else {
