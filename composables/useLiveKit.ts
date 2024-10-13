@@ -61,32 +61,53 @@ export function useLiveKit() {
 	const fetchToken = async (
 		roomName: string,
 		username: string,
-		canPublish: boolean,
-		canSubscribe: boolean
+		isHost: boolean
 	) => {
 		const params = new URLSearchParams({
 			room: roomName,
-			username: username,
-			canPublish: canPublish.toString(),
-			canSubscribe: canSubscribe.toString()
+			username: username
 		})
 
-		const response = await fetch(`/api/getLiveKitToken?${params.toString()}`, {
-			method: "GET"
-		})
+		if (isHost) {
+			const response = await fetch(
+				`/api/livekit/generateTokenForHostRoom?${params.toString()}`,
+				{
+					method: "GET"
+				}
+			)
 
-		if (response.ok) {
-			const data = await response.json() // Parse the response to JSON
-			token.value = data.token // Access the token from the parsed data
+			if (response.ok) {
+				const data = await response.json() // Parse the response to JSON
+				token.value = data.token // Access the token from the parsed data
 
-			return {
-				token: data.token,
-				host: data.host ?? "",
-				participantNames: data.participantNames
+				return {
+					token: data.token
+				}
+			} else {
+				throw new Error(`Error fetching token: 
+					HTTP request status ${response.status}`)
 			}
 		} else {
-			throw new Error(`Error fetching token: 
-				HTTP request status ${response.status}`)
+			const response = await fetch(
+				`/api/livekit/generateTokenForJoinRoom?${params.toString()}`,
+				{
+					method: "GET"
+				}
+			)
+
+			if (response.ok) {
+				const data = await response.json() // Parse the response to JSON
+				token.value = data.token // Access the token from the parsed data
+
+				return {
+					host: data.host,
+					token: data.token,
+					participantNames: data.participantNames
+				}
+			} else {
+				throw new Error(`Error fetching token: 
+					HTTP request status ${response.status}`)
+			}
 		}
 	}
 
@@ -142,7 +163,7 @@ export function useLiveKit() {
 		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
-		const fetchedToken = await fetchToken(roomName, username, false, true)
+		const fetchedToken = await fetchToken(roomName, username, false)
 		currentRoom.value = new Room()
 
 		// room events for p2p streaming
@@ -204,7 +225,7 @@ export function useLiveKit() {
 
 		currentRoom.value?.disconnect()
 
-		await fetchToken(roomName, username, true, true)
+		await fetchToken(roomName, username, true)
 		currentUsername.value = username
 
 		const options: RoomOptions = {

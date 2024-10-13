@@ -55,7 +55,7 @@ const {
 	joinRoom,
 	sendMessageLiveKit,
 	toggleScreenshareP2P,
-	cleanUpData, 
+	cleanUpData,
 	participantNames
 } = useLiveKit()
 const currentRoom = ref("")

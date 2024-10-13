@@ -10,7 +10,6 @@ const props = defineProps<{
 	isSfu: boolean
 }>()
 
-
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
 type ToggleChatFunction = () => void
