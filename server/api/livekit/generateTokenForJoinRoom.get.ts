@@ -35,9 +35,10 @@ export default defineEventHandler(async (event) => {
 	).map((p: ParticipantInfo) => p.name)
 
 	// host name
-	const host: string = (await roomService.listParticipants(room)).filter(
-		(participant: ParticipantInfo) => participant.permission?.canPublish
-	)[0].name ?? "filler name"
+	const host: string =
+		(await roomService.listParticipants(room)).filter(
+			(participant: ParticipantInfo) => participant.permission?.canPublish
+		)[0].name ?? "filler name"
 
 	return {
 		statusCode: 200,
