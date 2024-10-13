@@ -10,7 +10,8 @@ import {
 	type ScreenShareCaptureOptions,
 	type ChatMessage as LiveKitChatMessage,
 	DataPacket_Kind,
-	type DataPublishOptions
+	type DataPublishOptions,
+	LocalTrack
 } from "livekit-client"
 import type { ParticipantInfo } from "livekit-server-sdk"
 import moment from "moment"
@@ -56,7 +57,7 @@ const streamSetting = {
 }
 
 export function useLiveKit() {
-	const { pushNotification, pushMessage } = useChatMessage()
+	const { pushNotification, pushMessage, clearMessages } = useChatMessage()
 
 	const fetchToken = async (
 		roomName: string,
@@ -323,27 +324,20 @@ export function useLiveKit() {
 		const data = await res.json()
 		await clearPeerConnection()
 
-		const videoTrack =
-			localStream.value && localStream.value.getVideoTracks()[0]
-
 		// foreach users in the lobby
-		if (videoTrack && videoTrack.readyState !== "ended") {
+		if (
+			localStream.value &&
+			localStream.value
+				.getTracks()
+				.some((track) => track.readyState === "live" && track.enabled)
+		) {
 			await endStream()
 		} else {
 			data.result.forEach(async (p: ParticipantInfo) => {
 				if (p.name === currentUsername.value) {
 					return
 				}
-				const pCon = await createPeerConnection(p.identity, videoElement)
-				if (pCon) {
-					const offer = await pCon.createOffer()
-					await pCon.setLocalDescription(offer)
-					const payload = { type: "offer", offer: offer }
-					await sendWebSocketPayload(payload, {
-						reliable: true,
-						destinationIdentities: [p.identity]
-					})
-				}
+				await createOffer(p.identity, videoElement)
 			})
 		}
 	}
@@ -375,10 +369,8 @@ export function useLiveKit() {
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 
-		if (!localStream.value) {
-			localStream.value =
-				await navigator.mediaDevices.getDisplayMedia(streamSetting)
-		}
+		localStream.value =
+			await navigator.mediaDevices.getDisplayMedia(streamSetting)
 
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream.value
@@ -387,7 +379,7 @@ export function useLiveKit() {
 		localStream.value.getTracks().forEach((track: MediaStreamTrack) => {
 			newPeerConnection.addTrack(track, localStream.value as MediaStream)
 			track.onended = function () {
-				localStream.value = null
+				localStream.value?.getTracks().forEach((track) => track.stop())
 			}
 		})
 
@@ -458,7 +450,7 @@ export function useLiveKit() {
 	) => {
 		const peerConnection: RTCPeerConnection | undefined =
 			peerConnections.value.get(identity)
-		if (peerConnection && !peerConnection.currentRemoteDescription) {
+		if (peerConnection) {
 			peerConnection.setRemoteDescription(answer)
 		}
 	}
@@ -485,7 +477,7 @@ export function useLiveKit() {
 			event.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
 				localStream.value?.addTrack(track)
 				track.onended = function () {
-					localStream.value = null
+					localStream.value?.getTracks().forEach((track) => track.stop())
 				}
 			})
 		}
@@ -512,14 +504,20 @@ export function useLiveKit() {
 	}
 
 	const endStream = async () => {
-		const videoTrack =
-			localStream.value && localStream.value.getVideoTracks()[0]
-		if (videoTrack && videoTrack.readyState !== "ended") {
-			localStream.value?.getTracks().forEach((track) => track.stop())
-			localStream.value = null
-		}
+		localStream.value?.getTracks().forEach((track) => track.stop())
 
 		await clearPeerConnection()
+	}
+
+	const cleanUpData = async () => {
+		await endStream()
+		await clearPeerConnection()
+		clearMessages()
+		currentRoom.value?.disconnect()
+		participantNames.value = []
+		token.value = ""
+		currentRoom.value = null
+		currentUsername.value = ""
 	}
 
 	return {
@@ -537,6 +535,7 @@ export function useLiveKit() {
 		createOffer,
 		createAnswer,
 		addAnswer,
-		toggleScreenshareP2P
+		toggleScreenshareP2P,
+		cleanUpData
 	}
 }

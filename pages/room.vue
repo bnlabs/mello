@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-
 const { chatMessages } = useChatMessage()
 const users = ref<User[]>([])
 const chatIsOpen = ref(true)
@@ -55,7 +54,8 @@ const {
 	leaveRoom,
 	joinRoom,
 	sendMessageLiveKit,
-	toggleScreenshareP2P
+	toggleScreenshareP2P,
+	cleanUpData
 } = useLiveKit()
 const currentRoom = ref("")
 const currentHost = ref("")
@@ -202,7 +202,8 @@ onMounted(async () => {
 	}
 })
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
+	await cleanUpData()
 	window.removeEventListener("keydown", adjustVolume)
 	if (localVideo.value) {
 		// Remove the click event listener
