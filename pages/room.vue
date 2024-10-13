@@ -20,7 +20,7 @@
 		<div class="h-[10%]">
 			<RoomInfo
 				:roomName="currentRoom"
-				:users="users"
+				:usernames="participantNames"
 				:username="username ?? ''"
 				:host="currentHost"
 				:isHost="isHost ?? ''"
@@ -55,7 +55,8 @@ const {
 	joinRoom,
 	sendMessageLiveKit,
 	toggleScreenshareP2P,
-	cleanUpData
+	cleanUpData, 
+	participantNames
 } = useLiveKit()
 const currentRoom = ref("")
 const currentHost = ref("")

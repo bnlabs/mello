@@ -3,19 +3,13 @@ import { inject } from "vue"
 
 const props = defineProps<{
 	roomName: string
-	users: Array<User>
+	usernames: string[]
 	username: string
 	host: string
 	isHost: string
 	isSfu: boolean
 }>()
 
-const userNames = computed(
-	() =>
-		props.users
-			.map((user: User) => user.username)
-			.filter((username: string) => username) // Optionally filter out undefined or empty names
-)
 
 type ToggleStreamFunction = () => void
 type LeaveRoomFunction = () => void
@@ -51,7 +45,7 @@ if (props.isSfu) {
 				<span class="text-black"> {{ host }}</span>
 			</RoomInfoSlot>
 
-			<RoomUserList :users="userNames" />
+			<RoomUserList :users="usernames" />
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">
