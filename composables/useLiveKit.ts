@@ -142,7 +142,7 @@ export function useLiveKit() {
 		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
-		const fetchedToken = await fetchToken(roomName, username, true, true)
+		const fetchedToken = await fetchToken(roomName, username, false, true)
 		currentRoom.value = new Room()
 
 		// room events for p2p streaming
@@ -174,7 +174,11 @@ export function useLiveKit() {
 		}
 	}
 
-	const hostRoom = async (roomName: string, username: string) => {
+	const hostRoom = async (
+		roomName: string,
+		username: string,
+		serverSideStreaming: boolean
+	) => {
 		const handleDataReceived = async (
 			payload: Uint8Array<ArrayBufferLike>,
 			participant?: RemoteParticipant | undefined,
@@ -237,6 +241,14 @@ export function useLiveKit() {
 
 		// room events for p2p streaming
 		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
+
+		await $fetch("/api/sendRoomInfo", {
+			method: "POST",
+			body: {
+				roomName: currentRoom.value.name,
+				usingServerSideStreaming: serverSideStreaming
+			}
+		})
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {

@@ -176,7 +176,7 @@ onMounted(async () => {
 				return
 			}
 
-			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+			await hostRoom(room.toString() ?? "", username.toString() ?? "", true)
 			currentHost.value = username
 		} else {
 			// joining existing room

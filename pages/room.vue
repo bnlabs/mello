@@ -170,7 +170,7 @@ onMounted(async () => {
 				failureMessage.value = "Room already exist"
 				return
 			}
-			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+			await hostRoom(room.toString() ?? "", username.toString() ?? "", false)
 			currentHost.value = username
 			currentRoom.value = room
 		} else {
