@@ -217,71 +217,6 @@ onMounted(async () => {
 
 	}
 
-	socket.on("message", (response: ChatMessage) => {
-		pushMessage(response)
-	})
-
-	socket.on(
-		"userJoin",
-		(response: {
-			room: string
-			users: User[]
-			host: string
-			newUser: User
-		}) => {
-			// necessary for when user start hosting a room
-			currentRoom.value = response.room
-
-			users.value = response.users
-			if (response.host) {
-				currentHost.value = response.host
-			}
-
-			const notificationMessage: ChatMessage = {
-				username: botName,
-				text: `${response.newUser.username} has joined the chat`,
-				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
-				isHost: ""
-			}
-
-			pushNotification(notificationMessage.text)
-
-			if (
-				response.newUser &&
-				response.newUser.username !== username &&
-				localVideo.value &&
-				isHost === "true" &&
-				isStreaming()
-			) {
-				createOffer(localVideo.value, response.newUser.id)
-			}
-		}
-	)
-
-	socket.on(
-		"userDisconnect",
-		(response: { room: string; users: User[]; oldUser: User }) => {
-			users.value = response.users
-
-			if (response.oldUser) {
-				removePeerConnection(response.oldUser.id)
-			}
-
-			const notifMessage: ChatMessage = {
-				username: botName,
-				text: `${response.oldUser.username} has left the chat`,
-				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
-				isHost: ""
-			}
-			pushNotification(notifMessage.text)
-		}
-	)
-
-	socket.on("hostingOrJoiningFailed", (response: { reason: string }) => {
-		failureMessage.value = response.reason
-		dialogVisible.value = true
-	})
-
 	socket.on(
 		"receiveWebRTCMessage",
 		(response: { username: string; payload: string; socketId: string }) => {
@@ -304,50 +239,6 @@ onMounted(async () => {
 			}
 		}
 	)
-
-	socket.on("reconnect", (attemptNumber) => {
-		const notifMessage: ChatMessage = {
-			username: botName,
-			text: `Reconnected to the server after ${attemptNumber} attempts.`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
-		}
-		pushNotification(notifMessage.text)
-	})
-
-	socket.on("reconnect_attempt", (attemptNumber) => {
-		const notifMessage: ChatMessage = {
-			username: botName,
-			text: `Attempting to reconnect (attempt ${attemptNumber})`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
-		}
-		pushNotification(notifMessage.text)
-	})
-
-	socket.on("disconnect", (reason) => {
-		const notifMessage: ChatMessage = {
-			username: botName,
-			text: `Disconnected: ${reason}`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
-		}
-
-		pushNotification(notifMessage.text)
-
-		// Optionally, attempt to reconnect based on the reason
-		if (reason === "io server disconnect") {
-			// The disconnection was initiated by the server, you need to reconnect manually
-			socket.connect()
-		}
-	})
-
-	socket.on("error", (error) => {
-		const notifMessage: ChatMessage = {
-			username: botName,
-			text: `Connection Error: ${error}`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
-		}
-
-		pushNotification(notifMessage.text)
-	})
 
 	window.addEventListener("keydown", adjustVolume)
 
