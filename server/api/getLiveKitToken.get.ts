@@ -52,7 +52,8 @@ const createToken = async (
 		roomJoin: true,
 		room: room,
 		canPublish: canPublish,
-		canSubscribe: canSubscribe
+		canSubscribe: canSubscribe,
+		canPublishData: true
 	})
 
 	const token = await at.toJwt()
