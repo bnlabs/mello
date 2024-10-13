@@ -8,7 +8,8 @@ import {
 	RoomEvent,
 	type RoomOptions,
 	type ScreenShareCaptureOptions,
-	type ChatMessage as LiveKitChatMessage
+	type ChatMessage as LiveKitChatMessage,
+	DataPacket_Kind
 } from "livekit-client"
 import moment from "moment"
 
@@ -73,22 +74,37 @@ export function useLiveKit() {
 			throw new Error("missing input")
 		}
 
+		const handleDataReceived = async (payload: Uint8Array<ArrayBufferLike>,
+			participant?: RemoteParticipant | undefined,
+			kind?: DataPacket_Kind | undefined, 
+			topic?: string | undefined): Promise<void> => {
+
+		}
+
 		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
 		const fetchedToken = await fetchToken(roomName, username, true, true)
 		currentRoom.value = new Room()
+		
+		// room events for p2p streaming
+		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
+
+		// room events for server side streaming
 		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+
+		// room events for both server side streaming and p2p
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
 			handleParticipantLeave
 		)
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
+
 		await currentRoom.value.connect(wsUrl, token.value)
 
 		participantNames.value = fetchedToken?.participantNames
 
-		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
 		return {
 			host: fetchedToken?.host
@@ -199,6 +215,14 @@ export function useLiveKit() {
 			)
 
 		screensharePub?.videoTrack?.attach(videoElement)
+	}
+
+	const toggleScreenshareP2P = async (videoElement: HTMLMediaElement) => {
+		// turn off server-side streaming
+		const screensharePub = await currentRoom.value?.localParticipant.setScreenShareEnabled(false)
+		screensharePub?.videoTrack?.attach(videoElement)
+
+
 	}
 
 	const sendMessageLiveKit = async (msg: string) => {

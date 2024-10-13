@@ -4,13 +4,13 @@
 			<video
 				autoPlay
 				playsInline
-				ref="videoPlayer"
+				ref="localVideo"
 				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
 			></video>
 			<Chat
 				v-if="chatIsOpen"
-				:chats
+				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
 				:using-live-kit="false"
 			>
@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import moment from "moment"
 
-const chats = ref<ChatMessage[]>([])
+const { chatMessages, pushMessage, pushNotification } = useChatMessage()
 const users = ref<User[]>([])
 const chatIsOpen = ref(true)
 const { socket } = useSocketIo()
@@ -60,9 +60,18 @@ const {
 	isStreaming,
 	removePeerConnection
 } = useWebRtc()
+const {
+	toggleScreenshare,
+	hostRoom,
+	leaveRoom,
+	joinRoom,
+	currentUsername,
+	participantNames,
+	sendMessageLiveKit
+} = useLiveKit()
 const currentRoom = ref("")
 const currentHost = ref("")
-const videoPlayer = ref<HTMLMediaElement | null>(null)
+const localVideo = ref<HTMLMediaElement | null>(null)
 const dialogVisible = useState<boolean>("diaglogVisible", () => false)
 const failureMessage = useState<string>("failureMessage", () => "")
 
@@ -74,7 +83,8 @@ const sendMessage = async (message: String) => {
 	socket.emit("chatMessage", message)
 }
 
-const leaveRoom = () => {
+const leave = () => {
+	leaveRoom()
 	router.push("/")
 }
 
@@ -89,25 +99,25 @@ const handleToggleStream = () => {
 			.map((user) => user.id)
 	)
 
-	if (videoPlayer.value) {
-		toggleStream(userIds.value, videoPlayer.value)
+	if (localVideo.value) {
+		toggleStream(userIds.value, localVideo.value)
 	}
 }
 
 const adjustVolume = (event: KeyboardEvent) => {
-	if (!videoPlayer.value) return
+	if (!localVideo.value) return
 
 	const volumeChangeAmount = 0.1
 	switch (event.key) {
 		case "ArrowUp":
-			videoPlayer.value.volume = Math.min(
-				videoPlayer.value.volume + volumeChangeAmount,
+			localVideo.value.volume = Math.min(
+				localVideo.value.volume + volumeChangeAmount,
 				1
 			)
 			break
 		case "ArrowDown":
-			videoPlayer.value.volume = Math.max(
-				videoPlayer.value.volume - volumeChangeAmount,
+			localVideo.value.volume = Math.max(
+				localVideo.value.volume - volumeChangeAmount,
 				0
 			)
 			break
@@ -115,20 +125,20 @@ const adjustVolume = (event: KeyboardEvent) => {
 }
 
 const toggleFullScreen = (): void => {
-	if (!videoPlayer.value) return
+	if (!localVideo.value) return
 
 	if (!document.fullscreenElement) {
-		if (videoPlayer.value.requestFullscreen) {
-			videoPlayer.value.requestFullscreen()
-		} else if ((videoPlayer.value as any).mozRequestFullScreen) {
+		if (localVideo.value.requestFullscreen) {
+			localVideo.value.requestFullscreen()
+		} else if ((localVideo.value as any).mozRequestFullScreen) {
 			/* Firefox */
-			;(videoPlayer.value as any).mozRequestFullScreen()
-		} else if ((videoPlayer.value as any).webkitRequestFullscreen) {
+			;(localVideo.value as any).mozRequestFullScreen()
+		} else if ((localVideo.value as any).webkitRequestFullscreen) {
 			/* Chrome, Safari & Opera */
-			;(videoPlayer.value as any).webkitRequestFullscreen()
-		} else if ((videoPlayer.value as any).msRequestFullscreen) {
+			;(localVideo.value as any).webkitRequestFullscreen()
+		} else if ((localVideo.value as any).msRequestFullscreen) {
 			/* IE/Edge */
-			;(videoPlayer.value as any).msRequestFullscreen()
+			;(localVideo.value as any).msRequestFullscreen()
 		}
 	} else {
 		if (document.exitFullscreen) {
@@ -154,23 +164,65 @@ const preventPlayPause = (event: MouseEvent): void => {
 provide("sendMessage", sendMessage)
 provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
-provide("leaveRoom", leaveRoom)
+provide("leaveRoom", leave)
 
 const { username, room, isHost } = route.query as Partial<UrlParam>
-onMounted(() => {
-	if (!username || !room || !isHost) {
+onMounted(async () => {
+	if (!username || !room) {
 		router.push("/")
+		return
+	}
+	// check if room already exist
+	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+		method: "GET"
+	})
+
+	if (!res.ok) {
+		dialogVisible.value = true
+		failureMessage.value = "Error Checking if room already exist"
+		return
 	}
 
-	// Join ChatRoom
-	if (isHost === "true") {
-		socket.emit("hostRoom", { username, room })
-	} else {
-		socket.emit("joinRoom", { username, room })
+	const data = await res.json()
+
+	try {
+
+		if (isHost === "true") { // hosting room
+			if (data.roomExist) {
+				dialogVisible.value = true
+				failureMessage.value = "Room already exist"
+				return
+			}
+			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+			currentHost.value = username
+			currentRoom.value = room
+
+		} else {	// joining existing room
+			if (!data.roomExist) { // check if room exist
+				dialogVisible.value = true
+				failureMessage.value = "Room does not exist"
+				return
+			}
+
+			if (localVideo.value) {
+				const { host } = await joinRoom(
+					room.toString() ?? "",
+					username.toString() ?? "",
+					localVideo.value
+				)
+				currentHost.value = host
+				currentRoom.value = room
+			}
+
+			//socket.emit("joinRoom", { username, room })
+		}
+	}
+	catch (err: any) {
+
 	}
 
 	socket.on("message", (response: ChatMessage) => {
-		chats.value.push(response)
+		pushMessage(response)
 	})
 
 	socket.on(
@@ -196,16 +248,16 @@ onMounted(() => {
 				isHost: ""
 			}
 
-			chats.value.push(notificationMessage)
+			pushNotification(notificationMessage.text)
 
 			if (
 				response.newUser &&
 				response.newUser.username !== username &&
-				videoPlayer.value &&
+				localVideo.value &&
 				isHost === "true" &&
 				isStreaming()
 			) {
-				createOffer(videoPlayer.value, response.newUser.id)
+				createOffer(localVideo.value, response.newUser.id)
 			}
 		}
 	)
@@ -225,7 +277,7 @@ onMounted(() => {
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
 				isHost: ""
 			}
-			chats.value.push(notifMessage)
+			pushNotification(notifMessage.text)
 		}
 	)
 
@@ -240,8 +292,8 @@ onMounted(() => {
 			const message = JSON.parse(response.payload)
 			switch (message.type) {
 				case "offer":
-					if (videoPlayer.value) {
-						createAnswer(response.socketId, message.offer, videoPlayer.value)
+					if (localVideo.value) {
+						createAnswer(response.socketId, message.offer, localVideo.value)
 					}
 					break
 				case "answer":
@@ -263,7 +315,7 @@ onMounted(() => {
 			text: `Reconnected to the server after ${attemptNumber} attempts.`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
-		chats.value.push(notifMessage)
+		pushNotification(notifMessage.text)
 	})
 
 	socket.on("reconnect_attempt", (attemptNumber) => {
@@ -272,7 +324,7 @@ onMounted(() => {
 			text: `Attempting to reconnect (attempt ${attemptNumber})`,
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
-		chats.value.push(notifMessage)
+		pushNotification(notifMessage.text)
 	})
 
 	socket.on("disconnect", (reason) => {
@@ -282,7 +334,7 @@ onMounted(() => {
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 
-		chats.value.push(notifMessage)
+		pushNotification(notifMessage.text)
 
 		// Optionally, attempt to reconnect based on the reason
 		if (reason === "io server disconnect") {
@@ -298,22 +350,22 @@ onMounted(() => {
 			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 
-		chats.value.push(notifMessage)
+		pushNotification(notifMessage.text)
 	})
 
 	window.addEventListener("keydown", adjustVolume)
 
-	if (videoPlayer.value) {
+	if (localVideo.value) {
 		// Add click event listener to prevent play/pause
-		videoPlayer.value.addEventListener("click", preventPlayPause)
+		localVideo.value.addEventListener("click", preventPlayPause)
 	}
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener("keydown", adjustVolume)
-	if (videoPlayer.value) {
+	if (localVideo.value) {
 		// Remove the click event listener
-		videoPlayer.value.removeEventListener("click", preventPlayPause)
+		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
 })
 </script>
