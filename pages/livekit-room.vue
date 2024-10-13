@@ -64,11 +64,6 @@
 </template>
 
 <script setup lang="ts">
-interface UrlParam {
-	username: string
-	room: string
-	isHost: string
-}
 
 const route = useRoute()
 const router = useRouter()

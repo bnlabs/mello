@@ -45,10 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, provide } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useSocketIo } from "@/composables/useSocketIo"
-import { useWebRtc } from "@/composables/useWebRtc"
 import moment from "moment"
 
 const chats = ref<ChatMessage[]>([])
@@ -159,12 +155,6 @@ provide("sendMessage", sendMessage)
 provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leaveRoom)
-
-interface UrlParam {
-	username: string
-	room: string
-	isHost: string
-}
 
 const { username, room, isHost } = route.query as Partial<UrlParam>
 onMounted(() => {
