@@ -333,11 +333,18 @@ export function useLiveKit() {
 		) {
 			await endStream()
 		} else {
+
+			// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
+			if(!localStream.value){
+				localStream.value =
+					await navigator.mediaDevices.getDisplayMedia(streamSetting)
+			}
+
 			data.result.forEach(async (p: ParticipantInfo) => {
 				if (p.name === currentUsername.value) {
 					return
 				}
-				await createOffer(p.identity, videoElement)
+				createOffer(p.identity, videoElement)
 			})
 		}
 	}
@@ -369,8 +376,11 @@ export function useLiveKit() {
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 
-		localStream.value =
-			await navigator.mediaDevices.getDisplayMedia(streamSetting)
+		// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
+		if(!localStream.value){
+			localStream.value =
+				await navigator.mediaDevices.getDisplayMedia(streamSetting)
+		}
 
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream.value
@@ -380,6 +390,7 @@ export function useLiveKit() {
 			newPeerConnection.addTrack(track, localStream.value as MediaStream)
 			track.onended = function () {
 				localStream.value?.getTracks().forEach((track) => track.stop())
+				localStream.value = null
 			}
 		})
 
@@ -478,6 +489,7 @@ export function useLiveKit() {
 				localStream.value?.addTrack(track)
 				track.onended = function () {
 					localStream.value?.getTracks().forEach((track) => track.stop())
+					localStream.value = null
 				}
 			})
 		}
@@ -505,6 +517,7 @@ export function useLiveKit() {
 
 	const endStream = async () => {
 		localStream.value?.getTracks().forEach((track) => track.stop())
+		localStream.value = null
 
 		await clearPeerConnection()
 	}
