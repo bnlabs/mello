@@ -10,8 +10,7 @@ import {
 	type ScreenShareCaptureOptions,
 	type ChatMessage as LiveKitChatMessage,
 	DataPacket_Kind,
-	type DataPublishOptions,
-	LocalTrack
+	type DataPublishOptions
 } from "livekit-client"
 import type { ParticipantInfo } from "livekit-server-sdk"
 import moment from "moment"
