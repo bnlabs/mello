@@ -411,7 +411,7 @@ export function useLiveKit() {
 	}
 
 	const sendWebSocketPayload = async (
-		payload: any,
+		payload: object,
 		options?: DataPublishOptions
 	) => {
 		const strData = JSON.stringify(payload)
