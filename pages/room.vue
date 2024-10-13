@@ -79,12 +79,8 @@ const botName = "Notification"
 const route = useRoute()
 const router = useRouter()
 
-const sendMessage = async (message: String) => {
-	socket.emit("chatMessage", message)
-}
-
-const leave = () => {
-	leaveRoom()
+const leave = async () => {
+	await leaveRoom()
 	router.push("/")
 }
 
@@ -161,7 +157,7 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
-provide("sendMessage", sendMessage)
+provide("sendMessage", sendMessageLiveKit)
 provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leave)
