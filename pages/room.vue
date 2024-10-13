@@ -16,7 +16,7 @@ const {
 	addAnswer,
 	toggleStream,
 	isStreaming,
-	removePeerConnection,
+	removePeerConnection
 } = useWebRtc()
 const currentRoom = ref("")
 const currentHost = ref("")
@@ -44,7 +44,7 @@ const handleToggleStream = () => {
 	const userIds = computed(() =>
 		users.value
 			.filter((user) => user.username !== username)
-			.map((user) => user.id),
+			.map((user) => user.id)
 	)
 
 	if (videoPlayer.value) {
@@ -60,13 +60,13 @@ const adjustVolume = (event: KeyboardEvent) => {
 		case "ArrowUp":
 			videoPlayer.value.volume = Math.min(
 				videoPlayer.value.volume + volumeChangeAmount,
-				1,
+				1
 			)
 			break
 		case "ArrowDown":
 			videoPlayer.value.volume = Math.max(
 				videoPlayer.value.volume - volumeChangeAmount,
-				0,
+				0
 			)
 			break
 	}
@@ -157,7 +157,7 @@ onMounted(() => {
 				username: botName,
 				text: `${response.newUser.username} has joined the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
-				isHost: "",
+				isHost: ""
 			}
 
 			chats.value.push(notificationMessage)
@@ -171,7 +171,7 @@ onMounted(() => {
 			) {
 				createOffer(videoPlayer.value, response.newUser.id)
 			}
-		},
+		}
 	)
 
 	socket.on(
@@ -187,10 +187,10 @@ onMounted(() => {
 				username: botName,
 				text: `${response.oldUser.username} has left the chat`,
 				time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
-				isHost: "",
+				isHost: ""
 			}
 			chats.value.push(notifMessage)
-		},
+		}
 	)
 
 	socket.on("hostingOrJoiningFailed", (response: { reason: string }) => {
@@ -218,14 +218,14 @@ onMounted(() => {
 					}
 					break
 			}
-		},
+		}
 	)
 
 	socket.on("reconnect", (attemptNumber) => {
 		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Reconnected to the server after ${attemptNumber} attempts.`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 		chats.value.push(notifMessage)
 	})
@@ -234,7 +234,7 @@ onMounted(() => {
 		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Attempting to reconnect (attempt ${attemptNumber})`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 		chats.value.push(notifMessage)
 	})
@@ -243,7 +243,7 @@ onMounted(() => {
 		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Disconnected: ${reason}`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 
 		chats.value.push(notifMessage)
@@ -259,7 +259,7 @@ onMounted(() => {
 		const notifMessage: ChatMessage = {
 			username: botName,
 			text: `Connection Error: ${error}`,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss")
 		}
 
 		chats.value.push(notifMessage)
@@ -292,7 +292,12 @@ onBeforeUnmount(() => {
 				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
 			></video>
-			<Chat v-if="chatIsOpen" :chats :class="chatIsOpen ? 'w-1/6' : 'w-0'">
+			<Chat
+				v-if="chatIsOpen"
+				:chats
+				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
+				:using-live-kit="false"
+			>
 			</Chat>
 		</div>
 

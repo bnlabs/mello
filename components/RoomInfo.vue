@@ -14,7 +14,7 @@ const userNames = computed(
 	() =>
 		props.users
 			.map((user: User) => user.username)
-			.filter((username: string) => username), // Optionally filter out undefined or empty names
+			.filter((username: string) => username) // Optionally filter out undefined or empty names
 )
 
 type ToggleStreamFunction = () => void

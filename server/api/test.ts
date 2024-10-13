@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
 	return {
-		result: "ice cream",
+		result: "ice cream"
 	}
 })

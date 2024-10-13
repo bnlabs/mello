@@ -3,11 +3,11 @@ import moment from "moment"
 const chatMessages = ref<ChatMessage[]>([])
 
 export function useChatMessage() {
-	const pushMessage = async (message: string) => {
+	const pushNotification = async (message: string) => {
 		const msg: ChatMessage = {
 			username: "Notification",
 			text: message,
-			time: moment().utc().format("YYYY-MM-DDTHH:mm:ss"),
+			time: moment().format("LT")
 		}
 
 		chatMessages.value.push(msg)
@@ -17,9 +17,14 @@ export function useChatMessage() {
 		chatMessages.value = []
 	}
 
+	const pushMessage = async (msg: ChatMessage) => {
+		chatMessages.value.push(msg)
+	}
+
 	return {
-		pushMessage,
+		pushNotification,
 		clearMessages,
 		chatMessages,
+		pushMessage
 	}
 }

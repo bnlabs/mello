@@ -16,17 +16,17 @@ export function useWebRtc() {
 					"stun:global.stun.twilio.com:3478",
 					"stun:stun4.l.google.com:19302",
 					"stun:stun3.l.google.com:19302",
-					"stun:stun.l.google.com:19302",
-				],
-			},
-		],
+					"stun:stun.l.google.com:19302"
+				]
+			}
+		]
 	}
 
 	const streamSetting = {
 		video: {
 			width: { ideal: 2560, max: 2560 },
 			height: { ideal: 1440, max: 1440 },
-			frameRate: { ideal: 60, max: 60 },
+			frameRate: { ideal: 60, max: 60 }
 		},
 		audio: {
 			autoGainControl: false,
@@ -34,8 +34,8 @@ export function useWebRtc() {
 			echoCancellation: false,
 			noiseSuppression: false,
 			sampleRate: 48000,
-			sampleSize: 16,
-		},
+			sampleSize: 16
+		}
 	}
 
 	const getPeerConnection = (uid: string) => {
@@ -44,7 +44,7 @@ export function useWebRtc() {
 
 	const createPeerConnection = async (
 		uid: string,
-		videoPlayer: HTMLMediaElement,
+		videoPlayer: HTMLMediaElement
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 		if (!localStream) {
@@ -65,7 +65,7 @@ export function useWebRtc() {
 			if (event.candidate) {
 				const payload = JSON.stringify({
 					type: "candidate",
-					candidate: event.candidate,
+					candidate: event.candidate
 				})
 				socket.emit("sendWebRTCMessage", payload, uid)
 			}
@@ -78,7 +78,7 @@ export function useWebRtc() {
 
 	const createPeerConnectionAnswer = async (
 		uid: string,
-		videoPlayer: HTMLMediaElement,
+		videoPlayer: HTMLMediaElement
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 		localStream = new MediaStream()
@@ -100,7 +100,7 @@ export function useWebRtc() {
 			if (event.candidate) {
 				const payload = JSON.stringify({
 					type: "candidate",
-					candidate: event.candidate,
+					candidate: event.candidate
 				})
 				socket.emit("sendWebRTCMessage", payload, uid)
 			}
@@ -124,7 +124,7 @@ export function useWebRtc() {
 	const createAnswer = async (
 		uid: string,
 		offer: RTCSessionDescriptionInit,
-		videoPlayer: HTMLMediaElement,
+		videoPlayer: HTMLMediaElement
 	) => {
 		await clearPeerConnection()
 		const pCon = await createPeerConnectionAnswer(uid, videoPlayer)
@@ -144,7 +144,7 @@ export function useWebRtc() {
 
 	const createOfferToLobby = async (
 		userIds: string[],
-		videoPlayer: HTMLMediaElement,
+		videoPlayer: HTMLMediaElement
 	) => {
 		await clearPeerConnection()
 		for (const userId of userIds) {
@@ -164,7 +164,7 @@ export function useWebRtc() {
 
 	const toggleStream = async (
 		userIds: string[],
-		videoPlayer: HTMLMediaElement,
+		videoPlayer: HTMLMediaElement
 	) => {
 		// Check if localStream exists and if it has video tracks
 		const videoTrack = localStream && localStream.getVideoTracks()[0]
@@ -219,6 +219,6 @@ export function useWebRtc() {
 		addAnswer,
 		toggleStream,
 		isStreaming,
-		removePeerConnection,
+		removePeerConnection
 	}
 }

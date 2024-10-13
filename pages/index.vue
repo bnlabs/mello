@@ -5,7 +5,7 @@ import { useToast } from "primevue/usetoast"
 
 export default {
 	components: {
-		InputText,
+		InputText
 	},
 	data() {
 		return {
@@ -13,10 +13,10 @@ export default {
 			room: "",
 			touched: {
 				username: false,
-				room: false,
+				room: false
 			},
 			serverSideStreaming: false,
-			toast: useToast(),
+			toast: useToast()
 		}
 	},
 	computed: {
@@ -33,7 +33,7 @@ export default {
 		},
 		showRoomValidation() {
 			return this.touched.room && !this.isRoomValid
-		},
+		}
 	},
 	methods: {
 		async showError(summary: string, detail: string) {
@@ -41,7 +41,7 @@ export default {
 				severity: "error",
 				summary: summary,
 				detail: detail,
-				life: 3000,
+				life: 3000
 			})
 		},
 		async joinRoom() {
@@ -52,13 +52,13 @@ export default {
 			const room = this.room.trim()
 
 			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
-				method: "GET",
+				method: "GET"
 			})
 
 			if (!res.ok) {
 				await this.showError(
 					"Network Error",
-					"Error occured while checking if server exist.",
+					"Error occured while checking if server exist."
 				)
 				return
 			}
@@ -76,8 +76,8 @@ export default {
 					query: {
 						username: this.username.trim(),
 						room: room,
-						isHost: "false",
-					},
+						isHost: "false"
+					}
 				})
 			} else {
 				this.$router.push({
@@ -85,8 +85,8 @@ export default {
 					query: {
 						username: this.username.trim(),
 						room: room,
-						isHost: "false",
-					},
+						isHost: "false"
+					}
 				})
 			}
 		},
@@ -96,13 +96,13 @@ export default {
 			} else {
 				// Check if room already exist
 				const res = await fetch(`/api/roomCheck?roomName=${this.room}`, {
-					method: "GET",
+					method: "GET"
 				})
 
 				if (!res.ok) {
 					await this.showError(
 						"Network Error",
-						"Error occured while checking if server exist.",
+						"Error occured while checking if server exist."
 					)
 					return
 				}
@@ -129,8 +129,8 @@ export default {
 					query: {
 						username: this.username.trim(),
 						room: this.room.trim(),
-						isHost: "true",
-					},
+						isHost: "true"
+					}
 				})
 			} else {
 				this.$router.push({
@@ -138,8 +138,8 @@ export default {
 					query: {
 						username: this.username.trim(),
 						room: this.room.trim(),
-						isHost: "true",
-					},
+						isHost: "true"
+					}
 				})
 			}
 		},
@@ -148,13 +148,14 @@ export default {
 		},
 		setRoomTouched() {
 			this.touched.room = true
-		},
-	},
+		}
+	}
 }
 </script>
 
 <template>
 	<Toast />
+	<Navbar class="absolute left-0 top-0" />
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
 		<TabView class="shadow-2xl">
 			<TabPanel header="Join Room">
@@ -214,7 +215,7 @@ export default {
 					<form
 						v-focustrap
 						@submit.prevent="hostRoom"
-						class="flex w-3/6 flex-col items-center gap-8 text-white"
+						class="flex w-3/6 flex-col items-center gap-4 text-white"
 					>
 						<div class="flex items-center justify-end gap-2">
 							<div>

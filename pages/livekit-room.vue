@@ -13,6 +13,7 @@
 				v-if="chatIsOpen"
 				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
+				:usingLiveKit="true"
 			/>
 		</div>
 
@@ -79,6 +80,7 @@ const {
 	joinRoom,
 	currentUsername,
 	participantNames,
+	sendMessageLiveKit
 } = useLiveKit()
 
 // URL param
@@ -86,7 +88,7 @@ const { username, room, isHost } = route.query as Partial<UrlParam>
 
 // page data
 const localVideo = ref<HTMLMediaElement | null>(null)
-const { chatMessages } = useChatMessage()
+const { chatMessages, clearMessages } = useChatMessage()
 const currentHost = ref<string>("")
 
 // UI state
@@ -140,13 +142,13 @@ const adjustVolume = (event: KeyboardEvent) => {
 		case "ArrowUp":
 			localVideo.value.volume = Math.min(
 				localVideo.value.volume + volumeChangeAmount,
-				1,
+				1
 			)
 			break
 		case "ArrowDown":
 			localVideo.value.volume = Math.max(
 				localVideo.value.volume - volumeChangeAmount,
-				0,
+				0
 			)
 			break
 	}
@@ -160,7 +162,7 @@ onMounted(async () => {
 
 	// check if room already exist
 	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
-		method: "GET",
+		method: "GET"
 	})
 
 	if (!res.ok) {
@@ -194,13 +196,14 @@ onMounted(async () => {
 				const { host } = await joinRoom(
 					room.toString() ?? "",
 					username.toString() ?? "",
-					localVideo.value,
+					localVideo.value
 				)
 				currentHost.value = host
 			}
 		}
-	} catch {
-		console.log("ERROR JOINING")
+	} catch (err: any) {
+		dialogVisible.value = true
+		failureMessage.value = err.toString()
 	}
 
 	window.addEventListener("keydown", adjustVolume)
@@ -211,12 +214,15 @@ onMounted(async () => {
 	}
 })
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
 	window.removeEventListener("keydown", adjustVolume)
 	if (localVideo.value) {
 		// Remove the click event listener
 		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
+
+	clearMessages()
+	await leaveRoom()
 })
 
 const leave = async () => {
@@ -234,7 +240,7 @@ const handleToggleChat = () => {
 	chatIsOpen.value = !chatIsOpen.value
 }
 
-provide("sendMessageSfu", () => {}) // TODO: implement
+provide("sendMessageSfu", sendMessageLiveKit)
 provide("handleToggleStreamSfu", screenshare)
 provide("ToggleChatSfu", handleToggleChat)
 provide("leaveRoomSfu", leave)

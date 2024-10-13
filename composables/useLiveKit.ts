@@ -1,4 +1,5 @@
 import {
+	LocalParticipant,
 	Participant,
 	RemoteParticipant,
 	RemoteTrack,
@@ -7,7 +8,9 @@ import {
 	RoomEvent,
 	type RoomOptions,
 	type ScreenShareCaptureOptions,
+	type ChatMessage as LiveKitChatMessage
 } from "livekit-client"
+import moment from "moment"
 
 const participantNames = ref<string[]>([])
 const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
@@ -16,23 +19,23 @@ const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")
 
 export function useLiveKit() {
-	const { pushMessage } = useChatMessage()
+	const { pushNotification, pushMessage } = useChatMessage()
 
 	const fetchToken = async (
 		roomName: string,
 		username: string,
 		canPublish: boolean,
-		canSubscribe: boolean,
+		canSubscribe: boolean
 	) => {
 		const params = new URLSearchParams({
 			room: roomName,
 			username: username,
 			canPublish: canPublish.toString(),
-			canSubscribe: canSubscribe.toString(),
+			canSubscribe: canSubscribe.toString()
 		})
 
 		const response = await fetch(`/api/getLiveKitToken?${params.toString()}`, {
-			method: "GET",
+			method: "GET"
 		})
 
 		if (response.ok) {
@@ -42,44 +45,53 @@ export function useLiveKit() {
 			return {
 				token: data.token,
 				host: data.host ?? "",
-				participantNames: data.participantNames,
+				participantNames: data.participantNames
 			}
 		} else {
-			throw new Error("error fetching token")
+			throw new Error(`Error fetching token: 
+				HTTP request status ${response.status}`)
 		}
 	}
 
 	const joinRoom = async (
 		roomName: string,
 		username: string,
-		remoteVideoElement: HTMLMediaElement,
+		remoteVideoElement: HTMLMediaElement
 	) => {
 		const handleTrackSubscribed = async (
 			_track: RemoteTrack,
 			publication: RemoteTrackPublication,
-			_participant: RemoteParticipant,
+			_participant: RemoteParticipant
 		) => {
+			publication.setVideoQuality(2)
+			publication.setVideoFPS(60)
 			publication.videoTrack?.attach(remoteVideoElement)
 			publication.audioTrack?.attach(remoteVideoElement)
+		}
+
+		if (!roomName || !username) {
+			throw new Error("missing input")
 		}
 
 		currentRoom.value?.disconnect()
 		currentUsername.value = username
 
-		const fetchedToken = await fetchToken(roomName, username, false, true)
+		const fetchedToken = await fetchToken(roomName, username, true, true)
 		currentRoom.value = new Room()
 		currentRoom.value?.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
-			handleParticipantLeave,
+			handleParticipantLeave
 		)
-		currentRoom.value.connect(wsUrl, fetchedToken?.token)
+		await currentRoom.value.connect(wsUrl, token.value)
 
-		participantNames.value = fetchedToken.participantNames
+		participantNames.value = fetchedToken?.participantNames
+
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
 		return {
-			host: fetchedToken?.host,
+			host: fetchedToken?.host
 		}
 	}
 
@@ -92,7 +104,7 @@ export function useLiveKit() {
 	const hostRoom = async (roomName: string, username: string) => {
 		currentRoom.value?.disconnect()
 
-		await fetchToken(roomName, username, true, false)
+		await fetchToken(roomName, username, true, true)
 		currentUsername.value = username
 
 		const options: RoomOptions = {
@@ -102,8 +114,8 @@ export function useLiveKit() {
 				resolution: {
 					height: 1440,
 					width: 2560,
-					frameRate: 60,
-				},
+					frameRate: 60
+				}
 			},
 			audioCaptureDefaults: {
 				autoGainControl: false,
@@ -111,25 +123,27 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16,
-			},
+				sampleSize: 16
+			}
 		}
 
 		currentRoom.value = new Room(options)
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
-			handleParticipantLeave,
+			handleParticipantLeave
 		)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
+
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
 		if (!participant.name) return
 
 		participantNames.value.push(participant.name)
-		await pushMessage(`${participant.name} has joined the chat`)
+		await pushNotification(`${participant.name} has joined the chat`)
 	}
 
 	const handleParticipantLeave = async (participant: RemoteParticipant) => {
@@ -141,7 +155,20 @@ export function useLiveKit() {
 			participantNames.value.splice(index, 1) // Remove the object at the found index
 		}
 
-		await pushMessage(`${participant.name} has left the chat`)
+		await pushNotification(`${participant.name} has left the chat`)
+	}
+
+	const handleChatMessage = async (
+		message: LiveKitChatMessage,
+		participant?: RemoteParticipant | LocalParticipant | undefined
+	) => {
+		const mappedMsg: ChatMessage = {
+			username: participant?.name ?? "",
+			text: message.message,
+			time: moment().format("LT")
+		}
+
+		pushMessage(mappedMsg)
 	}
 
 	const toggleScreenshare = async (videoElement: HTMLMediaElement) => {
@@ -152,14 +179,14 @@ export function useLiveKit() {
 				echoCancellation: false,
 				channelCount: 2,
 				sampleRate: 48000,
-				sampleSize: 16,
+				sampleSize: 16
 			},
 			preferCurrentTab: false,
 			resolution: {
 				height: 1440,
 				width: 2560,
-				frameRate: 60,
-			},
+				frameRate: 60
+			}
 		}
 
 		const screenshareEnabled =
@@ -168,10 +195,14 @@ export function useLiveKit() {
 		const screensharePub =
 			await currentRoom.value?.localParticipant.setScreenShareEnabled(
 				!screenshareEnabled,
-				screenshareSettings,
+				screenshareSettings
 			)
 
 		screensharePub?.videoTrack?.attach(videoElement)
+	}
+
+	const sendMessageLiveKit = async (msg: string) => {
+		await currentRoom.value?.localParticipant.sendChatMessage(msg)
 	}
 
 	return {
@@ -184,5 +215,6 @@ export function useLiveKit() {
 		currentUsername,
 		currentRoom,
 		participantNames,
+		sendMessageLiveKit
 	}
 }

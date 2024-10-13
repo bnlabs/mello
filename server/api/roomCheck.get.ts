@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 	if (!roomName) {
 		return {
 			statusCode: 400,
-			message: "roomName is required.",
+			message: "roomName is required."
 		}
 	}
 
@@ -21,27 +21,27 @@ export default defineEventHandler(async (event) => {
 			return {
 				statusCode: 200,
 				roomExist: true,
-				roomIsInLK: false,
+				roomIsInLK: false
 			}
 		} else if (roomInLK) {
 			return {
 				statusCode: 200,
 				roomExist: true,
-				roomIsInLK: true,
+				roomIsInLK: true
 			}
 		} else {
 			return {
 				statusCode: 200,
 				roomExist: false,
 				roomIsInLK: false,
-				message: "Room does not exist.",
+				message: "Room does not exist."
 			}
 		}
 	} catch (error) {
 		console.error("Error:", error)
 		return {
 			statusCode: 500,
-			message: "Internal server error.",
+			message: "Internal server error."
 		}
 	}
 })

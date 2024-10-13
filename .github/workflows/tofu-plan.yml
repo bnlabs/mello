@@ -1,18 +1,17 @@
 name: Tofu Plan
 
 on:
-    push:
-      branches:
-        - main
-    pull_request:
-      types: [opened, synchronize, reopened]
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   tofu:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v2
 

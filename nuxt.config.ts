@@ -4,23 +4,23 @@ export default defineNuxtConfig({
 		head: {
 			title: "Mello",
 			meta: [{ name: "description", content: "Screen sharing website" }],
-			link: [{ rel: "icon", type: "image/png", href: "/bnlab.png" }],
-		},
+			link: [{ rel: "icon", type: "image/png", href: "/bnlab.png" }]
+		}
 	},
 	devtools: { enabled: true },
 	css: ["~/assets/css/main.css"],
 	postcss: {
 		plugins: {
 			tailwindcss: {},
-			autoprefixer: {},
-		},
+			autoprefixer: {}
+		}
 	},
 	modules: ["nuxt-primevue"],
 	primevue: {
 		/* Options */
 		options: {
 			ripple: true,
-			inputStyle: "filled",
-		},
-	},
+			inputStyle: "filled"
+		}
+	}
 })
