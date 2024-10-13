@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 	// host name
 	const host: string = (await roomService.listParticipants(room)).filter(
 		(participant: ParticipantInfo) => participant.permission?.canPublish
-	)[0].name
+	)[0].name ?? "filler name"
 
 	return {
 		statusCode: 200,

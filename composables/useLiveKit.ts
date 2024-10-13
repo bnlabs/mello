@@ -539,6 +539,7 @@ export function useLiveKit() {
 		oldPeerConnection?.close()
 
 		const peerConnection = new RTCPeerConnection(servers)
+		localStream.value?.getTracks().forEach((track) => track.stop())
 		localStream.value = new MediaStream()
 
 		peerConnection.ontrack = (event) => {
