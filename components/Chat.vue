@@ -38,9 +38,7 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 						{{ chat.username }}
 					</span>
 					<span class="time text-[0.8rem] text-sm text-[#777]">
-						{{
-							chat.time
-						}}</span
+						{{ chat.time }}</span
 					>
 				</div>
 				<p class="text m-0 text-white">{{ chat.text }}</p>

@@ -9,8 +9,10 @@ import {
 	type RoomOptions,
 	type ScreenShareCaptureOptions,
 	type ChatMessage as LiveKitChatMessage,
-	DataPacket_Kind
+	DataPacket_Kind,
+	type DataPublishOptions
 } from "livekit-client"
+import type { ParticipantInfo } from "livekit-server-sdk"
 import moment from "moment"
 
 const participantNames = ref<string[]>([])
@@ -18,6 +20,40 @@ const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
 const token = ref<string>("")
 const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")
+
+// Define a type for the peer connections map
+type PeerConnectionsMap = Map<string, RTCPeerConnection>
+
+// these states are used for p2p streams
+const localStream = ref<MediaStream | null>(null)
+const peerConnections: Ref<PeerConnectionsMap> = ref(new Map())
+const servers = {
+	iceServers: [
+		{
+			urls: [
+				"stun:global.stun.twilio.com:3478",
+				"stun:stun4.l.google.com:19302",
+				"stun:stun3.l.google.com:19302",
+				"stun:stun.l.google.com:19302"
+			]
+		}
+	]
+}
+const streamSetting = {
+	video: {
+		width: { ideal: 2560, max: 2560 },
+		height: { ideal: 1440, max: 1440 },
+		frameRate: { ideal: 60, max: 60 }
+	},
+	audio: {
+		autoGainControl: false,
+		channelCount: 2,
+		echoCancellation: false,
+		noiseSuppression: false,
+		sampleRate: 48000,
+		sampleSize: 16
+	}
+}
 
 export function useLiveKit() {
 	const { pushNotification, pushMessage } = useChatMessage()
@@ -74,11 +110,33 @@ export function useLiveKit() {
 			throw new Error("missing input")
 		}
 
-		const handleDataReceived = async (payload: Uint8Array<ArrayBufferLike>,
+		const handleDataReceived = async (
+			payload: Uint8Array<ArrayBufferLike>,
 			participant?: RemoteParticipant | undefined,
-			kind?: DataPacket_Kind | undefined, 
-			topic?: string | undefined): Promise<void> => {
+			_kind?: DataPacket_Kind | undefined,
+			_topic?: string | undefined
+		): Promise<void> => {
+			const decoder = new TextDecoder()
+			const strData = decoder.decode(payload)
+			const message = JSON.parse(strData)
 
+			switch (message.type) {
+				case "offer":
+					if (remoteVideoElement) {
+						await createAnswer(
+							participant?.identity ?? "",
+							message.offer,
+							remoteVideoElement
+						)
+					}
+					break
+				case "candidate":
+					const pc = peerConnections.value.get(participant?.identity ?? "")
+					if (pc) {
+						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+					}
+					break
+			}
 		}
 
 		currentRoom.value?.disconnect()
@@ -86,7 +144,7 @@ export function useLiveKit() {
 
 		const fetchedToken = await fetchToken(roomName, username, true, true)
 		currentRoom.value = new Room()
-		
+
 		// room events for p2p streaming
 		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
 
@@ -105,7 +163,6 @@ export function useLiveKit() {
 
 		participantNames.value = fetchedToken?.participantNames
 
-
 		return {
 			host: fetchedToken?.host
 		}
@@ -118,6 +175,29 @@ export function useLiveKit() {
 	}
 
 	const hostRoom = async (roomName: string, username: string) => {
+		const handleDataReceived = async (
+			payload: Uint8Array<ArrayBufferLike>,
+			participant?: RemoteParticipant | undefined,
+			_kind?: DataPacket_Kind | undefined,
+			_topic?: string | undefined
+		): Promise<void> => {
+			const decoder = new TextDecoder()
+			const strData = decoder.decode(payload)
+			const message = JSON.parse(strData)
+
+			switch (message.type) {
+				case "answer":
+					await addAnswer(participant?.identity ?? "", message.answer)
+					break
+				case "candidate":
+					const pc = peerConnections.value.get(participant?.identity ?? "")
+					if (pc) {
+						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+					}
+					break
+			}
+		}
+
 		currentRoom.value?.disconnect()
 
 		await fetchToken(roomName, username, true, true)
@@ -144,15 +224,19 @@ export function useLiveKit() {
 		}
 
 		currentRoom.value = new Room(options)
+
+		// room event for both P2P and sever-side streaming
 		currentRoom.value.on(RoomEvent.ParticipantConnected, handleParticipantJoin)
 		currentRoom.value.on(
 			RoomEvent.ParticipantDisconnected,
 			handleParticipantLeave
 		)
+		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
 
 		await currentRoom.value?.connect(wsUrl, token.value)
 
-		currentRoom.value.on(RoomEvent.ChatMessage, handleChatMessage)
+		// room events for p2p streaming
+		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
@@ -218,15 +302,224 @@ export function useLiveKit() {
 	}
 
 	const toggleScreenshareP2P = async (videoElement: HTMLMediaElement) => {
-		// turn off server-side streaming
-		const screensharePub = await currentRoom.value?.localParticipant.setScreenShareEnabled(false)
+		// turn off server-side streaming if it exist
+		const screensharePub =
+			await currentRoom.value?.localParticipant.setScreenShareEnabled(false)
 		screensharePub?.videoTrack?.attach(videoElement)
 
+		// foreach users in the lobby, create and send webrtc offer
+		// make api call to get all participants
+		const res = await fetch(
+			`/api/getUsersInRoom?roomName=${currentRoom.value?.name.toString().trim()}`,
+			{
+				method: "GET"
+			}
+		)
 
+		if (!res.ok) {
+			throw new Error("error fetching users in lobby")
+		}
+
+		const data = await res.json()
+		await clearPeerConnection()
+
+		const videoTrack =
+			localStream.value && localStream.value.getVideoTracks()[0]
+
+		// foreach users in the lobby
+		if (videoTrack && videoTrack.readyState !== "ended") {
+			await endStream()
+		} else {
+			data.result.forEach(async (p: ParticipantInfo) => {
+				if (p.name === currentUsername.value) {
+					return
+				}
+				const pCon = await createPeerConnection(p.identity, videoElement)
+				if (pCon) {
+					const offer = await pCon.createOffer()
+					await pCon.setLocalDescription(offer)
+					const payload = { type: "offer", offer: offer }
+					await sendWebSocketPayload(payload, {
+						reliable: true,
+						destinationIdentities: [p.identity]
+					})
+				}
+			})
+		}
 	}
 
 	const sendMessageLiveKit = async (msg: string) => {
 		await currentRoom.value?.localParticipant.sendChatMessage(msg)
+	}
+
+	const sendWebSocketPayload = async (
+		payload: any,
+		options?: DataPublishOptions
+	) => {
+		const strData = JSON.stringify(payload)
+		const encoder = new TextEncoder()
+
+		// publishData takes in a Uint8Array, so we need to convert it
+		const data = encoder.encode(strData)
+
+		if (options) {
+			currentRoom.value?.localParticipant.publishData(data, options)
+		} else {
+			currentRoom.value?.localParticipant.publishData(data, { reliable: true })
+		}
+	}
+
+	const createPeerConnection = async (
+		identity: string,
+		videoPlayer: HTMLMediaElement
+	) => {
+		const newPeerConnection = new RTCPeerConnection(servers)
+
+		if (!localStream.value) {
+			localStream.value =
+				await navigator.mediaDevices.getDisplayMedia(streamSetting)
+		}
+
+		if (videoPlayer) {
+			videoPlayer.srcObject = localStream.value
+		}
+
+		localStream.value.getTracks().forEach((track: MediaStreamTrack) => {
+			newPeerConnection.addTrack(track, localStream.value as MediaStream)
+			track.onended = function () {
+				localStream.value = null
+			}
+		})
+
+		newPeerConnection.onicecandidate = async (event) => {
+			if (event.candidate) {
+				const payload = {
+					type: "candidate",
+					candidate: event.candidate
+				}
+
+				await sendWebSocketPayload(payload, {
+					reliable: true,
+					destinationIdentities: [identity]
+				})
+			}
+		}
+
+		peerConnections.value.set(identity, newPeerConnection)
+		return peerConnections.value.get(identity)
+	}
+
+	const createOffer = async (
+		identity: string,
+		videoPlayer: HTMLMediaElement
+	) => {
+		const peerConnection = await createPeerConnection(identity, videoPlayer)
+		if (peerConnection) {
+			const offer = await peerConnection.createOffer()
+			peerConnection.setLocalDescription(offer)
+			const payload = { type: "offer", offer: offer }
+
+			// send offer
+			await sendWebSocketPayload(payload, {
+				reliable: true,
+				destinationIdentities: [identity]
+			})
+		}
+	}
+
+	const createAnswer = async (
+		identity: string,
+		offer: RTCSessionDescriptionInit,
+		videoPlayer: HTMLMediaElement
+	) => {
+		await clearPeerConnection()
+
+		const peerConnection = await createPeerConnectionAnswer(
+			identity,
+			videoPlayer
+		)
+		await peerConnection?.setRemoteDescription(offer)
+
+		const answer = await peerConnection?.createAnswer()
+
+		await peerConnection?.setLocalDescription(answer)
+
+		const payload = { type: "answer", answer: answer }
+
+		await sendWebSocketPayload(payload, {
+			reliable: true,
+			destinationIdentities: [identity]
+		})
+	}
+
+	const addAnswer = async (
+		identity: string,
+		answer: RTCSessionDescriptionInit
+	) => {
+		const peerConnection: RTCPeerConnection | undefined =
+			peerConnections.value.get(identity)
+		if (peerConnection && !peerConnection.currentRemoteDescription) {
+			peerConnection.setRemoteDescription(answer)
+		}
+	}
+
+	const clearPeerConnection = async () => {
+		peerConnections.value.forEach((pc, _) => {
+			pc.close()
+		})
+
+		peerConnections.value.clear()
+	}
+
+	const createPeerConnectionAnswer = async (
+		identity: string,
+		videoPlayer: HTMLMediaElement
+	) => {
+		const oldPeerConnection = peerConnections.value.get(identity)
+		oldPeerConnection?.close()
+
+		const peerConnection = new RTCPeerConnection(servers)
+		localStream.value = new MediaStream()
+
+		peerConnection.ontrack = (event) => {
+			event.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
+				localStream.value?.addTrack(track)
+				track.onended = function () {
+					localStream.value = null
+				}
+			})
+		}
+
+		if (videoPlayer) {
+			videoPlayer.srcObject = localStream.value
+		}
+
+		peerConnection.onicecandidate = async (event) => {
+			if (event.candidate) {
+				const payload = {
+					type: "candidate",
+					candidate: event.candidate
+				}
+				await sendWebSocketPayload(payload, {
+					reliable: true,
+					destinationIdentities: [identity]
+				})
+			}
+		}
+
+		peerConnections.value.set(identity, peerConnection)
+		return peerConnections.value.get(identity)
+	}
+
+	const endStream = async () => {
+		const videoTrack =
+			localStream.value && localStream.value.getVideoTracks()[0]
+		if (videoTrack && videoTrack.readyState !== "ended") {
+			localStream.value?.getTracks().forEach((track) => track.stop())
+			localStream.value = null
+		}
+
+		await clearPeerConnection()
 	}
 
 	return {
@@ -239,6 +532,11 @@ export function useLiveKit() {
 		currentUsername,
 		currentRoom,
 		participantNames,
-		sendMessageLiveKit
+		sendMessageLiveKit,
+		sendWebSocketPayload,
+		createOffer,
+		createAnswer,
+		addAnswer,
+		toggleScreenshareP2P
 	}
 }

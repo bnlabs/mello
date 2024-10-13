@@ -50,24 +50,13 @@ import moment from "moment"
 const { chatMessages, pushMessage, pushNotification } = useChatMessage()
 const users = ref<User[]>([])
 const chatIsOpen = ref(true)
-const { socket } = useSocketIo()
+
 const {
-	getPeerConnection,
-	createOffer,
-	createAnswer,
-	addAnswer,
-	toggleStream,
-	isStreaming,
-	removePeerConnection
-} = useWebRtc()
-const {
-	toggleScreenshare,
 	hostRoom,
 	leaveRoom,
 	joinRoom,
-	currentUsername,
-	participantNames,
-	sendMessageLiveKit
+	sendMessageLiveKit,
+	toggleScreenshareP2P
 } = useLiveKit()
 const currentRoom = ref("")
 const currentHost = ref("")
@@ -75,7 +64,6 @@ const localVideo = ref<HTMLMediaElement | null>(null)
 const dialogVisible = useState<boolean>("diaglogVisible", () => false)
 const failureMessage = useState<string>("failureMessage", () => "")
 
-const botName = "Notification"
 const route = useRoute()
 const router = useRouter()
 
@@ -88,15 +76,9 @@ const handleToggleChat = () => {
 	chatIsOpen.value = !chatIsOpen.value
 }
 
-const handleToggleStream = () => {
-	const userIds = computed(() =>
-		users.value
-			.filter((user) => user.username !== username)
-			.map((user) => user.id)
-	)
-
+const handleToggleStream = async () => {
 	if (localVideo.value) {
-		toggleStream(userIds.value, localVideo.value)
+		await toggleScreenshareP2P(localVideo.value)
 	}
 }
 
@@ -182,8 +164,8 @@ onMounted(async () => {
 	const data = await res.json()
 
 	try {
-
-		if (isHost === "true") { // hosting room
+		if (isHost === "true") {
+			// hosting room
 			if (data.roomExist) {
 				dialogVisible.value = true
 				failureMessage.value = "Room already exist"
@@ -192,9 +174,10 @@ onMounted(async () => {
 			await hostRoom(room.toString() ?? "", username.toString() ?? "")
 			currentHost.value = username
 			currentRoom.value = room
-
-		} else {	// joining existing room
-			if (!data.roomExist) { // check if room exist
+		} else {
+			// joining existing room
+			if (!data.roomExist) {
+				// check if room exist
 				dialogVisible.value = true
 				failureMessage.value = "Room does not exist"
 				return
@@ -209,35 +192,8 @@ onMounted(async () => {
 				currentHost.value = host
 				currentRoom.value = room
 			}
-
 		}
-	}
-	catch (err: any) {
-
-	}
-
-	socket.on(
-		"receiveWebRTCMessage",
-		(response: { username: string; payload: string; socketId: string }) => {
-			const message = JSON.parse(response.payload)
-			switch (message.type) {
-				case "offer":
-					if (localVideo.value) {
-						createAnswer(response.socketId, message.offer, localVideo.value)
-					}
-					break
-				case "answer":
-					addAnswer(message.answer, response.socketId)
-					break
-				case "candidate":
-					const pc = getPeerConnection(response.socketId)
-					if (pc) {
-						pc.addIceCandidate(new RTCIceCandidate(message.candidate))
-					}
-					break
-			}
-		}
-	)
+	} catch (err: any) {}
 
 	window.addEventListener("keydown", adjustVolume)
 

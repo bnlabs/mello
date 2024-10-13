@@ -5,7 +5,7 @@ type PeerConnectionsMap = Map<string, RTCPeerConnection>
 
 export function useWebRtc() {
 	let localStream: MediaStream | null
-
+	const { sendWebSocketPayload } = useLiveKit()
 	const peerConnections: Ref<PeerConnectionsMap> = ref(new Map())
 
 	const { socket } = useSocketIo()
@@ -43,13 +43,14 @@ export function useWebRtc() {
 	}
 
 	const createPeerConnection = async (
-		uid: string,
+		identity: string,
 		videoPlayer: HTMLMediaElement
 	) => {
 		const newPeerConnection = new RTCPeerConnection(servers)
 		if (!localStream) {
 			localStream = await navigator.mediaDevices.getDisplayMedia(streamSetting)
 		}
+
 		if (videoPlayer) {
 			videoPlayer.srcObject = localStream
 		}
@@ -67,11 +68,15 @@ export function useWebRtc() {
 					type: "candidate",
 					candidate: event.candidate
 				})
-				socket.emit("sendWebRTCMessage", payload, uid)
+
+				sendWebSocketPayload(payload, {
+					reliable: true,
+					destinationIdentities: [identity]
+				})
 			}
 		}
 
-		peerConnections.value.set(uid, newPeerConnection)
+		peerConnections.value.set(identity, newPeerConnection)
 
 		return newPeerConnection
 	}
