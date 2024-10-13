@@ -45,9 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import moment from "moment"
 
-const { chatMessages, pushMessage, pushNotification } = useChatMessage()
+const { chatMessages } = useChatMessage()
 const users = ref<User[]>([])
 const chatIsOpen = ref(true)
 
