@@ -70,7 +70,7 @@ export default {
 				return
 			}
 
-			if (data.roomIsInLK && !data.usingServerSideStreaming) {
+			if (!data.usingServerSideStreaming) {
 				this.$router.push({
 					path: "/room",
 					query: {

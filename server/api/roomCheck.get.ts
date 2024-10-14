@@ -1,6 +1,5 @@
 import { roomExistInLiveKit } from "../utils/livekit"
 import { roomInfoMap } from "../utils/roomManager"
-import { roomExist } from "../utils/users"
 
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
@@ -15,22 +14,14 @@ export default defineEventHandler(async (event) => {
 	}
 
 	try {
-		const re = await roomExist(roomName)
 		const roomInLK = await roomExistInLiveKit(roomName)
 		const usingServerSideStreaming: boolean = roomInfoMap.get(roomName) ?? false
-		if (re) {
+		if (roomInLK) {
 			return {
 				statusCode: 200,
 				roomExist: true,
-				roomIsInLK: false,
-				usingServerSideStreaming: usingServerSideStreaming
-			}
-		} else if (roomInLK) {
-			return {
-				statusCode: 200,
-				roomExist: true,
-				roomIsInLK: true,
-				usingServerSideStreaming: usingServerSideStreaming
+				usingServerSideStreaming: usingServerSideStreaming,
+				mesage: "Room exist"
 			}
 		} else {
 			return {

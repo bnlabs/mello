@@ -69,7 +69,7 @@ export function useLiveKit() {
 			username: username
 		})
 
-		if (isHost) {
+		if (isHost) { // Hosting Room
 			const response = await fetch(
 				`/api/livekit/generateTokenForHostRoom?${params.toString()}`,
 				{
@@ -88,7 +88,7 @@ export function useLiveKit() {
 				throw new Error(`Error fetching token: 
 					HTTP request status ${response.status}`)
 			}
-		} else {
+		} else { // Joining a room
 			const response = await fetch(
 				`/api/livekit/generateTokenForJoinRoom?${params.toString()}`,
 				{
