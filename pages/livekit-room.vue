@@ -59,7 +59,7 @@
 		"
 	>
 		<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
-		<Button type="button" @click="router.push('/')">Close</Button>
+		<Button type="button" @click="handleCloseDialog">Close</Button>
 	</Dialog>
 </template>
 
@@ -235,8 +235,14 @@ const screenshare = async () => {
 	}
 }
 
-const handleToggleChat = () => {
+const handleToggleChat = async () => {
 	chatIsOpen.value = !chatIsOpen.value
+}
+
+const handleCloseDialog = async () => {
+	failureMessage.value = ""
+	dialogVisible.value = false
+	router.push('/')
 }
 
 provide("sendMessageSfu", sendMessageLiveKit)

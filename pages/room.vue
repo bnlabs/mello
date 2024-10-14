@@ -39,14 +39,13 @@
 			"
 		>
 			<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
-			<Button type="button" @click="router.push('/')">Close</Button>
+			<Button type="button" @click="handleCloseDialog">Close</Button>
 		</Dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
 const { chatMessages } = useChatMessage()
-const users = ref<User[]>([])
 const chatIsOpen = ref(true)
 
 const {
@@ -137,6 +136,12 @@ const toggleFullScreen = (): void => {
 const preventPlayPause = (event: MouseEvent): void => {
 	event.preventDefault()
 	toggleFullScreen()
+}
+
+const handleCloseDialog = async () => {
+	failureMessage.value = ""
+	dialogVisible.value = false
+	router.push('/')
 }
 
 provide("sendMessage", sendMessageLiveKit)
