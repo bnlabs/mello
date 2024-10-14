@@ -41,18 +41,16 @@ export default defineEventHandler(async (event) => {
 		await roomService.listParticipants(room)
 	).map((p: ParticipantInfo) => p.name)
 
-	// host name, TODO: actually store host name
-	const host: string =
-		(await roomService.listParticipants(room)).filter(
-			(participant: ParticipantInfo) => participant.permission?.canPublish
-		)[0].name ?? "filler name"
+	// host name fetching host name
+	const liveKitRoom = (await roomService.listRooms()).filter(r => r.name === room)[0]
+	const metadata = JSON.parse(liveKitRoom.metadata)
 
 	return {
 		statusCode: 200,
 		result: "Room exist, returning token",
 		token: token,
 		participantNames: roomParticipantNames,
-		host: host
+		host: metadata.host
 	}
 })
 

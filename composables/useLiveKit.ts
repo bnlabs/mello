@@ -103,7 +103,6 @@ export function useLiveKit() {
 				if(data.statusCode === 409) {
 					throw new Error("Username is Taken")
 				}
-				
 				return {
 					host: data.host,
 					token: data.token,
@@ -131,11 +130,6 @@ export function useLiveKit() {
 			publication.videoTrack?.attach(remoteVideoElement)
 			publication.audioTrack?.attach(remoteVideoElement)
 		}
-
-		if (!roomName || !username) {
-			throw new Error("missing input")
-		}
-
 		const handleDataReceived = async (
 			payload: Uint8Array<ArrayBufferLike>,
 			participant?: RemoteParticipant | undefined,
@@ -164,6 +158,11 @@ export function useLiveKit() {
 					break
 			}
 		}
+		
+		if (!roomName || !username) {
+			throw new Error("missing input")
+		}
+
 
 		currentRoom.value?.disconnect()
 		currentUsername.value = username

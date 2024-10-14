@@ -1,4 +1,4 @@
-import { AccessToken } from "livekit-server-sdk"
+import { AccessToken, CreateOptions } from "livekit-server-sdk"
 import {
 	livekitApiKey,
 	livekitApiSecret,
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// room does not exist yet, creating room
-	await createRoom(room)
+	await createRoom(room, username)
 
 	const token = await createToken(room, username, true, true)
 
@@ -63,12 +63,15 @@ const createToken = async (
 	return token
 }
 
-const createRoom = async (room: string) => {
+const createRoom = async (room: string, hostName:string) => {
 	// create a new room
-	const opts = {
+	const opts: CreateOptions = {
 		name: room,
 		emptyTimeout: 3 * 60, // 3 minutes
-		maxParticipants: 20
+		maxParticipants: 20,
+		metadata: JSON.stringify({
+			host: hostName
+		})
 	}
 
 	roomService.createRoom(opts)
