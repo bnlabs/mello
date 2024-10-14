@@ -203,7 +203,10 @@ onMounted(async () => {
 				currentRoom.value = room
 			}
 		}
-	} catch (err: any) {}
+	} catch (err: any) {
+		dialogVisible.value = true
+		failureMessage.value = err.toString()
+	}
 
 	window.addEventListener("keydown", adjustVolume)
 
