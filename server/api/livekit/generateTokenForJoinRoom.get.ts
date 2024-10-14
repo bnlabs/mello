@@ -82,7 +82,7 @@ const createToken = async (
 
 const usernameTaken = async (name: string, roomName: string) => {
 	const participants: ParticipantInfo[] = await roomService.listParticipants(roomName)
-	const isTaken = participants.some(participant => participant.identity === name);
+	const isTaken:boolean  = participants.some(participant => participant.identity === name);
 
 	return isTaken
 }

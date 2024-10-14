@@ -100,6 +100,10 @@ export function useLiveKit() {
 				const data = await response.json() // Parse the response to JSON
 				token.value = data.token // Access the token from the parsed data
 
+				if(data.statusCode === 409) {
+					throw new Error("Username is Taken")
+				}
+				
 				return {
 					host: data.host,
 					token: data.token,
