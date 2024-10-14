@@ -48,3 +48,4 @@ jobs:
               -e LIVEKIT_API_SECRET=${{ secrets.LIVEKIT_API_SECRET }} \
               -e LIVEKIT_WS_URL=${{ secrets.LIVEKIT_WS_URL }} \
               ${{ secrets.DOCKER_USERNAME }}/mello:latest
+            docker system prune -f

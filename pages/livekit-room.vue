@@ -64,12 +64,6 @@
 </template>
 
 <script setup lang="ts">
-interface UrlParam {
-	username: string
-	room: string
-	isHost: string
-}
-
 const route = useRoute()
 const router = useRouter()
 
@@ -182,7 +176,12 @@ onMounted(async () => {
 				return
 			}
 
-			await hostRoom(room.toString() ?? "", username.toString() ?? "")
+			await hostRoom(
+				room.toString() ?? "",
+				username.toString() ?? "",
+				true,
+				localVideo.value
+			)
 			currentHost.value = username
 		} else {
 			// joining existing room
