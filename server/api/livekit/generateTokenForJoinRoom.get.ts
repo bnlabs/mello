@@ -26,6 +26,13 @@ export default defineEventHandler(async (event) => {
 			message: "Room does not exist"
 		}
 	}
+	
+	if(await usernameTaken(username, room)) {
+		return {
+			statusCode: 409,
+			message: "Username is taken"
+		}
+	}
 
 	// Room exist, generate token for join room
 	const token = await createToken(room, username, false, true)
@@ -34,7 +41,7 @@ export default defineEventHandler(async (event) => {
 		await roomService.listParticipants(room)
 	).map((p: ParticipantInfo) => p.name)
 
-	// host name
+	// host name, TODO: actually store host name
 	const host: string =
 		(await roomService.listParticipants(room)).filter(
 			(participant: ParticipantInfo) => participant.permission?.canPublish
@@ -71,4 +78,11 @@ const createToken = async (
 
 	const token = await at.toJwt()
 	return token
+}
+
+const usernameTaken = async (name: string, roomName: string) => {
+	const participants: ParticipantInfo[] = await roomService.listParticipants(roomName)
+	const isTaken = participants.some(participant => participant.identity === name);
+
+	return isTaken
 }

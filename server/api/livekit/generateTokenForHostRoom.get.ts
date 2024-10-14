@@ -67,7 +67,7 @@ const createRoom = async (room: string) => {
 	// create a new room
 	const opts = {
 		name: room,
-		emptyTimeout: 5 * 60, // 10 minutes
+		emptyTimeout: 3 * 60, // 3 minutes
 		maxParticipants: 20
 	}
 
