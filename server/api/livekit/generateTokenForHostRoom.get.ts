@@ -21,10 +21,10 @@ export default defineEventHandler(async (event) => {
 	// check if room already exist
 	const roomList = await roomService.listRooms()
 	if (roomList.filter((r) => r.name === room).length > 0) {
-		return {
+		throw createError ({
 			statusCode: 400,
-			message: "Room already exist"
-		}
+			statusMessage: "Room already exist"
+		})
 	}
 
 	// room does not exist yet, creating room
