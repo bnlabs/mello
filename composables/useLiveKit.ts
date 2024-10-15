@@ -292,7 +292,7 @@ export function useLiveKit() {
 		// room events for p2p streaming
 		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
 
-		await $fetch("/api/sendRoomInfo", {
+		await $fetch("/api/livekit/sendRoomInfo", {
 			method: "POST",
 			body: {
 				roomName: currentRoom.value.name,
