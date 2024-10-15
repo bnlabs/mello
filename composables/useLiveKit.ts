@@ -70,6 +70,7 @@ export function useLiveKit() {
 		})
 
 		if (isHost) {
+			// Hosting Room
 			const response = await fetch(
 				`/api/livekit/generateTokenForHostRoom?${params.toString()}`,
 				{
@@ -89,6 +90,7 @@ export function useLiveKit() {
 					HTTP request status ${response.status}`)
 			}
 		} else {
+			// Joining a room
 			const response = await fetch(
 				`/api/livekit/generateTokenForJoinRoom?${params.toString()}`,
 				{
@@ -100,6 +102,9 @@ export function useLiveKit() {
 				const data = await response.json() // Parse the response to JSON
 				token.value = data.token // Access the token from the parsed data
 
+				if (data.statusCode === 409) {
+					throw new Error("Username is Taken")
+				}
 				return {
 					host: data.host,
 					token: data.token,
@@ -127,11 +132,6 @@ export function useLiveKit() {
 			publication.videoTrack?.attach(remoteVideoElement)
 			publication.audioTrack?.attach(remoteVideoElement)
 		}
-
-		if (!roomName || !username) {
-			throw new Error("missing input")
-		}
-
 		const handleDataReceived = async (
 			payload: Uint8Array<ArrayBufferLike>,
 			participant?: RemoteParticipant | undefined,
@@ -159,6 +159,10 @@ export function useLiveKit() {
 					}
 					break
 			}
+		}
+
+		if (!roomName || !username) {
+			throw new Error("missing input")
 		}
 
 		currentRoom.value?.disconnect()
@@ -289,7 +293,7 @@ export function useLiveKit() {
 		// room events for p2p streaming
 		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
 
-		await $fetch("/api/sendRoomInfo", {
+		await $fetch("/api/livekit/sendRoomInfo", {
 			method: "POST",
 			body: {
 				roomName: currentRoom.value.name,
@@ -369,7 +373,7 @@ export function useLiveKit() {
 		// foreach users in the lobby, create and send webrtc offer
 		// make api call to get all participants
 		const res = await fetch(
-			`/api/getUsersInRoom?roomName=${currentRoom.value?.name.toString().trim()}`,
+			`/api/livekit/getUsersInRoom?roomName=${currentRoom.value?.name.toString().trim()}`,
 			{
 				method: "GET"
 			}

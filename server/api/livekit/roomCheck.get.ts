@@ -1,36 +1,29 @@
-import { roomExistInLiveKit } from "../utils/livekit"
-import { roomInfoMap } from "../utils/roomManager"
-import { roomExist } from "../utils/users"
+import { roomExistInLiveKit } from "../../utils/livekit"
+import { roomInfoMap } from "../../utils/roomManager"
 
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
 	const roomName = query.roomName?.toString() ?? ""
+	const username = query.username?.toString() ?? ""
 
 	// Check if roomName is provided
 	if (!roomName) {
-		return {
-			statusCode: 400,
-			message: "roomName is required."
-		}
+		throw createError({
+			statusCode: 422,
+			statusMessage: "Missing parameter roomName"
+		})
 	}
 
 	try {
-		const re = await roomExist(roomName)
 		const roomInLK = await roomExistInLiveKit(roomName)
 		const usingServerSideStreaming: boolean = roomInfoMap.get(roomName) ?? false
-		if (re) {
+		if (roomInLK) {
 			return {
 				statusCode: 200,
 				roomExist: true,
-				roomIsInLK: false,
-				usingServerSideStreaming: usingServerSideStreaming
-			}
-		} else if (roomInLK) {
-			return {
-				statusCode: 200,
-				roomExist: true,
-				roomIsInLK: true,
-				usingServerSideStreaming: usingServerSideStreaming
+				usingServerSideStreaming: usingServerSideStreaming,
+				usernameAvailable: !(await usernameTaken(username, roomName)),
+				message: "Room exist"
 			}
 		} else {
 			return {
@@ -40,7 +33,6 @@ export default defineEventHandler(async (event) => {
 			}
 		}
 	} catch (error) {
-		console.error("Error:", error)
 		return {
 			statusCode: 500,
 			message: "Internal server error."

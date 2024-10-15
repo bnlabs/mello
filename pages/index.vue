@@ -50,10 +50,14 @@ export default {
 			}
 
 			const room = this.room.trim()
+			const username = this.username.trim()
 
-			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
-				method: "GET"
-			})
+			const res = await fetch(
+				`/api/livekit/roomCheck?roomName=${room}&username=${username}`,
+				{
+					method: "GET"
+				}
+			)
 
 			if (!res.ok) {
 				await this.showError(
@@ -70,7 +74,12 @@ export default {
 				return
 			}
 
-			if (data.roomIsInLK && !data.usingServerSideStreaming) {
+			if (!data.usernameAvailable) {
+				await this.showError("Error joining room", "Username Taken")
+				return
+			}
+
+			if (!data.usingServerSideStreaming) {
 				this.$router.push({
 					path: "/room",
 					query: {
@@ -95,9 +104,12 @@ export default {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
 			} else {
 				// Check if room already exist
-				const res = await fetch(`/api/roomCheck?roomName=${this.room}`, {
-					method: "GET"
-				})
+				const res = await fetch(
+					`/api/livekit/roomCheck?roomName=${this.room}&username=${this.username}`,
+					{
+						method: "GET"
+					}
+				)
 
 				if (!res.ok) {
 					await this.showError(

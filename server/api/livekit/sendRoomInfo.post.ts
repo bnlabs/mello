@@ -1,4 +1,4 @@
-import { roomInfoMap } from "../utils/roomManager"
+import { roomInfoMap } from "../../utils/roomManager"
 
 export default defineEventHandler(async (event) => {
 	// TODO: validate JWT or might not need to in the long term?

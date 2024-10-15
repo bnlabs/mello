@@ -39,14 +39,13 @@
 			"
 		>
 			<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
-			<Button type="button" @click="router.push('/')">Close</Button>
+			<Button type="button" @click="handleCloseDialog">Close</Button>
 		</Dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
 const { chatMessages } = useChatMessage()
-const users = ref<User[]>([])
 const chatIsOpen = ref(true)
 
 const {
@@ -139,6 +138,12 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
+const handleCloseDialog = async () => {
+	failureMessage.value = ""
+	dialogVisible.value = false
+	router.push("/")
+}
+
 provide("sendMessage", sendMessageLiveKit)
 provide("handleToggleStream", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
@@ -151,7 +156,7 @@ onMounted(async () => {
 		return
 	}
 	// check if room already exist
-	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"
 	})
 
@@ -198,7 +203,10 @@ onMounted(async () => {
 				currentRoom.value = room
 			}
 		}
-	} catch (err: any) {}
+	} catch (err: any) {
+		dialogVisible.value = true
+		failureMessage.value = err.toString()
+	}
 
 	window.addEventListener("keydown", adjustVolume)
 

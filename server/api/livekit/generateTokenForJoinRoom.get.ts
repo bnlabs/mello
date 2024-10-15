@@ -2,7 +2,8 @@ import { AccessToken, ParticipantInfo } from "livekit-server-sdk"
 import {
 	livekitApiKey,
 	livekitApiSecret,
-	roomService
+	roomService,
+	usernameTaken
 } from "../../utils/livekit"
 
 export default defineEventHandler(async (event) => {
@@ -27,6 +28,13 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 
+	if (await usernameTaken(username, room)) {
+		return {
+			statusCode: 409,
+			message: "Username is taken"
+		}
+	}
+
 	// Room exist, generate token for join room
 	const token = await createToken(room, username, false, true)
 
@@ -34,18 +42,18 @@ export default defineEventHandler(async (event) => {
 		await roomService.listParticipants(room)
 	).map((p: ParticipantInfo) => p.name)
 
-	// host name
-	const host: string =
-		(await roomService.listParticipants(room)).filter(
-			(participant: ParticipantInfo) => participant.permission?.canPublish
-		)[0].name ?? "filler name"
+	// host name fetching host name
+	const liveKitRoom = (await roomService.listRooms()).filter(
+		(r) => r.name === room
+	)[0]
+	const metadata = JSON.parse(liveKitRoom.metadata)
 
 	return {
 		statusCode: 200,
 		result: "Room exist, returning token",
 		token: token,
 		participantNames: roomParticipantNames,
-		host: host
+		host: metadata.host
 	}
 })
 

@@ -11,15 +11,11 @@
 		"pretty": "prettier . --write"
 	},
 	"dependencies": {
-		"@aws-sdk/client-dynamodb": "^3.564.0",
-		"@aws-sdk/lib-dynamodb": "^3.564.0",
 		"livekit-client": "^2.5.7",
 		"livekit-server-sdk": "^2.7.0",
 		"moment": "^2.30.1",
 		"nuxt": "^3.11.1",
 		"primevue": "^3.50.0",
-		"socket.io": "^4.7.5",
-		"socket.io-client": "^4.7.5",
 		"vue": "^3.4.21",
 		"vue-router": "^4.3.0"
 	},
