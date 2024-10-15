@@ -2,7 +2,8 @@ import { AccessToken, ParticipantInfo } from "livekit-server-sdk"
 import {
 	livekitApiKey,
 	livekitApiSecret,
-	roomService
+	roomService,
+	usernameTaken
 } from "../../utils/livekit"
 
 export default defineEventHandler(async (event) => {
@@ -76,11 +77,4 @@ const createToken = async (
 
 	const token = await at.toJwt()
 	return token
-}
-
-const usernameTaken = async (name: string, roomName: string) => {
-	const participants: ParticipantInfo[] = await roomService.listParticipants(roomName)
-	const isTaken:boolean  = participants.some(participant => participant.identity === name);
-
-	return isTaken
 }
