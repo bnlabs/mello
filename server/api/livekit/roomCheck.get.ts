@@ -1,5 +1,5 @@
-import { roomExistInLiveKit } from "../utils/livekit"
-import { roomInfoMap } from "../utils/roomManager"
+import { roomExistInLiveKit } from "../../utils/livekit"
+import { roomInfoMap } from "../../utils/roomManager"
 
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)

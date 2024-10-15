@@ -51,7 +51,7 @@ export default {
 
 			const room = this.room.trim()
 
-			const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+			const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 				method: "GET"
 			})
 
@@ -95,7 +95,7 @@ export default {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
 			} else {
 				// Check if room already exist
-				const res = await fetch(`/api/roomCheck?roomName=${this.room}`, {
+				const res = await fetch(`/api/livekit/roomCheck?roomName=${this.room}`, {
 					method: "GET"
 				})
 

@@ -155,7 +155,7 @@ onMounted(async () => {
 	}
 
 	// check if room already exist
-	const res = await fetch(`/api/roomCheck?roomName=${room}`, {
+	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"
 	})
 
