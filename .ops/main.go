@@ -2,14 +2,25 @@ package main
 
 import (
 	"log"
+
 	"lesiw.io/cmdio/sys"
+	"lesiw.io/ops"
 )
 
-var rnr = sys.Runner().WithEnv(map[string]string{
-	"PKGNAME": "cmdio",
-})
+type Ops struct{}
 
 func main() {
+	ops.Handle(Ops{})
+}
+
+func (Ops) Hello() {
+	println("Hello world!")
+}
+
+func (Ops) Build () {
+	var rnr = sys.Runner().WithEnv(map[string]string{
+		"PKGNAME": "cmdio",
+	})
 	defer rnr.Close()
 
 	err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
@@ -31,5 +42,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }

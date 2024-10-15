@@ -45,8 +45,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Build the CI workflow
-        run: go build -o build
-
-      - name: Run Go workflow script
-        run: ./build
+      - name: Run Go script
+        run: op build
