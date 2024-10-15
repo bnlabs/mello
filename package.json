@@ -11,8 +11,6 @@
 		"pretty": "prettier . --write"
 	},
 	"dependencies": {
-		"@aws-sdk/client-dynamodb": "^3.564.0",
-		"@aws-sdk/lib-dynamodb": "^3.564.0",
 		"livekit-client": "^2.5.7",
 		"livekit-server-sdk": "^2.7.0",
 		"moment": "^2.30.1",
