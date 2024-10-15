@@ -372,7 +372,7 @@ export function useLiveKit() {
 		// foreach users in the lobby, create and send webrtc offer
 		// make api call to get all participants
 		const res = await fetch(
-			`/api/getUsersInRoom?roomName=${currentRoom.value?.name.toString().trim()}`,
+			`/api/livekit/getUsersInRoom?roomName=${currentRoom.value?.name.toString().trim()}`,
 			{
 				method: "GET"
 			}
