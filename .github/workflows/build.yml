@@ -17,34 +17,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        name: Checkout Repository
 
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          version: 8
-          run_install: false
+          go-version: "1.22.2" # Specify the Go version (adjust as needed)
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
+      - name: Cache Go modules
+        uses: actions/cache@v3
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-go-
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Cache node modules
+        uses: actions/cache@v3
         with:
-          node-version: "20"
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Install Dependencies
-        run: |
-          pnpm install
+      - name: Build the CI workflow
+        run: go build -o build
 
-      - name: Build
-        run: pnpm run build
+      - name: Run Go workflow script
+        run: ./build
