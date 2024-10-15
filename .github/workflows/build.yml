@@ -34,8 +34,8 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-go-
 
-      # - name: Install dependencies
-      #   run: go mod tidy
+      - name: Install dependencies
+        run: go install lesiw.io/op@latest
 
       - name: Cache node modules
         uses: actions/cache@v3
