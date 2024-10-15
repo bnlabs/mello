@@ -19,8 +19,8 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// check if room already exist
-	const roomList = await roomService.listRooms()
-	if (roomList.filter((r) => r.name === room).length > 0) {
+	const roomExist = await roomExistInLiveKit(room)
+	if (roomExist) {
 		throw createError ({
 			statusCode: 400,
 			statusMessage: "Room already exist"
