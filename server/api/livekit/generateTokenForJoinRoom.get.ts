@@ -27,8 +27,8 @@ export default defineEventHandler(async (event) => {
 			message: "Room does not exist"
 		}
 	}
-	
-	if(await usernameTaken(username, room)) {
+
+	if (await usernameTaken(username, room)) {
 		return {
 			statusCode: 409,
 			message: "Username is taken"
@@ -43,7 +43,9 @@ export default defineEventHandler(async (event) => {
 	).map((p: ParticipantInfo) => p.name)
 
 	// host name fetching host name
-	const liveKitRoom = (await roomService.listRooms()).filter(r => r.name === room)[0]
+	const liveKitRoom = (await roomService.listRooms()).filter(
+		(r) => r.name === room
+	)[0]
 	const metadata = JSON.parse(liveKitRoom.metadata)
 
 	return {

@@ -52,9 +52,12 @@ export default {
 			const room = this.room.trim()
 			const username = this.username.trim()
 
-			const res = await fetch(`/api/livekit/roomCheck?roomName=${room}&username=${username}`, {
-				method: "GET"
-			})
+			const res = await fetch(
+				`/api/livekit/roomCheck?roomName=${room}&username=${username}`,
+				{
+					method: "GET"
+				}
+			)
 
 			if (!res.ok) {
 				await this.showError(
@@ -65,13 +68,13 @@ export default {
 			}
 
 			const data = await res.json()
-			console.log("Response: ", data)
+
 			if (!data.roomExist) {
 				await this.showError("Error joining room", "Room does not exist")
 				return
 			}
 
-			if(!data.usernameAvailable) {
+			if (!data.usernameAvailable) {
 				await this.showError("Error joining room", "Username Taken")
 				return
 			}
@@ -101,9 +104,12 @@ export default {
 				this.room = foodList[Math.floor(Math.random() * foodList.length)]
 			} else {
 				// Check if room already exist
-				const res = await fetch(`/api/livekit/roomCheck?roomName=${this.room}&username=${this.username}`, {
-					method: "GET"
-				})
+				const res = await fetch(
+					`/api/livekit/roomCheck?roomName=${this.room}&username=${this.username}`,
+					{
+						method: "GET"
+					}
+				)
 
 				if (!res.ok) {
 					await this.showError(

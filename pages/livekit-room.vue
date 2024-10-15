@@ -242,7 +242,7 @@ const handleToggleChat = async () => {
 const handleCloseDialog = async () => {
 	failureMessage.value = ""
 	dialogVisible.value = false
-	router.push('/')
+	router.push("/")
 }
 
 provide("sendMessageSfu", sendMessageLiveKit)

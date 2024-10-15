@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 	// check if room already exist
 	const roomExist = await roomExistInLiveKit(room)
 	if (roomExist) {
-		throw createError ({
+		throw createError({
 			statusCode: 400,
 			statusMessage: "Room already exist"
 		})
@@ -63,7 +63,7 @@ const createToken = async (
 	return token
 }
 
-const createRoom = async (room: string, hostName:string) => {
+const createRoom = async (room: string, hostName: string) => {
 	// create a new room
 	const opts: CreateOptions = {
 		name: room,

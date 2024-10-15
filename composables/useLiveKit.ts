@@ -69,7 +69,8 @@ export function useLiveKit() {
 			username: username
 		})
 
-		if (isHost) { // Hosting Room
+		if (isHost) {
+			// Hosting Room
 			const response = await fetch(
 				`/api/livekit/generateTokenForHostRoom?${params.toString()}`,
 				{
@@ -88,7 +89,8 @@ export function useLiveKit() {
 				throw new Error(`Error fetching token: 
 					HTTP request status ${response.status}`)
 			}
-		} else { // Joining a room
+		} else {
+			// Joining a room
 			const response = await fetch(
 				`/api/livekit/generateTokenForJoinRoom?${params.toString()}`,
 				{
@@ -100,7 +102,7 @@ export function useLiveKit() {
 				const data = await response.json() // Parse the response to JSON
 				token.value = data.token // Access the token from the parsed data
 
-				if(data.statusCode === 409) {
+				if (data.statusCode === 409) {
 					throw new Error("Username is Taken")
 				}
 				return {
@@ -158,11 +160,10 @@ export function useLiveKit() {
 					break
 			}
 		}
-		
+
 		if (!roomName || !username) {
 			throw new Error("missing input")
 		}
-
 
 		currentRoom.value?.disconnect()
 		currentUsername.value = username

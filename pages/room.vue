@@ -141,7 +141,7 @@ const preventPlayPause = (event: MouseEvent): void => {
 const handleCloseDialog = async () => {
 	failureMessage.value = ""
 	dialogVisible.value = false
-	router.push('/')
+	router.push("/")
 }
 
 provide("sendMessage", sendMessageLiveKit)

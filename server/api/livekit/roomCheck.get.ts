@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
 		})
 	}
 
-
 	try {
 		const roomInLK = await roomExistInLiveKit(roomName)
 		const usingServerSideStreaming: boolean = roomInfoMap.get(roomName) ?? false
@@ -23,7 +22,7 @@ export default defineEventHandler(async (event) => {
 				statusCode: 200,
 				roomExist: true,
 				usingServerSideStreaming: usingServerSideStreaming,
-				usernameAvailable:!(await usernameTaken(username, roomName)),
+				usernameAvailable: !(await usernameTaken(username, roomName)),
 				message: "Room exist"
 			}
 		} else {
