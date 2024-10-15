@@ -26,6 +26,11 @@ export const roomExistInLiveKit = async (roomName: string) => {
 }
 
 export const usernameTaken = async (name: string, roomName: string) => {
+	const roomExist = await roomExistInLiveKit(name)
+	if(!roomExist) {
+		return true
+	}
+
 	const participants: ParticipantInfo[] = await roomService.listParticipants(roomName)
 	const isTaken:boolean  = participants.some(participant => participant.identity === name);
 

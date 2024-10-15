@@ -4,14 +4,16 @@ import { roomInfoMap } from "../../utils/roomManager"
 export default defineEventHandler(async (event) => {
 	const query = getQuery(event)
 	const roomName = query.roomName?.toString() ?? ""
+	const username = query.username?.toString() ?? ""
 
 	// Check if roomName is provided
 	if (!roomName) {
-		return {
-			statusCode: 400,
-			message: "roomName is required."
-		}
+		throw createError({
+			statusCode: 422,
+			statusMessage: "Missing parameter roomName"
+		})
 	}
+
 
 	try {
 		const roomInLK = await roomExistInLiveKit(roomName)
@@ -21,7 +23,8 @@ export default defineEventHandler(async (event) => {
 				statusCode: 200,
 				roomExist: true,
 				usingServerSideStreaming: usingServerSideStreaming,
-				mesage: "Room exist"
+				usernameAvailable:!(await usernameTaken(username, roomName)),
+				message: "Room exist"
 			}
 		} else {
 			return {
