@@ -26,9 +26,9 @@ export const roomExistInLiveKit = async (roomName: string) => {
 }
 
 export const usernameTaken = async (name: string, roomName: string) => {
-	const roomExist = await roomExistInLiveKit(name)
+	const roomExist = await roomExistInLiveKit(roomName)
 	if(!roomExist) {
-		return true
+		return false
 	}
 
 	const participants: ParticipantInfo[] = await roomService.listParticipants(roomName)
