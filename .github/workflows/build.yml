@@ -15,7 +15,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: read-all
     env:  # Job-level environment variables
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
