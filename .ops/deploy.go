@@ -7,36 +7,47 @@ import (
 	"lesiw.io/cmdio/sys"
 )
 
-func (Ops) Deploy() {
+func (o Ops) Deploy() {
 	sshKey := os.Getenv("SSH_PRIVATE_KEY")
-	var rnr = sys.Runner().WithEnv(map[string]string{
-		"PKGNAME": "cmdio",
-		"HOSTNAME": os.Getenv("PROD_SSH_HOST"),
-		"sshKey" : os.Getenv("SSH_PRIVATE_KEY"),
-		"USER" : os.Getenv("PROD_SSH_USER"),
+	if sshKey == "" {
+		log.Fatal("SSH_PRIVATE_KEY environment variable is not set")
+	}
+
+	hostname := os.Getenv("PROD_SSH_HOST")
+	if hostname == "" {
+		log.Fatal("PROD_SSH_HOST environment variable is not set")
+	}
+
+	user := os.Getenv("PROD_SSH_USER")
+	if user == "" {
+		log.Fatal("PROD_SSH_USER environment variable is not set")
+	}
+
+	rnr := sys.Runner().WithEnv(map[string]string{
+		"PKGNAME":  "cmdio",
+		"HOSTNAME": hostname,
+		"USER":     user,
 	})
 
 	defer rnr.Close()
 
-	err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
-	if err != nil {
+	// Run an initial command
+	if err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME")); err != nil {
 		log.Fatal(err)
 	}
 
-	// write ssh key to file
-	err = os.WriteFile("key", []byte(sshKey), 0644)
-	if err != nil {
+	// Write the SSH key to a file
+	if err := os.WriteFile("key", []byte(sshKey), 0600); err != nil { // Use 0600 for private key
 		log.Fatal(err)
 	}
 
-	// "-o","StrictHostKeyChecking=no"
-	err = rnr.Run("ssh", "-t", "-i", "./key", rnr.Env("USER") + "@" + rnr.Env("HOSTNAME"))
-	if err != nil {
+	// Run the SSH command with options
+	if err := rnr.Run("ssh", "-t", "-i", "key", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run("echo", "goodbye from", rnr.Env("PKGNAME"))
-	if err != nil {
+	// Run a final command
+	if err := rnr.Run("echo", "goodbye from", rnr.Env("PKGNAME")); err != nil {
 		log.Fatal(err)
 	}
 }
