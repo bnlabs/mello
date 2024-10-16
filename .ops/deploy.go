@@ -30,6 +30,11 @@ func (Ops) Deploy() {
 		log.Fatal(err)
 	}
 
+	err = rnr.Run("ls")
+	if err != nil{
+		log.Fatal(err)
+	}
+
 	err = rnr.Run("ssh","-o","StrictHostKeyChecking=no", "-i", "./key", vpsusr + "@" + hostname)
 	if err != nil{
 		log.Fatal(err)
