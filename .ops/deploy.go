@@ -23,14 +23,14 @@ func (Ops) Deploy() {
 		log.Fatal(err)
 	}
 
-	// assign ssh key to env var
+	// write ssh key to file
 	err = os.WriteFile("key", []byte(sshKey), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// "-o","StrictHostKeyChecking=no"
-	err = rnr.Run("ssh", "-t", "-i", "./key", rnr.Env("USER") + rnr.Env("HOSTNAME"))
+	err = rnr.Run("ssh", "-t", "-i", "./key", rnr.Env("USER") + "@" + rnr.Env("HOSTNAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
