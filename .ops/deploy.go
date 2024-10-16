@@ -37,12 +37,12 @@ func (o Ops) Deploy() {
 	}
 
 	// Write the SSH key to a file
-	if err := os.WriteFile("key.txt", []byte(sshKey), 0600); err != nil { // Write the actual SSH key
+	if err := os.WriteFile("key", []byte(sshKey), 0600); err != nil { // Write the actual SSH key
 		log.Fatal(err)
 	}
 
 	// Run the SSH command with options
-	if err := rnr.Run("ssh", "-t", "-i", "key", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
+	if err := rnr.Run("ssh", "-t", "-i", "key.txt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
 		log.Fatal(err)
 	}
 
