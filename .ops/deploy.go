@@ -25,7 +25,7 @@ func (Ops) Deploy() {
 	}
 
 	// assign ssh key to env var
-	err = rnr.Run("echo", sshKey, "./key")
+	err = os.WriteFile("key", []byte(sshKey), 0644)
 	if err != nil{
 		log.Fatal(err)
 	}
