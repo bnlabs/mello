@@ -27,6 +27,11 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
+	err := rnr.Run("ssh-add", "~/.ssh/id_ed25519")
+	if err != nil {
+		log.Fatal(err)
+	}
+	
 	if err := connectViaSSH(rnr, user, hostname); err != nil {
 		log.Fatal(err)
 	}
