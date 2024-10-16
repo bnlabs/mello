@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"os"
-
+	"path/filepath"
 	"lesiw.io/cmdio/sys"
 )
 
@@ -36,13 +36,23 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
-	// Write the SSH key to a file
-	if err := os.WriteFile("./.ops/key", []byte(sshKey), 0600); err != nil { // Write the actual SSH key
+	// Create the .ssh directory if it doesn't exist
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sshDir := filepath.Join(homeDir, ".ssh")
+	if err := os.MkdirAll(sshDir, 0700); err != nil {
+		log.Fatal(err)
+	}
+
+	// Write the SSH key to the id_ed25519 file
+	if err := os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKey), 0600); err != nil {
 		log.Fatal(err)
 	}
 
 	// Run the SSH command with options
-	if err := rnr.Run("ssh", "-tt", "-i", "key.txt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
+	if err := rnr.Run("ssh", "-tt", "-i", filepath.Join(sshDir, "id_ed25519"), "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
 		log.Fatal(err)
 	}
 
