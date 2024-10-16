@@ -46,8 +46,8 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
-	// Write the SSH key to the id_ed25519 file
-	if err := os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKey), 0600); err != nil {
+	sshKeyWithNewline := sshKey + "\n" // Add a newline at the end
+	if err := os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKeyWithNewline), 0600); err != nil {
 		log.Fatal(err)
 	}
 
