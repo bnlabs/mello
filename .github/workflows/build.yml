@@ -33,9 +33,6 @@ jobs:
 
       - name: Set up SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./key
-          chmod 600 ./key
           ssh-keyscan -H 149.28.234.53 >> ~/.ssh/known_hosts
 
       # - name: Cache node modules
