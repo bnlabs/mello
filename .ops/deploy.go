@@ -42,7 +42,7 @@ func (o Ops) Deploy() {
 	}
 
 	// Run the SSH command with options
-	if err := rnr.Run("ssh", "-t", "-i", "key.txt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
+	if err := rnr.Run("ssh", "-tt", "-i", "key.txt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
 		log.Fatal(err)
 	}
 
