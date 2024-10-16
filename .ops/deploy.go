@@ -8,12 +8,11 @@ import (
 )
 
 func (Ops) Deploy() {
-	vpsusr := os.Getenv("PROD_SSH_USER")
-	hostname := os.Getenv("PROD_SSH_HOST")
-	sshKey := os.Getenv("SSH_PRIVATE_KEY")
-
 	var rnr = sys.Runner().WithEnv(map[string]string{
 		"PKGNAME": "cmdio",
+		"HOSTNAME": os.Getenv("PROD_SSH_HOST"),
+		"sshKey" : os.Getenv("SSH_PRIVATE_KEY"),
+		"USER" : os.Getenv("PROD_SSH_USER").
 	})
 	defer rnr.Close()
 
@@ -29,7 +28,7 @@ func (Ops) Deploy() {
 	}
 
 	// "-o","StrictHostKeyChecking=no"
-	err = rnr.Run("ssh", "-i", "./key", vpsusr+"@"+hostname)
+	err = rnr.Run("ssh", "-i", "./key", "$USER@$HOSTNAME")
 	if err != nil {
 		log.Fatal(err)
 	}
