@@ -36,12 +36,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.PROD_SSH_HOST }} >> ~/.ssh/known_hosts || true
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Run SSH command
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} 'echo "Hello, World!"'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} 'echo "Hello, World!"'
 
       # - name: Run Go script
       #   run: op deploy
