@@ -4,10 +4,39 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"lesiw.io/cmdio"
 	"lesiw.io/cmdio/sys"
 )
 
 func (o Ops) Deploy() {
+	sshKey, hostname, user := getEnvVariables()
+	rnr := sys.Runner().WithEnv(map[string]string{
+		"PKGNAME":  "cmdio",
+		"HOSTNAME": hostname,
+		"USER":     user,
+	})
+
+	defer rnr.Close()
+
+	if err := runInitialCommand(rnr); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := setupSSHKey(sshKey); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := connectViaSSH(rnr, user, hostname); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := runFinalCommand(rnr); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getEnvVariables() (string, string, string) {
 	sshKey := os.Getenv("SSH_PRIVATE_KEY")
 	if sshKey == "" {
 		log.Fatal("SSH_PRIVATE_KEY environment variable is not set")
@@ -23,41 +52,31 @@ func (o Ops) Deploy() {
 		log.Fatal("PROD_SSH_USER environment variable is not set")
 	}
 
-	rnr := sys.Runner().WithEnv(map[string]string{
-		"PKGNAME":  "cmdio",
-		"HOSTNAME": hostname,
-		"USER":     user,
-	})
+	return sshKey, hostname, user
+}
 
-	defer rnr.Close()
+func runInitialCommand(rnr *cmdio.Runner) error {
+	return rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
+}
 
-	// Run an initial command
-	if err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME")); err != nil {
-		log.Fatal(err)
-	}
-
-	// Create the .ssh directory if it doesn't exist
+func setupSSHKey(sshKey string) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	sshDir := filepath.Join(homeDir, ".ssh")
 	if err := os.MkdirAll(sshDir, 0700); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	sshKeyWithNewline := sshKey + "\n" // Add a newline at the end
-	if err := os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKeyWithNewline), 0600); err != nil {
-		log.Fatal(err)
-	}
+	return os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKeyWithNewline), 0600)
+}
 
-	// Run the SSH command with options
-	if err := rnr.Run("ssh", "-tt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
-		log.Fatal(err)
-	}
+func connectViaSSH(rnr *cmdio.Runner, user, hostname string) error {
+	return rnr.Run("ssh", "-tt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname)
+}
 
-	// Run a final command
-	if err := rnr.Run("echo", "goodbye from", rnr.Env("PKGNAME")); err != nil {
-		log.Fatal(err)
-	}
+func runFinalCommand(rnr *cmdio.Runner) error {
+	return rnr.Run("echo", "goodbye from", rnr.Env("PKGNAME"))
 }
