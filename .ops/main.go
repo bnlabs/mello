@@ -1,9 +1,6 @@
 package main
 
 import (
-	"log"
-
-	"lesiw.io/cmdio/sys"
 	"lesiw.io/ops"
 )
 
