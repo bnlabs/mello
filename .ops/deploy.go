@@ -25,12 +25,12 @@ func (Ops) Deploy() {
 	}
 
 	// assign ssh key to env var
-	err = rnr.Run("echo", sshKey, "/tmp/id_rsa")
+	err = rnr.Run("echo", sshKey, "./key")
 	if err != nil{
 		log.Fatal(err)
 	}
 
-	err = rnr.Run("ssh","-o","StrictHostKeyChecking=no", "-i", "/tmp/id_rsa", vpsusr + "@" + hostname)
+	err = rnr.Run("ssh","-o","StrictHostKeyChecking=no", "-i", "./key", vpsusr + "@" + hostname)
 	if err != nil{
 		log.Fatal(err)
 	}
