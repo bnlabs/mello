@@ -31,5 +31,10 @@ jobs:
       - name: Install dependencies
         run: go install lesiw.io/op@latest
 
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
       - name: Run Go script
         run: op deploy
