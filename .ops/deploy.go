@@ -8,12 +8,14 @@ import (
 )
 
 func (Ops) Deploy() {
+	sshKey := os.Getenv("SSH_PRIVATE_KEY")
 	var rnr = sys.Runner().WithEnv(map[string]string{
 		"PKGNAME": "cmdio",
 		"HOSTNAME": os.Getenv("PROD_SSH_HOST"),
 		"sshKey" : os.Getenv("SSH_PRIVATE_KEY"),
-		"USER" : os.Getenv("PROD_SSH_USER").
+		"USER" : os.Getenv("PROD_SSH_USER"),
 	})
+
 	defer rnr.Close()
 
 	err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
