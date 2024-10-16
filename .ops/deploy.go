@@ -8,10 +8,10 @@ import (
 )
 
 func (o Ops) Deploy() {
-	// sshKey := os.Getenv("SSH_PRIVATE_KEY")
-	// if sshKey == "" {
-	// 	log.Fatal("SSH_PRIVATE_KEY environment variable is not set")
-	// }
+	sshKey := os.Getenv("SSH_PRIVATE_KEY")
+	if sshKey == "" {
+		log.Fatal("SSH_PRIVATE_KEY environment variable is not set")
+	}
 
 	hostname := os.Getenv("PROD_SSH_HOST")
 	if hostname == "" {
