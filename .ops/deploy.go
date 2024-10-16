@@ -41,6 +41,9 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
+	// Ensure permissions are set correctly (if necessary)
+	os.Chmod("key", 0600)
+
 	// Run the SSH command with options
 	if err := rnr.Run("ssh", "-t", "-i", "key", "-o", "StrictHostKeyChecking=no", user+"@"+hostname); err != nil {
 		log.Fatal(err)
