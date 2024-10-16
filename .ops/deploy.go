@@ -30,7 +30,7 @@ func (Ops) Deploy() {
 	}
 
 	// "-o","StrictHostKeyChecking=no"
-	err = rnr.Run("ssh", "-i", "./key", rnr.Env("USER") + rnr.Env("HOSTNAME"))
+	err = rnr.Run("ssh", "-t", "-i", "./key", rnr.Env("USER") + rnr.Env("HOSTNAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
