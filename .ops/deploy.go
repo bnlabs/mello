@@ -27,10 +27,10 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
-	err := rnr.Run("ssh-add", "~/.ssh/id_ed25519")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := rnr.Run("ssh-add", "~/.ssh/id_ed25519")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	
 	if err := connectViaSSH(rnr, user, hostname); err != nil {
 		log.Fatal(err)
@@ -79,7 +79,7 @@ func setupSSHKey(sshKey string) error {
 }
 
 func connectViaSSH(rnr *cmdio.Runner, user, hostname string) error {
-	return rnr.Run("ssh", "-tt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname)
+	return rnr.Run("ssh", "-vvv", "-tt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname)
 }
 
 func runFinalCommand(rnr *cmdio.Runner) error {
