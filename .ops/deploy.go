@@ -37,7 +37,7 @@ func (o Ops) Deploy() {
 	}
 
 	// Write the SSH key to a file
-	if err := os.WriteFile("key", []byte(""), 0600); err != nil { // Use 0600 for private key
+	if err := os.WriteFile("key", []byte(sshKey), 0600); err != nil { // Write the actual SSH key
 		log.Fatal(err)
 	}
 
