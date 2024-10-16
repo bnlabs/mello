@@ -7,13 +7,11 @@ import (
 	"lesiw.io/cmdio/sys"
 )
 
-
-
 func (Ops) Deploy() {
 	vpsusr := os.Getenv("PROD_SSH_USER")
 	hostname := os.Getenv("PROD_SSH_HOST")
 	sshKey := os.Getenv("SSH_PRIVATE_KEY")
-	
+
 	var rnr = sys.Runner().WithEnv(map[string]string{
 		"PKGNAME": "cmdio",
 	})
@@ -26,22 +24,13 @@ func (Ops) Deploy() {
 
 	// assign ssh key to env var
 	err = os.WriteFile("key", []byte(sshKey), 0644)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run("ls")
-	if err != nil{
-		log.Fatal(err)
-	}
-
-	err = rnr.Run("ssh","-o","StrictHostKeyChecking=no", "-i", "./key", vpsusr + "@" + hostname)
-	if err != nil{
-		log.Fatal(err)
-	}
-
-	err = rnr.Run("ls")
-	if err != nil{
+	// "-o","StrictHostKeyChecking=no"
+	err = rnr.Run("ssh", "-i", "./key", vpsusr+"@"+hostname)
+	if err != nil {
 		log.Fatal(err)
 	}
 
