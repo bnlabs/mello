@@ -3,14 +3,13 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"lesiw.io/cmdio"
 	"lesiw.io/cmdio/sys"
 )
 
 func (o Ops) Deploy() {
-	sshKey, hostname, user := getEnvVariables()
+	_, hostname, user := getEnvVariables()
 	rnr := sys.Runner().WithEnv(map[string]string{
 		"PKGNAME":  "cmdio",
 		"HOSTNAME": hostname,
@@ -23,9 +22,9 @@ func (o Ops) Deploy() {
 		log.Fatal(err)
 	}
 
-	if err := setupSSHKey(sshKey); err != nil {
-		log.Fatal(err)
-	}
+	// if err := setupSSHKey(sshKey); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// err := rnr.Run("ssh-add", "~/.ssh/id_ed25519")
 	// if err != nil {
@@ -64,19 +63,19 @@ func runInitialCommand(rnr *cmdio.Runner) error {
 	return rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
 }
 
-func setupSSHKey(sshKey string) error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	sshDir := filepath.Join(homeDir, ".ssh")
-	if err := os.MkdirAll(sshDir, 0700); err != nil {
-		return err
-	}
+// func setupSSHKey(sshKey string) error {
+// 	homeDir, err := os.UserHomeDir()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	sshDir := filepath.Join(homeDir, ".ssh")
+// 	if err := os.MkdirAll(sshDir, 0700); err != nil {
+// 		return err
+// 	}
 
-	sshKeyWithNewline := sshKey + "\n" // Add a newline at the end
-	return os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKeyWithNewline), 0600)
-}
+// 	sshKeyWithNewline := sshKey + "\n" // Add a newline at the end
+// 	return os.WriteFile(filepath.Join(sshDir, "id_ed25519"), []byte(sshKeyWithNewline), 0600)
+// }
 
 func connectViaSSH(rnr *cmdio.Runner, user, hostname string) error {
 	return rnr.Run("ssh", "-vvv", "-tt", "-o", "StrictHostKeyChecking=no", user+"@"+hostname)
