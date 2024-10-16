@@ -15,6 +15,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:  # Job-level environment variables
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+      PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout Repository
@@ -27,13 +31,5 @@ jobs:
       - name: Install dependencies
         run: go install lesiw.io/op@latest
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Run Go script
-        run: op build
+        run: op deploy
