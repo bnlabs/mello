@@ -41,7 +41,7 @@ jobs:
 
       - name: Run SSH command
         run: |
-          ssh -i ~/.ssh/id_ed25519 user@your.server.com 'echo "Hello, World!"'
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} 'echo "Hello, World!"'
 
       # - name: Run Go script
       #   run: op deploy
