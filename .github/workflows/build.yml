@@ -31,6 +31,13 @@ jobs:
       - name: Install dependencies
         run: go install lesiw.io/op@latest
 
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./key
+          chmod 600 ./key
+          ssh-keyscan -H 149.28.234.53 >> ~/.ssh/known_hosts
+
       # - name: Cache node modules
       #   uses: actions/cache@v3
       #   with:
