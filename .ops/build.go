@@ -19,12 +19,12 @@ func (Ops) Build() {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run(npm, "run", "prettyCheck")
+	err = rnr.Run(npm, "install")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run(npm, "install")
+	err = rnr.Run(npm, "run", "prettyCheck")
 	if err != nil {
 		log.Fatal(err)
 	}
