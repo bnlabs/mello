@@ -12,17 +12,24 @@ func (Ops) Build() {
 	})
 	defer rnr.Close()
 
+	npm := useNpmOrPnpm(rnr)
+
 	err := rnr.Run("echo", "hello from", rnr.Env("PKGNAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run(useNpmOrPnpm(rnr), "install")
+	err = rnr.Run(npm, "run", "prettyCheck")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = rnr.Run(useNpmOrPnpm(rnr), "run", "build")
+	err = rnr.Run(npm, "install")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = rnr.Run(npm, "run", "build")
 	if err != nil {
 		log.Fatal(err)
 	}
