@@ -18,14 +18,13 @@ let toggleStream: ToggleStreamFunction | undefined
 let leaveRoom: LeaveRoomFunction | undefined
 let toggleChat: ToggleChatFunction | undefined
 
+leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+toggleChat = inject<ToggleChatFunction>("ToggleChat")
+
 if (props.isSfu) {
 	toggleStream = inject<ToggleStreamFunction>("handleToggleStreamSfu")
-	leaveRoom = inject<LeaveRoomFunction>("leaveRoomSfu")
-	toggleChat = inject<ToggleChatFunction>("ToggleChatSfu")
 } else {
 	toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-	leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
-	toggleChat = inject<ToggleChatFunction>("ToggleChat")
 }
 </script>
 

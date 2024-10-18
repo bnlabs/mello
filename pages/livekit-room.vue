@@ -13,38 +13,18 @@
 				v-if="chatIsOpen"
 				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
-				:usingLiveKit="true"
 			/>
 		</div>
 
-		<div
-			class="Room-Info flex h-[10%] flex-row items-center justify-between pl-4"
-		>
-			<div class="flex h-full items-center gap-3">
-				<RoomInfoSlot title="Room">
-					<span class="text-black"> {{ room }}</span>
-				</RoomInfoSlot>
-
-				<RoomInfoSlot title="Username">
-					<span class="text-black"> {{ currentUsername }}</span>
-				</RoomInfoSlot>
-
-				<RoomInfoSlot title="Host">
-					<span class="text-black"> {{ currentHost }}</span>
-				</RoomInfoSlot>
-
-				<RoomUserList :users="participantNames" />
-			</div>
-
-			<div class="flex flex-row gap-5 pr-3">
-				<Button severity="info" @click="handleToggleChat" outlined>
-					Hide Chat</Button
-				>
-				<Button v-if="isHost === 'true'" @click="screenshare" outlined
-					>Stream</Button
-				>
-				<Button @click="leave" severity="danger" outlined>Leave Room</Button>
-			</div>
+		<div class="h-[10%]">
+			<RoomInfo
+				:roomName="room ?? ''"
+				:usernames="participantNames"
+				:username="username ?? ''"
+				:host="currentHost"
+				:isHost="isHost ?? ''"
+				:isSfu="true"
+			/>
 		</div>
 	</div>
 	<!-- Dialog component -->
@@ -68,13 +48,13 @@ const route = useRoute()
 const router = useRouter()
 
 const {
-	toggleScreenshare,
 	hostRoom,
 	leaveRoom,
 	joinRoom,
-	currentUsername,
+	sendMessageLiveKit,
+	toggleScreenshare,
+	cleanUpData,
 	participantNames,
-	sendMessageLiveKit
 } = useLiveKit()
 
 // URL param
@@ -245,8 +225,8 @@ const handleCloseDialog = async () => {
 	router.push("/")
 }
 
-provide("sendMessageSfu", sendMessageLiveKit)
+provide("sendMessage", sendMessageLiveKit)
 provide("handleToggleStreamSfu", screenshare)
-provide("ToggleChatSfu", handleToggleChat)
-provide("leaveRoomSfu", leave)
+provide("ToggleChat", handleToggleChat)
+provide("leaveRoom", leave)
 </script>
