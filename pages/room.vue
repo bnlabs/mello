@@ -184,7 +184,6 @@ onMounted(async () => {
 		} else {
 			// joining existing room
 			if (!data.roomExist) {
-				// check if room exist
 				dialogVisible.value = true
 				failureMessage.value = "Room does not exist"
 				return
