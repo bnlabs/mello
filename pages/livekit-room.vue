@@ -135,7 +135,7 @@ const preventPlayPause = (event: MouseEvent): void => {
 
 const handleToggleStream = async () => {
 	if (localVideo.value) {
-		toggleScreenshare(localVideo.value)
+		await toggleScreenshare(localVideo.value)
 	}
 }
 
