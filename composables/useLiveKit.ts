@@ -12,7 +12,6 @@ import {
 	DataPacket_Kind,
 	type DataPublishOptions
 } from "livekit-client"
-import type { ParticipantInfo } from "livekit-server-sdk"
 import moment from "moment"
 
 const participantNames = ref<string[]>([])
