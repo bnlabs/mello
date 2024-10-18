@@ -44,8 +44,16 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
-const router = useRouter()
+// page data
+const localVideo = ref<HTMLMediaElement | null>(null)
+const { chatMessages, clearMessages } = useChatMessage()
+const currentRoom = ref<string>("")
+const currentHost = ref<string>("")
+
+// UI state
+const chatIsOpen = ref(true)
+const dialogVisible = useState<boolean>("diaglogVisible", () => false)
+const failureMessage = useState<string>("failureMessage", () => "")
 
 const {
 	hostRoom,
@@ -54,23 +62,40 @@ const {
 	sendMessageLiveKit,
 	toggleScreenshare,
 	cleanUpData,
-	participantNames,
+	participantNames
 } = useLiveKit()
+
+const route = useRoute()
+const router = useRouter()
 
 // URL param
 const { username, room, isHost } = route.query as Partial<UrlParam>
 
-// page data
-const localVideo = ref<HTMLMediaElement | null>(null)
-const { chatMessages, clearMessages } = useChatMessage()
-const currentHost = ref<string>("")
+const leave = async () => {
+	await leaveRoom()
+	router.push("/")
+}
 
-// UI state
-const chatIsOpen = ref(true)
-const dialogVisible = useState<boolean>("diaglogVisible", () => false)
-const failureMessage = useState<string>("failureMessage", () => "")
+const adjustVolume = (event: KeyboardEvent) => {
+	if (!localVideo.value) return
 
-// Video element function
+	const volumeChangeAmount = 0.1
+	switch (event.key) {
+		case "ArrowUp":
+			localVideo.value.volume = Math.min(
+				localVideo.value.volume + volumeChangeAmount,
+				1
+			)
+			break
+		case "ArrowDown":
+			localVideo.value.volume = Math.max(
+				localVideo.value.volume - volumeChangeAmount,
+				0
+			)
+			break
+	}
+}
+
 const toggleFullScreen = (): void => {
 	if (!localVideo.value) return
 
@@ -108,24 +133,20 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
-const adjustVolume = (event: KeyboardEvent) => {
-	if (!localVideo.value) return
-
-	const volumeChangeAmount = 0.1
-	switch (event.key) {
-		case "ArrowUp":
-			localVideo.value.volume = Math.min(
-				localVideo.value.volume + volumeChangeAmount,
-				1
-			)
-			break
-		case "ArrowDown":
-			localVideo.value.volume = Math.max(
-				localVideo.value.volume - volumeChangeAmount,
-				0
-			)
-			break
+const screenshare = async () => {
+	if (localVideo.value) {
+		toggleScreenshare(localVideo.value)
 	}
+}
+
+const handleToggleChat = async () => {
+	chatIsOpen.value = !chatIsOpen.value
+}
+
+const handleCloseDialog = async () => {
+	failureMessage.value = ""
+	dialogVisible.value = false
+	router.push("/")
 }
 
 onMounted(async () => {
@@ -203,27 +224,6 @@ onBeforeUnmount(async () => {
 	clearMessages()
 	await leaveRoom()
 })
-
-const leave = async () => {
-	await leaveRoom()
-	router.push("/")
-}
-
-const screenshare = async () => {
-	if (localVideo.value) {
-		toggleScreenshare(localVideo.value)
-	}
-}
-
-const handleToggleChat = async () => {
-	chatIsOpen.value = !chatIsOpen.value
-}
-
-const handleCloseDialog = async () => {
-	failureMessage.value = ""
-	dialogVisible.value = false
-	router.push("/")
-}
 
 provide("sendMessage", sendMessageLiveKit)
 provide("handleToggleStreamSfu", screenshare)

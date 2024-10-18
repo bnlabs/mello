@@ -44,8 +44,16 @@
 </template>
 
 <script setup lang="ts">
+// page data
+const localVideo = ref<HTMLMediaElement | null>(null)
 const { chatMessages } = useChatMessage()
+const currentRoom = ref<string>("")
+const currentHost = ref<string>("")
+
+// UI state
 const chatIsOpen = ref(true)
+const dialogVisible = useState<boolean>("diaglogVisible", () => false)
+const failureMessage = useState<string>("failureMessage", () => "")
 
 const {
 	hostRoom,
@@ -56,28 +64,16 @@ const {
 	cleanUpData,
 	participantNames
 } = useLiveKit()
-const currentRoom = ref("")
-const currentHost = ref("")
-const localVideo = ref<HTMLMediaElement | null>(null)
-const dialogVisible = useState<boolean>("diaglogVisible", () => false)
-const failureMessage = useState<string>("failureMessage", () => "")
 
 const route = useRoute()
 const router = useRouter()
 
+// URL param
+const { username, room, isHost } = route.query as Partial<UrlParam>
+
 const leave = async () => {
 	await leaveRoom()
 	router.push("/")
-}
-
-const handleToggleChat = () => {
-	chatIsOpen.value = !chatIsOpen.value
-}
-
-const handleToggleStream = async () => {
-	if (localVideo.value) {
-		await toggleScreenshareP2P(localVideo.value)
-	}
 }
 
 const adjustVolume = (event: KeyboardEvent) => {
@@ -137,18 +133,22 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
+const handleToggleStream = async () => {
+	if (localVideo.value) {
+		await toggleScreenshareP2P(localVideo.value)
+	}
+}
+
+const handleToggleChat = async () => {
+	chatIsOpen.value = !chatIsOpen.value
+}
+
 const handleCloseDialog = async () => {
 	failureMessage.value = ""
 	dialogVisible.value = false
 	router.push("/")
 }
 
-provide("sendMessage", sendMessageLiveKit)
-provide("handleToggleStream", handleToggleStream)
-provide("ToggleChat", handleToggleChat)
-provide("leaveRoom", leave)
-
-const { username, room, isHost } = route.query as Partial<UrlParam>
 onMounted(async () => {
 	if (!username || !room) {
 		router.push("/")
@@ -223,4 +223,9 @@ onBeforeUnmount(async () => {
 		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
 })
+
+provide("sendMessage", sendMessageLiveKit)
+provide("handleToggleStream", handleToggleStream)
+provide("ToggleChat", handleToggleChat)
+provide("leaveRoom", leave)
 </script>
