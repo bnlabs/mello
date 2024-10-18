@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 			autoprefixer: {}
 		}
 	},
-	modules: ["nuxt-primevue"],
+	modules: ["nuxt-primevue", "@nuxt/test-utils/module"],
 	primevue: {
 		/* Options */
 		options: {
