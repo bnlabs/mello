@@ -382,18 +382,12 @@ export function useLiveKit() {
 		) {
 			await endStream()
 		} else {
-			// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
-			if (!localStream.value) {
-				localStream.value =
-					await navigator.mediaDevices.getDisplayMedia(streamSetting)
-			}
-
-			data.result.forEach(async (p: ParticipantInfo) => {
+			for (const p of data.result) {
 				if (p.name === currentUsername.value) {
-					return
+					continue // Skip to the next iteration
 				}
 				await createOffer(p.identity, videoElement)
-			})
+			}
 		}
 	}
 

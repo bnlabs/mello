@@ -139,9 +139,9 @@ const preventPlayPause = (event: MouseEvent): void => {
 const handleToggleStream = async () => {
 	if (localVideo.value) {
 		if (serverSideStreamingEnabled.value) {
-			await toggleScreenshareP2P(localVideo.value)
-		} else {
 			await toggleScreenshare(localVideo.value)
+		} else {
+			await toggleScreenshareP2P(localVideo.value)
 		}
 	}
 }
