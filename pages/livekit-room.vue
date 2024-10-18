@@ -46,7 +46,7 @@
 <script setup lang="ts">
 // page data
 const localVideo = ref<HTMLMediaElement | null>(null)
-const { chatMessages, clearMessages } = useChatMessage()
+const { chatMessages } = useChatMessage()
 const currentRoom = ref<string>("")
 const currentHost = ref<string>("")
 
@@ -199,6 +199,7 @@ onMounted(async () => {
 					localVideo.value
 				)
 				currentHost.value = host
+				currentRoom.value = room
 			}
 		}
 	} catch (err: any) {
@@ -215,14 +216,12 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(async () => {
+	await cleanUpData()
 	window.removeEventListener("keydown", adjustVolume)
 	if (localVideo.value) {
 		// Remove the click event listener
 		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
-
-	clearMessages()
-	await leaveRoom()
 })
 
 provide("sendMessage", sendMessageLiveKit)
