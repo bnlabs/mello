@@ -1,6 +1,6 @@
 <template>
-	<div class="flex h-screen w-full flex-col bg-black">
-		<div class="flex h-[90%] w-full flex-row">
+	<div class="h-screen bg-black">
+		<div class="flex h-[90%]">
 			<video
 				autoPlay
 				playsInline
@@ -8,7 +8,6 @@
 				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
 			/>
-
 			<Chat
 				v-if="chatIsOpen"
 				:chats="chatMessages"
@@ -16,16 +15,15 @@
 			/>
 		</div>
 
-		<div class="h-[10%]">
-			<RoomInfo
-				:roomName="currentRoom"
-				:usernames="participantNames"
-				:username="username ?? ''"
-				:host="currentHost"
-				:isHost="isHost ?? ''"
-				:isSfu="true"
-			/>
-		</div>
+		<RoomInfo
+			class="h-[10%]"
+			:roomName="currentRoom"
+			:usernames="participantNames"
+			:username="username ?? ''"
+			:host="currentHost"
+			:isHost="isHost ?? ''"
+			:isSfu="true"
+		/>
 	</div>
 	<!-- Dialog component -->
 	<Dialog
@@ -154,7 +152,6 @@ onMounted(async () => {
 		router.push("/")
 		return
 	}
-
 	// check if room already exist
 	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"
@@ -176,7 +173,6 @@ onMounted(async () => {
 				failureMessage.value = "Room already exist"
 				return
 			}
-
 			await hostRoom(
 				room.toString() ?? "",
 				username.toString() ?? "",
