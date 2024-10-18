@@ -15,15 +15,16 @@
 			/>
 		</div>
 
-		<RoomInfo
-			class="h-[10%]"
-			:roomName="currentRoom"
-			:usernames="participantNames"
-			:username="username ?? ''"
-			:host="currentHost"
-			:isHost="isHost ?? ''"
-			:isSfu="false"
-		/>
+		<div class="h-[10%]">
+			<RoomInfo
+				:roomName="currentRoom"
+				:usernames="participantNames"
+				:username="username ?? ''"
+				:host="currentHost"
+				:isHost="isHost ?? ''"
+				:usingSFU="serverSideStreamingEnabled"
+			/>
+		</div>
 	</div>
 	<!-- Dialog component -->
 	<Dialog
@@ -47,6 +48,7 @@ const localVideo = ref<HTMLMediaElement | null>(null)
 const { chatMessages } = useChatMessage()
 const currentRoom = ref<string>("")
 const currentHost = ref<string>("")
+const serverSideStreamingEnabled = ref<boolean>(false) // only relevant for host user
 
 // UI state
 const chatIsOpen = ref(true)
@@ -59,6 +61,7 @@ const {
 	joinRoom,
 	sendMessageLiveKit,
 	toggleScreenshareP2P,
+	toggleScreenshare,
 	cleanUpData,
 	participantNames
 } = useLiveKit()
@@ -67,7 +70,7 @@ const route = useRoute()
 const router = useRouter()
 
 // URL param
-const { username, room, isHost } = route.query as Partial<UrlParam>
+const { username, room, isHost, serverSideStreaming } = route.query as Partial<UrlParam>
 
 const leave = async () => {
 	await leaveRoom()
@@ -133,7 +136,10 @@ const preventPlayPause = (event: MouseEvent): void => {
 
 const handleToggleStream = async () => {
 	if (localVideo.value) {
-		await toggleScreenshareP2P(localVideo.value)
+		serverSideStreamingEnabled.value ? 
+			await toggleScreenshareP2P(localVideo.value) 
+			: 
+			await toggleScreenshare(localVideo.value)
 	}
 }
 
@@ -152,6 +158,7 @@ onMounted(async () => {
 		router.push("/")
 		return
 	}
+	serverSideStreamingEnabled.value = serverSideStreaming === "true"
 	// check if room already exist
 	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"
@@ -176,7 +183,7 @@ onMounted(async () => {
 			await hostRoom(
 				room.toString() ?? "",
 				username.toString() ?? "",
-				false,
+				serverSideStreamingEnabled.value,
 				localVideo.value
 			)
 			currentHost.value = username
