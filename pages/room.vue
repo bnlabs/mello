@@ -63,7 +63,8 @@ const {
 	toggleScreenshareP2P,
 	toggleScreenshare,
 	cleanUpData,
-	participantNames
+	participantNames,
+	isServerSideStreaming
 } = useLiveKit()
 
 const route = useRoute()
@@ -137,9 +138,11 @@ const preventPlayPause = (event: MouseEvent): void => {
 
 const handleToggleStream = async () => {
 	if (localVideo.value) {
-		serverSideStreamingEnabled.value
-			? await toggleScreenshareP2P(localVideo.value)
-			: await toggleScreenshare(localVideo.value)
+		if(serverSideStreamingEnabled.value) {
+			await toggleScreenshareP2P(localVideo.value)
+		} else {
+			await toggleScreenshare(localVideo.value)
+		}
 	}
 }
 
@@ -159,6 +162,7 @@ onMounted(async () => {
 		return
 	}
 	serverSideStreamingEnabled.value = serverSideStreaming === "true"
+	isServerSideStreaming.value = serverSideStreaming === "true"
 	// check if room already exist
 	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"

@@ -603,6 +603,7 @@ export function useLiveKit() {
 		createAnswer,
 		addAnswer,
 		toggleScreenshareP2P,
-		cleanUpData
+		cleanUpData,
+		isServerSideStreaming
 	}
 }

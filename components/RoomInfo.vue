@@ -40,11 +40,11 @@ toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
 			</RoomInfoSlot>
 
 			<RoomUserList :users="usernames" />
+		</div>
+		
+		<div class="flex flex-row gap-5 pr-3 items-center">
 			<div v-if="usingSFU && isHost === 'true'">Server-side streaming</div>
 			<div v-if="!usingSFU && isHost === 'true'">P2p streaming</div>
-		</div>
-
-		<div class="flex flex-row gap-5 pr-3">
 			<Button @click="toggleChat" severity="info" outlined> Hide Chat</Button>
 			<Button v-if="isHost === 'true'" @click="toggleStream" outlined
 				>Stream</Button
