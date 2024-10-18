@@ -22,7 +22,6 @@ leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 toggleChat = inject<ToggleChatFunction>("ToggleChat")
 
 toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-
 </script>
 
 <template>
@@ -41,12 +40,8 @@ toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
 			</RoomInfoSlot>
 
 			<RoomUserList :users="usernames" />
-			<div v-if="usingSFU && isHost==='true'">
-				Server-side streaming
-			</div>
-			<div v-if="!usingSFU && isHost==='true'">
-				P2p streaming
-			</div>
+			<div v-if="usingSFU && isHost === 'true'">Server-side streaming</div>
+			<div v-if="!usingSFU && isHost === 'true'">P2p streaming</div>
 		</div>
 
 		<div class="flex flex-row gap-5 pr-3">

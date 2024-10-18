@@ -79,7 +79,6 @@ export default {
 				return
 			}
 
-
 			this.$router.push({
 				path: "/room",
 				query: {

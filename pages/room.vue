@@ -70,7 +70,8 @@ const route = useRoute()
 const router = useRouter()
 
 // URL param
-const { username, room, isHost, serverSideStreaming } = route.query as Partial<UrlParam>
+const { username, room, isHost, serverSideStreaming } =
+	route.query as Partial<UrlParam>
 
 const leave = async () => {
 	await leaveRoom()
@@ -136,10 +137,9 @@ const preventPlayPause = (event: MouseEvent): void => {
 
 const handleToggleStream = async () => {
 	if (localVideo.value) {
-		serverSideStreamingEnabled.value ? 
-			await toggleScreenshareP2P(localVideo.value) 
-			: 
-			await toggleScreenshare(localVideo.value)
+		serverSideStreamingEnabled.value
+			? await toggleScreenshareP2P(localVideo.value)
+			: await toggleScreenshare(localVideo.value)
 	}
 }
 
