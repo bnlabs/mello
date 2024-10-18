@@ -20,7 +20,6 @@ let toggleChat: ToggleChatFunction | undefined
 
 leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
 toggleChat = inject<ToggleChatFunction>("ToggleChat")
-
 toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
 </script>
 
