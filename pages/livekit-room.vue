@@ -18,7 +18,7 @@
 
 		<div class="h-[10%]">
 			<RoomInfo
-				:roomName="room ?? ''"
+				:roomName="currentRoom"
 				:usernames="participantNames"
 				:username="username ?? ''"
 				:host="currentHost"
@@ -133,7 +133,7 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
-const screenshare = async () => {
+const handleToggleStream = async () => {
 	if (localVideo.value) {
 		toggleScreenshare(localVideo.value)
 	}
@@ -184,6 +184,7 @@ onMounted(async () => {
 				localVideo.value
 			)
 			currentHost.value = username
+			currentRoom.value = room
 		} else {
 			// joining existing room
 			if (!data.roomExist) {
@@ -225,7 +226,7 @@ onBeforeUnmount(async () => {
 })
 
 provide("sendMessage", sendMessageLiveKit)
-provide("handleToggleStreamSfu", screenshare)
+provide("handleToggleStreamSfu", handleToggleStream)
 provide("ToggleChat", handleToggleChat)
 provide("leaveRoom", leave)
 </script>
