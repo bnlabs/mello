@@ -357,11 +357,6 @@ export function useLiveKit() {
 	}
 
 	const toggleScreenshareP2P = async (videoElement: HTMLMediaElement) => {
-		// turn off server-side streaming if it exist
-		const screensharePub =
-			await currentRoom.value?.localParticipant.setScreenShareEnabled(false)
-		screensharePub?.videoTrack?.attach(videoElement)
-
 		// foreach users in the lobby, create and send webrtc offer
 		// make api call to get all participants
 		const res = await fetch(
