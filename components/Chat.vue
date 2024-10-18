@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { watch, nextTick } from "vue"
-import moment from "moment"
 
 const messagesContainer = ref<HTMLElement | null>(null)
 const scrollToBottom = () => {
@@ -13,7 +12,6 @@ const scrollToBottom = () => {
 
 const props = defineProps<{
 	chats: ChatMessage[]
-	usingLiveKit: boolean
 }>()
 
 watch(() => props.chats, scrollToBottom, { deep: true })
@@ -46,7 +44,7 @@ watch(() => props.chats, scrollToBottom, { deep: true })
 		</ul>
 
 		<div class="mt-auto w-full">
-			<MessageEntry :use-live-kit="usingLiveKit" />
+			<MessageEntry />
 		</div>
 	</div>
 </template>

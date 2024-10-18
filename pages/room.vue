@@ -1,20 +1,18 @@
 <template>
 	<div class="h-screen bg-black">
-		<div class="flex h-[90%] flex-row gap-0">
+		<div class="flex h-[90%]">
 			<video
 				autoPlay
 				playsInline
 				ref="localVideo"
 				:class="chatIsOpen ? 'w-5/6' : 'w-full'"
 				:muted="isHost === 'true'"
-			></video>
+			/>
 			<Chat
 				v-if="chatIsOpen"
 				:chats="chatMessages"
 				:class="chatIsOpen ? 'w-1/6' : 'w-0'"
-				:using-live-kit="false"
-			>
-			</Chat>
+			/>
 		</div>
 
 		<div class="h-[10%]">
@@ -24,29 +22,38 @@
 				:username="username ?? ''"
 				:host="currentHost"
 				:isHost="isHost ?? ''"
-				:isSfu="false"
+				:usingSFU="serverSideStreamingEnabled"
 			/>
 		</div>
-		<!-- Dialog component -->
-		<Dialog
-			v-model="dialogVisible"
-			header="Failed to join/host"
-			:visible="dialogVisible"
-			@hide="
-				() => {
-					dialogVisible = false
-				}
-			"
-		>
-			<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
-			<Button type="button" @click="handleCloseDialog">Close</Button>
-		</Dialog>
 	</div>
+	<!-- Dialog component -->
+	<Dialog
+		v-model="dialogVisible"
+		header="Failed to join/host"
+		:visible="dialogVisible"
+		@hide="
+			() => {
+				dialogVisible = false
+			}
+		"
+	>
+		<p>Hosting/Joining room failed, error message: {{ failureMessage }}</p>
+		<Button type="button" @click="handleCloseDialog">Close</Button>
+	</Dialog>
 </template>
 
 <script setup lang="ts">
+// page data
+const localVideo = ref<HTMLMediaElement | null>(null)
 const { chatMessages } = useChatMessage()
+const currentRoom = ref<string>("")
+const currentHost = ref<string>("")
+const serverSideStreamingEnabled = ref<boolean>(false) // only relevant for host user
+
+// UI state
 const chatIsOpen = ref(true)
+const dialogVisible = useState<boolean>("diaglogVisible", () => false)
+const failureMessage = useState<string>("failureMessage", () => "")
 
 const {
 	hostRoom,
@@ -54,31 +61,22 @@ const {
 	joinRoom,
 	sendMessageLiveKit,
 	toggleScreenshareP2P,
+	toggleScreenshare,
 	cleanUpData,
-	participantNames
+	participantNames,
+	isServerSideStreaming
 } = useLiveKit()
-const currentRoom = ref("")
-const currentHost = ref("")
-const localVideo = ref<HTMLMediaElement | null>(null)
-const dialogVisible = useState<boolean>("diaglogVisible", () => false)
-const failureMessage = useState<string>("failureMessage", () => "")
 
 const route = useRoute()
 const router = useRouter()
 
+// URL param
+const { username, room, isHost, serverSideStreaming } =
+	route.query as Partial<UrlParam>
+
 const leave = async () => {
 	await leaveRoom()
 	router.push("/")
-}
-
-const handleToggleChat = () => {
-	chatIsOpen.value = !chatIsOpen.value
-}
-
-const handleToggleStream = async () => {
-	if (localVideo.value) {
-		await toggleScreenshareP2P(localVideo.value)
-	}
 }
 
 const adjustVolume = (event: KeyboardEvent) => {
@@ -138,23 +136,33 @@ const preventPlayPause = (event: MouseEvent): void => {
 	toggleFullScreen()
 }
 
+const handleToggleStream = async () => {
+	if (localVideo.value) {
+		if (serverSideStreamingEnabled.value) {
+			await toggleScreenshare(localVideo.value)
+		} else {
+			await toggleScreenshareP2P(localVideo.value)
+		}
+	}
+}
+
+const handleToggleChat = async () => {
+	chatIsOpen.value = !chatIsOpen.value
+}
+
 const handleCloseDialog = async () => {
 	failureMessage.value = ""
 	dialogVisible.value = false
 	router.push("/")
 }
 
-provide("sendMessage", sendMessageLiveKit)
-provide("handleToggleStream", handleToggleStream)
-provide("ToggleChat", handleToggleChat)
-provide("leaveRoom", leave)
-
-const { username, room, isHost } = route.query as Partial<UrlParam>
 onMounted(async () => {
 	if (!username || !room) {
 		router.push("/")
 		return
 	}
+	serverSideStreamingEnabled.value = serverSideStreaming === "true"
+	isServerSideStreaming.value = serverSideStreaming === "true"
 	// check if room already exist
 	const res = await fetch(`/api/livekit/roomCheck?roomName=${room}`, {
 		method: "GET"
@@ -179,7 +187,7 @@ onMounted(async () => {
 			await hostRoom(
 				room.toString() ?? "",
 				username.toString() ?? "",
-				false,
+				serverSideStreamingEnabled.value,
 				localVideo.value
 			)
 			currentHost.value = username
@@ -187,7 +195,6 @@ onMounted(async () => {
 		} else {
 			// joining existing room
 			if (!data.roomExist) {
-				// check if room exist
 				dialogVisible.value = true
 				failureMessage.value = "Room does not exist"
 				return
@@ -224,4 +231,9 @@ onBeforeUnmount(async () => {
 		localVideo.value.removeEventListener("click", preventPlayPause)
 	}
 })
+
+provide("sendMessage", sendMessageLiveKit)
+provide("handleToggleStream", handleToggleStream)
+provide("ToggleChat", handleToggleChat)
+provide("leaveRoom", leave)
 </script>

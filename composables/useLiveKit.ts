@@ -12,7 +12,6 @@ import {
 	DataPacket_Kind,
 	type DataPublishOptions
 } from "livekit-client"
-import type { ParticipantInfo } from "livekit-server-sdk"
 import moment from "moment"
 
 const participantNames = ref<string[]>([])
@@ -292,14 +291,6 @@ export function useLiveKit() {
 
 		// room events for p2p streaming
 		currentRoom.value?.on(RoomEvent.DataReceived, handleDataReceived)
-
-		await $fetch("/api/livekit/sendRoomInfo", {
-			method: "POST",
-			body: {
-				roomName: currentRoom.value.name,
-				usingServerSideStreaming: serverSideStreaming
-			}
-		})
 	}
 
 	const handleParticipantJoin = async (participant: Participant) => {
@@ -365,11 +356,6 @@ export function useLiveKit() {
 	}
 
 	const toggleScreenshareP2P = async (videoElement: HTMLMediaElement) => {
-		// turn off server-side streaming if it exist
-		const screensharePub =
-			await currentRoom.value?.localParticipant.setScreenShareEnabled(false)
-		screensharePub?.videoTrack?.attach(videoElement)
-
 		// foreach users in the lobby, create and send webrtc offer
 		// make api call to get all participants
 		const res = await fetch(
@@ -395,18 +381,12 @@ export function useLiveKit() {
 		) {
 			await endStream()
 		} else {
-			// this if statement block is needed because if its not there, and host toggle stream, the host will be prompted if there are more than one audience
-			if (!localStream.value) {
-				localStream.value =
-					await navigator.mediaDevices.getDisplayMedia(streamSetting)
-			}
-
-			data.result.forEach(async (p: ParticipantInfo) => {
+			for (const p of data.result) {
 				if (p.name === currentUsername.value) {
-					return
+					continue // Skip to the next iteration
 				}
 				await createOffer(p.identity, videoElement)
-			})
+			}
 		}
 	}
 
@@ -611,6 +591,7 @@ export function useLiveKit() {
 		createAnswer,
 		addAnswer,
 		toggleScreenshareP2P,
-		cleanUpData
+		cleanUpData,
+		isServerSideStreaming
 	}
 }

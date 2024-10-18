@@ -79,25 +79,14 @@ export default {
 				return
 			}
 
-			if (!data.usingServerSideStreaming) {
-				this.$router.push({
-					path: "/room",
-					query: {
-						username: this.username.trim(),
-						room: room,
-						isHost: "false"
-					}
-				})
-			} else {
-				this.$router.push({
-					path: "/livekit-room",
-					query: {
-						username: this.username.trim(),
-						room: room,
-						isHost: "false"
-					}
-				})
-			}
+			this.$router.push({
+				path: "/room",
+				query: {
+					username: this.username.trim(),
+					room: room,
+					isHost: "false"
+				}
+			})
 		},
 		async hostRoom() {
 			if (!this.room) {
@@ -135,25 +124,15 @@ export default {
 				return
 			}
 
-			if (this.serverSideStreaming) {
-				this.$router.push({
-					path: "/livekit-room",
-					query: {
-						username: this.username.trim(),
-						room: this.room.trim(),
-						isHost: "true"
-					}
-				})
-			} else {
-				this.$router.push({
-					path: "/room",
-					query: {
-						username: this.username.trim(),
-						room: this.room.trim(),
-						isHost: "true"
-					}
-				})
-			}
+			this.$router.push({
+				path: "/room",
+				query: {
+					username: this.username.trim(),
+					room: this.room.trim(),
+					isHost: "true",
+					serverSideStreaming: this.serverSideStreaming.toString()
+				}
+			})
 		},
 		setUsernameTouched() {
 			this.touched.username = true

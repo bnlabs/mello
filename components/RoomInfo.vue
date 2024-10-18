@@ -7,7 +7,7 @@ const props = defineProps<{
 	username: string
 	host: string
 	isHost: string
-	isSfu: boolean
+	usingSFU: boolean
 }>()
 
 type ToggleStreamFunction = () => void
@@ -18,15 +18,9 @@ let toggleStream: ToggleStreamFunction | undefined
 let leaveRoom: LeaveRoomFunction | undefined
 let toggleChat: ToggleChatFunction | undefined
 
-if (props.isSfu) {
-	toggleStream = inject<ToggleStreamFunction>("handleToggleStreamSfu")
-	leaveRoom = inject<LeaveRoomFunction>("leaveRoomSfu")
-	toggleChat = inject<ToggleChatFunction>("ToggleChatSfu")
-} else {
-	toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
-	leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
-	toggleChat = inject<ToggleChatFunction>("ToggleChat")
-}
+leaveRoom = inject<LeaveRoomFunction>("leaveRoom")
+toggleChat = inject<ToggleChatFunction>("ToggleChat")
+toggleStream = inject<ToggleStreamFunction>("handleToggleStream")
 </script>
 
 <template>
@@ -47,7 +41,9 @@ if (props.isSfu) {
 			<RoomUserList :users="usernames" />
 		</div>
 
-		<div class="flex flex-row gap-5 pr-3">
+		<div class="flex flex-row items-center gap-5 pr-3">
+			<div v-if="usingSFU && isHost === 'true'">Server-side streaming</div>
+			<div v-if="!usingSFU && isHost === 'true'">P2p streaming</div>
 			<Button @click="toggleChat" severity="info" outlined> Hide Chat</Button>
 			<Button v-if="isHost === 'true'" @click="toggleStream" outlined
 				>Stream</Button
