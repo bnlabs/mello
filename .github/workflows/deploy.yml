@@ -27,7 +27,7 @@ jobs:
   deploy:
     needs: [build-docker-image]
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: production
     steps:
       - name: SSH into VPS, pull docker image and run the image
