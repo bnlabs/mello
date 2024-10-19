@@ -11,6 +11,8 @@ on:
 jobs:
   tofu:
     runs-on: ubuntu-latest
+    env:  # Define environment variables for the job
+      TF_VAR_vercel_api_token: ${{ secrets.TF_VAR_vercel_api_token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
