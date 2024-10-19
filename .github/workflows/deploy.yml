@@ -28,7 +28,7 @@ jobs:
     needs: [build-docker-image]
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: dev
     steps:
       - name: SSH into VPS, pull docker image and run the image
         uses: appleboy/ssh-action@master
