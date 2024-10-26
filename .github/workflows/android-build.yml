@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          cd android && ./gradlew dependencies
+          cd android && chmod +x gradlew && ./gradlew dependencies
 
       - name: Build Android app
         run: |
@@ -32,20 +32,3 @@ jobs:
           npx cap sync android # Sync Capacitor and build the Android app
           cd android
           ./gradlew assembleRelease
-
-      # - name: Upload APK
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: android-release-apk
-      #     path: android/app/build/outputs/apk/release/app-release.apk
-
-      # - name: Publish to F-Droid
-      #   env:
-      #     FDROID_USER: ${{ secrets.FDROID_USER }} # F-Droid username
-      #     FDROID_PASS: ${{ secrets.FDROID_PASS }} # F-Droid password
-      #   run: |
-      #     echo "Publishing to F-Droid..."
-      #     # Use curl or any other method to publish your APK to F-Droid
-      #     curl -X POST -u "$FDROID_USER:$FDROID_PASS" \
-      #          -F "file=@android/app/build/outputs/apk/release/app-release.apk" \
-      #          "https://f-droid.org/upload/" # Modify URL based on your F-Droid setup
