@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: "23"
-          distribution: "adopt"
+          distribution: "oracle"
 
       - name: Install dependencies
         run: |
