@@ -31,7 +31,7 @@ jobs:
 
       - name: Build Android app
         run: |
-          npm run build # Assuming this builds your Nuxt app
+          npm run build
           npx cap sync android
           cd android
           ./gradlew assembleRelease
