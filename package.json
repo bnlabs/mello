@@ -8,8 +8,8 @@
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
-		"pretty": "prettier . --write",
-		"prettyCheck": "npx prettier --check ."
+		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\"",
+		"prettyCheck": "npx prettier --check \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\""
 	},
 	"dependencies": {
 		"livekit-client": "^2.5.7",
