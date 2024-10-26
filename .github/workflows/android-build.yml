@@ -24,11 +24,11 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          cd android && chmod +x gradlew && ./gradlew dependencies
+          cd android && chmod +w gradlew && ./gradlew dependencies
 
       - name: Build Android app
         run: |
           npm run build # Assuming this builds your Nuxt app
-          npx cap sync android # Sync Capacitor and build the Android app
+          npx cap sync android
           cd android
           ./gradlew assembleRelease
