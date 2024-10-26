@@ -1,0 +1,56 @@
+name: Deploy to F-Droid
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "23"
+          distribution: "adopt"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "23"
+
+      - name: Install dependencies
+        run: |
+          npm install
+          cd android && ./gradlew dependencies # Ensure all dependencies are installed
+
+      - name: Build Android app
+        run: |
+          npm run build # Assuming this builds your Nuxt app
+          npx cap sync android # Sync Capacitor and build the Android app
+          cd android
+          ./gradlew assembleRelease
+
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: android-release-apk
+      #     path: android/app/build/outputs/apk/release/app-release.apk
+
+      # - name: Publish to F-Droid
+      #   env:
+      #     FDROID_USER: ${{ secrets.FDROID_USER }} # F-Droid username
+      #     FDROID_PASS: ${{ secrets.FDROID_PASS }} # F-Droid password
+      #   run: |
+      #     echo "Publishing to F-Droid..."
+      #     # Use curl or any other method to publish your APK to F-Droid
+      #     curl -X POST -u "$FDROID_USER:$FDROID_PASS" \
+      #          -F "file=@android/app/build/outputs/apk/release/app-release.apk" \
+      #          "https://f-droid.org/upload/" # Modify URL based on your F-Droid setup
