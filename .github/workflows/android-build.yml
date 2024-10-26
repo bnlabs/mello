@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
+          npx cap sync
           chmod +x ./android/gradlew && chmod +w ./android/gradlew
           cd android
           ./gradlew dependencies
