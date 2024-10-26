@@ -1,8 +1,8 @@
 {
-  "appId": "mello.app",
-  "appName": "mello",
-  "server": {
-    "url": "https://mello.bnlabsolutions.net"
-  },
-  "webDir": ".nuxt"
+	"appId": "mello.app",
+	"appName": "mello",
+	"server": {
+		"url": "https://mello.bnlabsolutions.net"
+	},
+	"webDir": ".nuxt"
 }
