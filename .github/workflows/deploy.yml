@@ -44,8 +44,6 @@ jobs:
             docker run -d --restart=always \
               -p 127.0.0.1:4003:3000 \
               --name Mello \
-              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
               -e LIVEKIT_API_KEY=${{ secrets.LIVEKIT_API_KEY }} \
               -e LIVEKIT_API_SECRET=${{ secrets.LIVEKIT_API_SECRET }} \
               -e LIVEKIT_WS_URL=${{ secrets.LIVEKIT_WS_URL }} \
