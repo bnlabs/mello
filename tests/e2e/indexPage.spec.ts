@@ -29,7 +29,7 @@ test("Index page does not reroute when attempting to host a room if room name is
 	browser
 }) => {
 	// Broswer 1
-	await page.goto("http://localhost:3000/")
+	await page.goto(config.baseURL)
 
 	// Click the "Host Room" tab
 	await page.click("text=Host Room")
@@ -51,7 +51,7 @@ test("Index page does not reroute when attempting to host a room if room name is
 
 	// Browser 2
 	const page2 = await browser.newPage()
-	await page2.goto("http://localhost:3000/")
+	await page2.goto(config.baseURL)
 	const currentURL = page.url()
 
 	// Click the "Host Room" tab
