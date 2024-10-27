@@ -12,7 +12,7 @@ test("Hostroom Tab switch form", async ({ page }) => {
 	await page.goto(config.baseURL)
 
 	// Click the "Host Room" tab
-	await page.click("text=Host Room")
+	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
 
 	// Select the button using its aria-label
 	const button = page.locator('button[aria-label="Host Room"]')
@@ -32,33 +32,31 @@ test("Index page does not reroute when attempting to host a room if room name is
 	await page.goto(config.baseURL)
 
 	// Click the "Host Room" tab
-	await page.click("text=Host Room")
+	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
 
 	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
 
 	// Select the button using its aria-label
 	const button = page.locator('button[aria-label="Host Room"]')
 
-	const usernameField = page.locator("#host-username")
-	const roomField = page.locator("#host-room")
+	const usernameField = page.locator("#hostroom-username")
+	const roomField = page.locator("#hostroom-room")
 
 	await usernameField.fill("E2E-TEST" + randomThreeDigitNumber)
 	await roomField.fill("E2E-TEST" + randomThreeDigitNumber)
 
 	await button.click()
 
-	// await page.pause()
-
 	// Browser 2
 	const page2 = await browser.newPage()
 	await page2.goto(config.baseURL)
-	const currentURL = page.url()
+	const currentURL = page2.url()
 
 	// Click the "Host Room" tab
-	await page2.click("text=Host Room")
+	await page2.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
 
-	const usernameField2 = page2.locator("#host-username")
-	const roomField2 = page2.locator("#host-room")
+	const usernameField2 = page2.locator("#hostroom-username")
+	const roomField2 = page2.locator("#hostroom-room")
 
 	await usernameField2.fill("E2E-TEST" + randomThreeDigitNumber)
 	await roomField2.fill("E2E-TEST" + randomThreeDigitNumber)
@@ -66,4 +64,44 @@ test("Index page does not reroute when attempting to host a room if room name is
 	page2.locator('button[aria-label="Host Room"]').click()
 
 	await expect(page2).toHaveURL(currentURL)
+})
+
+test.only("Index Page won't reroute if username is taken", async ({
+	page,
+	browser
+}) => {
+	// Broswer 1
+	await page.goto(config.baseURL)
+
+	// Click the "Host Room" tab
+	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
+
+	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
+
+	// Select the button using its aria-label
+	const button = page.locator('button[aria-label="Host Room"]')
+
+	const usernameField = page.locator("#hostroom-username")
+	const roomField = page.locator("#hostroom-room")
+
+	await usernameField.fill("E2E-TEST" + randomThreeDigitNumber)
+	await roomField.fill("E2E-TEST" + randomThreeDigitNumber)
+
+	await button.click()
+
+    // Browser 2
+	const page2 = await browser.newPage()
+	await page2.goto(config.baseURL)
+	const currentURL = page2.url()
+
+	const usernameField2 = page2.locator("#joinroom-username")
+	const roomField2 = page2.locator("#joinroom-room")
+
+	await usernameField2.fill("E2E-TEST" + randomThreeDigitNumber)
+	await roomField2.fill("E2E-TEST" + randomThreeDigitNumber)
+
+	page2.locator('button[aria-label="Join Room"]').click()
+
+	await expect(page2).toHaveURL(currentURL)
+
 })
