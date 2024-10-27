@@ -25,7 +25,6 @@ test("Hostroom Tab switch form", async ({ page }) => {
 })
 
 test("Host room reroute page to /room", async ({ page }) => {
-	// Broswer 1
 	await page.goto(config.baseURL)
 
 	// Click the "Host Room" tab
