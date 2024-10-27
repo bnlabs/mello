@@ -220,7 +220,7 @@ export default {
 								<InputText
 									autofocus
 									class="w-full"
-									id="username"
+									id="host-username"
 									v-model="username"
 									@focus="setUsernameTouched"
 									aria-describedby="username-help"
@@ -234,7 +234,7 @@ export default {
 								<label for="room">Room</label>
 								<InputText
 									class="w-full"
-									id="room"
+									id="host-room"
 									v-model="room"
 									@focus="setRoomTouched"
 									aria-describedby="room-help"
