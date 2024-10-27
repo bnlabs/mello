@@ -38,8 +38,8 @@ test("Host room reroute page to /room", async ({ page }) => {
 	const usernameField = page.locator("#hostroom-username")
 	const roomField = page.locator("#hostroom-room")
 
-	const usernameInput = "E2E-TEST" + randomThreeDigitNumber
-	const roomInput = "E2E-TEST" + randomThreeDigitNumber
+	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
+	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
 
 	await usernameField.fill(usernameInput)
 	await roomField.fill(roomInput)
@@ -47,7 +47,16 @@ test("Host room reroute page to /room", async ({ page }) => {
 	await button.click()
 
 	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
+
+    // Wait for the API response
+    const response = await page.waitForResponse(response => 
+        response.url().includes('/api/livekit/roomCheck') && response.status() === 200
+    )
+
+    await expect(response.status()).toBe(200)
+
 	await expect(page).toHaveURL(expectedUrl)
+    await expect(page.locator("text=E2E-TEST-ROOMNAME")).toBeVisible()
 })
 
 // test("Index page does not reroute when attempting to host a room if room name is taken", async ({
