@@ -24,9 +24,7 @@ test("Hostroom Tab switch form", async ({ page }) => {
 	await expect(button).toBeVisible()
 })
 
-test("Host room reroute page to /room", async ({
-	page
-}) => {
+test("Host room reroute page to /room", async ({ page }) => {
 	// Broswer 1
 	await page.goto(config.baseURL)
 
@@ -41,16 +39,16 @@ test("Host room reroute page to /room", async ({
 	const usernameField = page.locator("#hostroom-username")
 	const roomField = page.locator("#hostroom-room")
 
-    const usernameInput = "E2E-TEST" + randomThreeDigitNumber
-    const roomInput = "E2E-TEST" + randomThreeDigitNumber
+	const usernameInput = "E2E-TEST" + randomThreeDigitNumber
+	const roomInput = "E2E-TEST" + randomThreeDigitNumber
 
 	await usernameField.fill(usernameInput)
 	await roomField.fill(roomInput)
 
 	await button.click()
 
-    const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
-    await expect(page).toHaveURL(expectedUrl)
+	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
+	await expect(page).toHaveURL(expectedUrl)
 })
 
 // test("Index page does not reroute when attempting to host a room if room name is taken", async ({
