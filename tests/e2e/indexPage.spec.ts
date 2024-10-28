@@ -122,10 +122,7 @@ test("User can't host room if room name is taken", async ({
 	await expect(page2).toHaveURL(config.baseURL)
 })
 
-test("User can't join room if username is taken", async ({
-	page,
-	browser
-}) => {
+test("User can't join room if username is taken", async ({ page, browser }) => {
 	await page.goto(config.baseURL)
 
 	// user 1 host a room
