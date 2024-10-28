@@ -96,7 +96,7 @@ test("User can't host room if room name is taken", async ({
 	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
 	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
 
-	await page.waitForTimeout(1000)
+	await page.waitForTimeout(4000)
 
 	// user 2 attempting to host room with the same name and room
 	const page2 = await browser.newPage()
@@ -110,6 +110,63 @@ test("User can't host room if room name is taken", async ({
 	await page2.locator("#hostroom-username").fill("user2")
 	await page2.locator("#hostroom-room").fill(roomInput)
 	await page2.locator('button[aria-label="Host Room"]').click()
+	const response2 = await page2.waitForResponse(
+		(response) =>
+			response.url().includes("/api/livekit/roomCheck") &&
+			response.status() === 200
+	)
+	expect(response2.status()).toBe(200)
+
+	await page2.waitForTimeout(1000)
+
+	await expect(page2).toHaveURL(config.baseURL)
+})
+
+test("User can't join room if username is taken", async ({
+	page,
+	browser
+}) => {
+	await page.goto(config.baseURL)
+
+	// user 1 host a room
+
+	// Click the "Host Room" tab
+	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
+	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
+	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
+	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
+
+	// user fill in info to host room
+	await page.locator("#hostroom-username").fill(usernameInput)
+	await page.locator("#hostroom-room").fill(roomInput)
+
+	// click host room button
+	await page.locator('button[aria-label="Host Room"]').click()
+
+	// assert user 1 host room successfully
+	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
+	const response = await page.waitForResponse(
+		(response) =>
+			response.url().includes("/api/livekit/roomCheck") &&
+			response.status() === 200
+	)
+	expect(response.status()).toBe(200)
+	await expect(page).toHaveURL(expectedUrl)
+
+	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
+	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
+
+	await page.waitForTimeout(4000)
+
+	// user 2 attempting to host room with the same name and room
+	const page2 = await browser.newPage()
+
+	await page2.goto(config.baseURL)
+
+	// user fill in info to host room
+	await page2.locator("#joinroom-username").fill(usernameInput)
+	await page2.locator("#joinroom-room").fill(roomInput)
+	await page2.locator('button[aria-label="Join Room"]').click()
 	const response2 = await page2.waitForResponse(
 		(response) =>
 			response.url().includes("/api/livekit/roomCheck") &&
