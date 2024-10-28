@@ -1,4 +1,4 @@
-const isLocal = true
+const isLocal = false
 
 export const config = {
 	baseURL: isLocal
