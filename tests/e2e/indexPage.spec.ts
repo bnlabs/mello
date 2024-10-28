@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { config } from "./E2eConfig"
+import { AssertRoomHosted, UserHostRoom } from "./HelperFunction"
 
 test("Page render correctly", async ({ page }) => {
 	await page.goto(config.baseURL)
@@ -25,38 +26,69 @@ test("Hostroom Tab switch form", async ({ page }) => {
 })
 
 test("Host room reroute page to /room", async ({ page }) => {
-	await page.goto(config.baseURL)
+	const { usernameInput, roomInput } = await UserHostRoom(page)
 
-	// Click the "Host Room" tab
-	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
+	await AssertRoomHosted(page, usernameInput, roomInput)
+})
 
-	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
+test("User can't host room if room name is taken", async ({
+	page,
+	browser
+}) => {
+	const { usernameInput, roomInput } = await UserHostRoom(page)
 
-	// Select the button using its aria-label
-	const button = page.locator('button[aria-label="Host Room"]')
+	await AssertRoomHosted(page, usernameInput, roomInput)
 
-	const usernameField = page.locator("#hostroom-username")
-	const roomField = page.locator("#hostroom-room")
+	await page.waitForTimeout(4000)
 
-	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
-	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
+	// user 2 attempting to host room with the same name and room
+	const page2 = await browser.newPage()
 
-	await usernameField.fill(usernameInput)
-	await roomField.fill(roomInput)
+	await page2.goto(config.baseURL)
 
-	await button.click()
+	// click on host room tab
+	await page2.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
 
-	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
-
-	// Wait for the API response
-	const response = await page.waitForResponse(
+	// user fill in info to host room
+	await page2.locator("#hostroom-username").fill("user2")
+	await page2.locator("#hostroom-room").fill(roomInput)
+	await page2.locator('button[aria-label="Host Room"]').click()
+	const response2 = await page2.waitForResponse(
 		(response) =>
 			response.url().includes("/api/livekit/roomCheck") &&
 			response.status() === 200
 	)
+	expect(response2.status()).toBe(200)
 
-	expect(response.status()).toBe(200)
+	await page2.waitForTimeout(1000)
 
-	await expect(page).toHaveURL(expectedUrl)
-	await expect(page.locator("text=E2E-TEST-ROOMNAME")).toBeVisible()
+	await expect(page2).toHaveURL(config.baseURL)
+})
+
+test("User can't join room if username is taken", async ({ page, browser }) => {
+	const { usernameInput, roomInput } = await UserHostRoom(page)
+
+	await AssertRoomHosted(page, usernameInput, roomInput)
+
+	await page.waitForTimeout(4000)
+
+	// user 2 attempting to host room with the same name and room
+	const page2 = await browser.newPage()
+
+	await page2.goto(config.baseURL)
+
+	// user fill in info to host room
+	await page2.locator("#joinroom-username").fill(usernameInput)
+	await page2.locator("#joinroom-room").fill(roomInput)
+	await page2.locator('button[aria-label="Join Room"]').click()
+	const response2 = await page2.waitForResponse(
+		(response) =>
+			response.url().includes("/api/livekit/roomCheck") &&
+			response.status() === 200
+	)
+	expect(response2.status()).toBe(200)
+
+	await page2.waitForTimeout(1000)
+
+	await expect(page2).toHaveURL(config.baseURL)
 })
