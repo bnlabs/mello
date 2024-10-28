@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { config } from "./E2eConfig"
+import { UserHostRoom } from "./HelperFunction"
 
 test("Page render correctly", async ({ page }) => {
 	await page.goto(config.baseURL)
@@ -66,22 +67,7 @@ test("User can't host room if room name is taken", async ({
 	page,
 	browser
 }) => {
-	await page.goto(config.baseURL)
-
-	// user 1 host a room
-
-	// Click the "Host Room" tab
-	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
-	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
-	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
-	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
-
-	// user fill in info to host room
-	await page.locator("#hostroom-username").fill(usernameInput)
-	await page.locator("#hostroom-room").fill(roomInput)
-
-	// click host room button
-	await page.locator('button[aria-label="Host Room"]').click()
+	const { usernameInput, roomInput } = await UserHostRoom(page)
 
 	// assert user 1 host room successfully
 	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
@@ -123,22 +109,7 @@ test("User can't host room if room name is taken", async ({
 })
 
 test("User can't join room if username is taken", async ({ page, browser }) => {
-	await page.goto(config.baseURL)
-
-	// user 1 host a room
-
-	// Click the "Host Room" tab
-	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
-	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
-	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
-	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
-
-	// user fill in info to host room
-	await page.locator("#hostroom-username").fill(usernameInput)
-	await page.locator("#hostroom-room").fill(roomInput)
-
-	// click host room button
-	await page.locator('button[aria-label="Host Room"]').click()
+	const { usernameInput, roomInput } = await UserHostRoom(page)
 
 	// assert user 1 host room successfully
 	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
