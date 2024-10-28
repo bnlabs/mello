@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { config } from "./E2eConfig"
-import { UserHostRoom } from "./HelperFunction"
+import { AssertRoomHosted, UserHostRoom } from "./HelperFunction"
 
 test("Page render correctly", async ({ page }) => {
 	await page.goto(config.baseURL)
@@ -28,20 +28,7 @@ test("Hostroom Tab switch form", async ({ page }) => {
 test("Host room reroute page to /room", async ({ page }) => {
 	const { usernameInput, roomInput } = await UserHostRoom(page)
 
-	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
-
-	// Wait for the API response
-	const response = await page.waitForResponse(
-		(response) =>
-			response.url().includes("/api/livekit/roomCheck") &&
-			response.status() === 200
-	)
-
-	expect(response.status()).toBe(200)
-
-	await expect(page).toHaveURL(expectedUrl)
-	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
-	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
+	await AssertRoomHosted(page, usernameInput, roomInput)
 })
 
 test("User can't host room if room name is taken", async ({
@@ -50,18 +37,7 @@ test("User can't host room if room name is taken", async ({
 }) => {
 	const { usernameInput, roomInput } = await UserHostRoom(page)
 
-	// assert user 1 host room successfully
-	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
-	const response = await page.waitForResponse(
-		(response) =>
-			response.url().includes("/api/livekit/roomCheck") &&
-			response.status() === 200
-	)
-	expect(response.status()).toBe(200)
-	await expect(page).toHaveURL(expectedUrl)
-
-	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
-	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
+	await AssertRoomHosted(page, usernameInput, roomInput)
 
 	await page.waitForTimeout(4000)
 
@@ -92,18 +68,7 @@ test("User can't host room if room name is taken", async ({
 test("User can't join room if username is taken", async ({ page, browser }) => {
 	const { usernameInput, roomInput } = await UserHostRoom(page)
 
-	// assert user 1 host room successfully
-	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
-	const response = await page.waitForResponse(
-		(response) =>
-			response.url().includes("/api/livekit/roomCheck") &&
-			response.status() === 200
-	)
-	expect(response.status()).toBe(200)
-	await expect(page).toHaveURL(expectedUrl)
-
-	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
-	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
+	await AssertRoomHosted(page, usernameInput, roomInput)
 
 	await page.waitForTimeout(4000)
 

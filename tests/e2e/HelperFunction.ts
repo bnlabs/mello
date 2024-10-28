@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
 import { config } from "./E2eConfig"
 
 type UserHostRoomResult = {
@@ -22,4 +22,23 @@ export const UserHostRoom = async (page: Page): Promise<UserHostRoomResult> => {
 	await page.locator('button[aria-label="Host Room"]').click()
 
 	return { usernameInput, roomInput }
+}
+
+export const AssertRoomHosted = async (
+	page: Page,
+	username: string,
+	room: string
+) => {
+	const expectedUrl = `${config.baseURL}room?username=${username}&room=${room}&isHost=true&serverSideStreaming=false`
+	const response = await page.waitForResponse(
+		(response) =>
+			response.url().includes("/api/livekit/roomCheck") &&
+			response.status() === 200
+	)
+
+	expect(response.status()).toBe(200)
+
+	await expect(page).toHaveURL(expectedUrl)
+	await expect(page.locator(`text=${username}`)).toBeVisible()
+	await expect(page.locator(`text=${room}`)).toBeVisible()
 }
