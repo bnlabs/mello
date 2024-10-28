@@ -62,9 +62,9 @@ test("Host room reroute page to /room", async ({ page }) => {
 	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
 })
 
-test("User can't host room if room name is taken", async ({ 
-	page, 
-	browser 
+test("User can't host room if room name is taken", async ({
+	page,
+	browser
 }) => {
 	await page.goto(config.baseURL)
 
@@ -96,7 +96,7 @@ test("User can't host room if room name is taken", async ({
 	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
 	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
 
-	await page.waitForTimeout(1000);
+	await page.waitForTimeout(1000)
 
 	// user 2 attempting to host room with the same name and room
 	const page2 = await browser.newPage()
@@ -118,6 +118,6 @@ test("User can't host room if room name is taken", async ({
 	expect(response2.status()).toBe(200)
 
 	await page2.waitForTimeout(1000)
-	
+
 	await expect(page2).toHaveURL(config.baseURL)
 })
