@@ -58,5 +58,6 @@ test("Host room reroute page to /room", async ({ page }) => {
 	expect(response.status()).toBe(200)
 
 	await expect(page).toHaveURL(expectedUrl)
-	await expect(page.locator("text=E2E-TEST-ROOMNAME")).toBeVisible()
+	await expect(page.locator(`text=${usernameInput}`)).toBeVisible()
+	await expect(page.locator(`text=${roomInput}`)).toBeVisible()
 })
