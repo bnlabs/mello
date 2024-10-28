@@ -6,7 +6,7 @@ import {
 	QuickHostRoom
 } from "./HelperFunction"
 
-test("Host can stream to audience (P2p)", async ({ page, browser }) => {
+test("User can join room", async ({ page, browser }) => {
 	const { usernameInput, roomInput } = await QuickHostRoom(page)
 
 	await AssertRoomHosted(page, usernameInput, roomInput)
