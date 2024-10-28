@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test } from "@playwright/test"
 import { config } from "./E2eConfig"
 import {
 	AssertRoomHosted,
