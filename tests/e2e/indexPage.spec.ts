@@ -26,26 +26,7 @@ test("Hostroom Tab switch form", async ({ page }) => {
 })
 
 test("Host room reroute page to /room", async ({ page }) => {
-	await page.goto(config.baseURL)
-
-	// Click the "Host Room" tab
-	await page.click('a[role="tab"][aria-controls="pv_id_1_1_content"]')
-
-	const randomThreeDigitNumber = Math.floor(Math.random() * 900) + 100
-
-	// Select the button using its aria-label
-	const button = page.locator('button[aria-label="Host Room"]')
-
-	const usernameField = page.locator("#hostroom-username")
-	const roomField = page.locator("#hostroom-room")
-
-	const usernameInput = "E2E-TEST-USERNAME" + randomThreeDigitNumber
-	const roomInput = "E2E-TEST-ROOMNAME" + randomThreeDigitNumber
-
-	await usernameField.fill(usernameInput)
-	await roomField.fill(roomInput)
-
-	await button.click()
+	const { usernameInput, roomInput } = await UserHostRoom(page)
 
 	const expectedUrl = `${config.baseURL}room?username=${usernameInput}&room=${roomInput}&isHost=true&serverSideStreaming=false`
 
