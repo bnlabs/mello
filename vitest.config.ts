@@ -3,7 +3,10 @@ import { defineVitestConfig } from "@nuxt/test-utils/config"
 
 export default defineVitestConfig({
 	test: {
-		environment: "nuxt"
+		environment: "nuxt",
+		include: [
+			"tests/integrations/**/**" // Include integration tests
+		]
 		// you can optionally set Nuxt-specific environment options
 		// environmentOptions: {
 		//   nuxt: {

@@ -94,7 +94,7 @@ export default {
 			} else {
 				// Check if room already exist
 				const res = await fetch(
-					`/api/livekit/roomCheck?roomName=${this.room}&username=${this.username}`,
+					`/api/livekit/roomCheck?roomName=${this.room.trim()}&username=${this.username.trim()}`,
 					{
 						method: "GET"
 					}
@@ -164,7 +164,7 @@ export default {
 								<InputText
 									autofocus
 									class="w-full"
-									id="username"
+									id="joinroom-username"
 									v-model="username"
 									@focus="setUsernameTouched"
 									aria-describedby="username-help"
@@ -178,7 +178,7 @@ export default {
 								<label for="room">Room</label>
 								<InputText
 									class="w-full"
-									id="room"
+									id="joinroom-room"
 									v-model="room"
 									@focus="setRoomTouched"
 									aria-describedby="room-help"
@@ -220,7 +220,7 @@ export default {
 								<InputText
 									autofocus
 									class="w-full"
-									id="username"
+									id="hostroom-username"
 									v-model="username"
 									@focus="setUsernameTouched"
 									aria-describedby="username-help"
@@ -234,7 +234,7 @@ export default {
 								<label for="room">Room</label>
 								<InputText
 									class="w-full"
-									id="room"
+									id="hostroom-room"
 									v-model="room"
 									@focus="setRoomTouched"
 									aria-describedby="room-help"
