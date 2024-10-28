@@ -94,7 +94,7 @@ export default {
 			} else {
 				// Check if room already exist
 				const res = await fetch(
-					`/api/livekit/roomCheck?roomName=${this.room}&username=${this.username}`,
+					`/api/livekit/roomCheck?roomName=${this.room.trim()}&username=${this.username.trim()}`,
 					{
 						method: "GET"
 					}
