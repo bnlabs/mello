@@ -3,7 +3,7 @@ module ops
 go 1.22.2
 
 require (
-	lesiw.io/cmdio v0.5.0
+	lesiw.io/cmdio v0.8.0
 	lesiw.io/ops v0.13.0
 )
 
