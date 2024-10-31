@@ -6,7 +6,6 @@ import {
 	QuickHostRoom
 } from "./HelperFunction"
 
-
 test("User can join room", async ({ page, browser }) => {
 	const { usernameInput, roomInput } = await QuickHostRoom(page)
 
@@ -46,12 +45,11 @@ test("User can send chat message in lobby", async ({ page, browser }) => {
 
 	// send chat message
 	await messageEntry.fill("Hello world!")
-	await page2.keyboard.press('Enter')
+	await page2.keyboard.press("Enter")
 
 	await page2.waitForTimeout(5000)
 
 	// user 1 can see message from user 2
 	const textLocator = page.locator('text="Hello world!"')
 	await expect(textLocator).toBeVisible()
-
 })
