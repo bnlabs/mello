@@ -47,7 +47,7 @@ test("User can send chat message in lobby", async ({ page, browser }) => {
 	await messageEntry.fill("Hello world!")
 	await page2.keyboard.press("Enter")
 
-	await page2.waitForTimeout(5000)
+	await page2.waitForSelector('text="Hello world!"', { state: "visible" })
 
 	// user 1 can see message from user 2
 	const textLocator = page.locator('text="Hello world!"')
