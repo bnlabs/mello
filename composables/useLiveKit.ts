@@ -14,8 +14,9 @@ import {
 } from "livekit-client"
 import moment from "moment"
 
+const runtimeConfig = useRuntimeConfig()
 const participantNames = ref<string[]>([])
-const wsUrl = "wss://mello-d6rzaz12.livekit.cloud"
+const wsUrl = runtimeConfig.public.livekitWSurl
 const token = ref<string>("")
 const currentRoom = ref<Room | null>(null)
 const currentUsername = ref<string>("")

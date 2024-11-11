@@ -22,5 +22,10 @@ export default defineNuxtConfig({
 			ripple: true,
 			inputStyle: "filled"
 		}
+	},
+	runtimeConfig: {
+		public: {
+		  livekitWSurl: 'wss://mello-d6rzaz12.livekit.cloud'
+		}
 	}
 })
