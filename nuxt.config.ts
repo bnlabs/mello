@@ -25,7 +25,7 @@ export default defineNuxtConfig({
 	},
 	runtimeConfig: {
 		public: {
-		  livekitWSurl: 'wss://mello-d6rzaz12.livekit.cloud'
+			livekitWSurl: "wss://mello-d6rzaz12.livekit.cloud"
 		}
 	}
 })
