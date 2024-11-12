@@ -12,6 +12,9 @@
 		"prettyCheck": "npx prettier --check \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\""
 	},
 	"dependencies": {
+		"@capacitor/android": "^6.1.2",
+		"@capacitor/cli": "^6.1.2",
+		"@capacitor/core": "^6.1.2",
 		"livekit-client": "^2.5.7",
 		"livekit-server-sdk": "^2.7.0",
 		"moment": "^2.30.1",
