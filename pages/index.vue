@@ -148,11 +148,9 @@ export default {
 	<Toast />
 	<Navbar class="absolute left-0 top-0" />
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
-		<TabView class="shadow-2xl sm:h-2/12 md:h-3/12 lg:w-3/12 ">
+		<TabView class="sm:h-2/12 md:h-3/12 shadow-2xl lg:w-3/12">
 			<TabPanel header="Join Room">
-				<div
-					class="flex flex-col items-center justify-center"
-				>
+				<div class="flex flex-col items-center justify-center">
 					<form
 						v-focustrap
 						@submit.prevent="joinRoom"
