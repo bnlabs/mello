@@ -1,0 +1,8 @@
+{
+	"appId": "mello.mobile",
+	"appName": "mello",
+	"webDir": ".nuxt",
+	"server": {
+		"url": "https://mello.bnlabsolutions.net"
+	}
+}

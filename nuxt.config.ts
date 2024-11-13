@@ -27,5 +27,12 @@ export default defineNuxtConfig({
 		public: {
 			livekitWSurl: "wss://mello-d6rzaz12.livekit.cloud"
 		}
+	},
+	devServer: {
+		port: 3000,
+		https: {
+			key: "./certs/localhost-key.pem",
+			cert: "./certs/localhost.pem"
+		}
 	}
 })
