@@ -148,10 +148,10 @@ export default {
 	<Toast />
 	<Navbar class="absolute left-0 top-0" />
 	<div class="flex h-screen items-center justify-center bg-[#82d2e8]">
-		<TabView class="shadow-2xl">
+		<TabView class="shadow-2xl sm:h-2/12 md:h-3/12 lg:w-3/12 ">
 			<TabPanel header="Join Room">
 				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
+					class="flex flex-col items-center justify-center"
 				>
 					<form
 						v-focustrap
@@ -201,7 +201,7 @@ export default {
 			</TabPanel>
 			<TabPanel header="Host Room">
 				<div
-					class="flex h-[350px] w-[500px] flex-col items-center justify-center"
+					class="flex flex-col items-center justify-center md:w-10/12 lg:w-full"
 				>
 					<form
 						v-focustrap
